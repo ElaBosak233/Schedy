@@ -1,0 +1,3 @@
+# Schedy
+
+A minimalist schedule
