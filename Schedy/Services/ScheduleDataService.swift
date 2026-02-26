@@ -47,7 +47,38 @@ func seedDefaultPresetsIfNeeded(modelContext: ModelContext) {
     try? modelContext.save()
 }
 
-/// 本学期第一天：取下一个周一，若今天已是周一则取今天
+/// 若预设的节次不足，则按「上一节结束 + 10 分钟」为下一节开始、每节 40 分钟，补齐到 requiredPeriodCount 节
+@MainActor
+func extendPresetToCoverPeriodIfNeeded(preset: TimeSlotPreset?, requiredPeriodCount: Int, modelContext: ModelContext) {
+    guard let preset = preset, requiredPeriodCount > 0 else { return }
+    let sortedSlots = preset.slots.sorted { $0.periodIndex < $1.periodIndex }
+    let maxPeriod = sortedSlots.map(\.periodIndex).max() ?? 0
+    guard maxPeriod < requiredPeriodCount else { return }
+
+    let cal = Calendar.current
+    var ref: Date
+    if let last = sortedSlots.last {
+        ref = cal.date(bySettingHour: last.endHour, minute: last.endMinute, second: 0, of: Date())!
+    } else {
+        ref = cal.date(bySettingHour: 8, minute: 0, second: 0, of: Date())!
+    }
+
+    for period in (maxPeriod + 1) ... requiredPeriodCount {
+        let gapMinutes = (period == maxPeriod + 1 && sortedSlots.isEmpty) ? 0 : 10
+        let nextStart = cal.date(byAdding: .minute, value: gapMinutes, to: ref)!
+        let nextEnd = cal.date(byAdding: .minute, value: 40, to: nextStart)!
+        let startH = cal.component(.hour, from: nextStart)
+        let startM = cal.component(.minute, from: nextStart)
+        let endH = cal.component(.hour, from: nextEnd)
+        let endM = cal.component(.minute, from: nextEnd)
+        let slot = TimeSlotItem(periodIndex: period, startHour: startH, startMinute: startM, endHour: endH, endMinute: endM)
+        slot.preset = preset
+        preset.slots.append(slot)
+        modelContext.insert(slot)
+        ref = nextEnd
+    }
+    try? modelContext.save()
+}
 private func defaultSemesterStartDate() -> Date {
     let cal = Calendar.current
     let today = cal.startOfDay(for: Date())

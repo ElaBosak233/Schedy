@@ -10,6 +10,66 @@ import SwiftUI
 
 private let maxWeeks = 25
 
+/// 复用 DateFormatter，避免在滚动/翻页时重复创建造成卡顿
+private enum ScheduleDateFormatters {
+    static let shortMD: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "M/d"
+        f.locale = Locale(identifier: "zh_CN")
+        return f
+    }()
+    static let monthDay: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "M月d日"
+        f.locale = Locale(identifier: "zh_CN")
+        return f
+    }()
+}
+
+/// 当周课程网格预计算结果，避免每个格子重复 filter 课程列表，减轻翻页卡顿
+private struct WeekCourseGrid {
+    /// [dayIndex 0..<7][slotIndex]，该格是否有课程在此「开始」且本周有课
+    let starting: [[Course?]]
+    /// [dayIndex 0..<7][slotIndex]，该格是否有课程在此「开始」且仅其他周有课（非本周半透明）
+    let notThisWeek: [[Course?]]
+    /// [dayIndex 0..<7][slotIndex]，该格是否被任意本周课程占用
+    let hasCourse: [[Bool]]
+
+    init?(week: Int, schedule: Schedule?, sortedSlots: [TimeSlotItem], maxWeeks: Int) {
+        guard let schedule = schedule else { return nil }
+        let slotCount = sortedSlots.count
+        var starting = [[Course?]](repeating: [Course?](repeating: nil, count: slotCount), count: 7)
+        var notThisWeek = [[Course?]](repeating: [Course?](repeating: nil, count: slotCount), count: 7)
+        var hasCourse = [[Bool]](repeating: [Bool](repeating: false, count: slotCount), count: 7)
+
+        for c in schedule.courses {
+            let applies = c.appliesToWeek(week)
+            let hasFuture = week < maxWeeks && (week + 1...maxWeeks).contains(where: { c.appliesToWeek($0) })
+            let dayIndex = c.dayOfWeek - 1
+            guard dayIndex >= 0, dayIndex < 7 else { continue }
+            let startPeriod = c.periodIndex
+            let endPeriod = c.effectivePeriodEnd
+
+            for (slotIndex, slot) in sortedSlots.enumerated() {
+                let period = slot.periodIndex
+                if period >= startPeriod && period <= endPeriod && applies {
+                    hasCourse[dayIndex][slotIndex] = true
+                }
+                if period == startPeriod {
+                    if applies {
+                        starting[dayIndex][slotIndex] = c
+                    } else if hasFuture {
+                        notThisWeek[dayIndex][slotIndex] = c
+                    }
+                }
+            }
+        }
+        self.starting = starting
+        self.notThisWeek = notThisWeek
+        self.hasCourse = hasCourse
+    }
+}
+
 struct ScheduleGridView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
@@ -40,12 +100,6 @@ struct ScheduleGridView: View {
         return p.slots.sorted { $0.periodIndex < $1.periodIndex }
     }
 
-    /// 当前课程表下、指定周次的课程（按周次范围与单双周过滤）
-    private func displayedCourses(forWeek week: Int) -> [Course] {
-        guard let schedule = activeSchedule else { return [] }
-        return schedule.courses.filter { $0.appliesToWeek(week) }
-    }
-
     private let rowHeight: CGFloat = 52
 
     /// 根据学期第一天计算「第 week 周、周 day」对应的日期（周一=1）
@@ -59,18 +113,12 @@ struct ScheduleGridView: View {
 
     private func dateString(forWeek week: Int, day: Int) -> String {
         guard let d = date(forWeek: week, day: day) else { return "" }
-        let f = DateFormatter()
-        f.dateFormat = "M/d"
-        f.locale = Locale(identifier: "zh_CN")
-        return f.string(from: d)
+        return ScheduleDateFormatters.shortMD.string(from: d)
     }
 
     /// 今日日期文案，如 "2月26日"
     private var todayDateString: String {
-        let f = DateFormatter()
-        f.dateFormat = "M月d日"
-        f.locale = Locale(identifier: "zh_CN")
-        return f.string(from: Date())
+        ScheduleDateFormatters.monthDay.string(from: Date())
     }
 
     /// 根据当前日期与学期第一天计算：第X周 / 未开学 / 学期已结束
@@ -97,28 +145,6 @@ struct ScheduleGridView: View {
         let week = days / 7 + 1
         if week > maxWeeks { return 1 }
         return min(max(1, week), maxWeeks)
-    }
-
-    /// 某天某节是否有课程占用（含跨节课程覆盖该节）
-    private func course(day: Int, period: Int, week: Int) -> Course? {
-        displayedCourses(forWeek: week).first { c in
-            c.dayOfWeek == day && period >= c.periodIndex && period <= c.effectivePeriodEnd
-        }
-    }
-
-    /// 某天某节是否有课程在此「开始」（用于画跨行格子的第一行）
-    private func courseStarting(day: Int, period: Int, week: Int) -> Course? {
-        displayedCourses(forWeek: week).first { $0.dayOfWeek == day && $0.periodIndex == period }
-    }
-
-    /// 某天某节是否有课程在此「开始」但不在当前周（其他周有课、本周无课 → 显示半透明「非本周」块）
-    private func courseStartingNotThisWeek(day: Int, period: Int, week: Int) -> Course? {
-        guard let schedule = activeSchedule else { return nil }
-        return schedule.courses.first { c in
-            guard c.dayOfWeek == day && c.periodIndex == period else { return false }
-            guard !c.appliesToWeek(week) else { return false }
-            return (1...maxWeeks).first(where: { w in w != week && c.appliesToWeek(w) }) != nil
-        }
     }
 
     var body: some View {
@@ -179,6 +205,7 @@ struct ScheduleGridView: View {
                 }
                 viewingWeek = defaultViewingWeek
                 refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
+                scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
                 // 延迟再刷一次，确保 @Query 已就绪、数据已写入 App Group，小组件能读到
                 Task { @MainActor in
                     try? await Task.sleep(for: .milliseconds(600))
@@ -188,10 +215,12 @@ struct ScheduleGridView: View {
             .onChange(of: activeScheduleName) { _, _ in
                 viewingWeek = defaultViewingWeek
                 refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
+                scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
             }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active {
                     refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
+                    scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
                 }
             }
         }
@@ -217,28 +246,9 @@ struct ScheduleGridView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
-            topInfoBar
             weekIndicator
         }
         .background(.ultraThinMaterial)
-    }
-
-    /// 独立一行：今日日期 + 学期周次状态（纯文字）
-    private var topInfoBar: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(todayDateString)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundStyle(.primary)
-                Text(semesterWeekStatusString)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer(minLength: 0)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
     }
 
     /// 当前周次指示 + 左右滑动提示
@@ -249,16 +259,21 @@ struct ScheduleGridView: View {
                 .fontWeight(.semibold)
                 .foregroundStyle(.secondary)
             Spacer()
-            Text("左右滑动切换周次")
+            Text(todayDateString)
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundStyle(.primary)
+            Text(semesterWeekStatusString)
                 .font(.caption2)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(.secondary)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
     }
 
     private func scheduleTable(week: Int) -> some View {
-        VStack(spacing: 0) {
+        let grid = WeekCourseGrid(week: week, schedule: activeSchedule, sortedSlots: sortedSlots, maxWeeks: maxWeeks)
+        return VStack(spacing: 0) {
             // 固定表头：不随滚动
             HStack(alignment: .top, spacing: 0) {
                 timeColumnHeader
@@ -273,12 +288,12 @@ struct ScheduleGridView: View {
             ScrollView {
                 ZStack(alignment: .top) {
                     VStack(spacing: 0) {
-                        ForEach(sortedSlots, id: \.periodIndex) { slot in
-                            scheduleRow(periodSlot: slot, week: week)
+                        ForEach(Array(sortedSlots.enumerated()), id: \.element.periodIndex) { slotIndex, slot in
+                            scheduleRow(periodSlot: slot, grid: grid, slotIndex: slotIndex)
                         }
                     }
                     .overlay(alignment: .top) {
-                        courseBlocksOverlay(week: week)
+                        courseBlocksOverlay(grid: grid)
                     }
                 }
                 .padding(.bottom, 24)
@@ -288,47 +303,52 @@ struct ScheduleGridView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    /// 与表格行同结构的 overlay，只画课程块；每行固定 52pt，课程块用 overlay 向下溢出
-    private func courseBlocksOverlay(week: Int) -> some View {
+    /// 与表格行同结构的 overlay，只画课程块；每行固定 52pt，课程块用 overlay 向下溢出（使用预计算 grid 减轻翻页卡顿）
+    private func courseBlocksOverlay(grid: WeekCourseGrid?) -> some View {
         VStack(spacing: 0) {
-            ForEach(sortedSlots, id: \.periodIndex) { slot in
-                let period = slot.periodIndex
+            ForEach(Array(sortedSlots.enumerated()), id: \.element.periodIndex) { slotIndex, _ in
                 HStack(alignment: .top, spacing: 0) {
                     Color.clear.frame(width: 56).frame(height: rowHeight)
                     ForEach(dayIndices, id: \.self) { day in
-                        if let c = courseStarting(day: day, period: period, week: week) {
-                            Color.clear
-                                .frame(maxWidth: .infinity)
-                                .frame(height: rowHeight)
-                                .overlay(alignment: .top) {
-                                    CourseCellView(course: c, rowHeight: rowHeight) {
-                                        courseToPreview = c
+                        let dayIndex = day - 1
+                        let c = grid?.starting[dayIndex][slotIndex]
+                        let cNotThisWeek = grid?.notThisWeek[dayIndex][slotIndex]
+                        Group {
+                            if let c = c {
+                                Color.clear
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: rowHeight)
+                                    .overlay(alignment: .top) {
+                                        CourseCellView(course: c, rowHeight: rowHeight) {
+                                            courseToPreview = c
+                                        }
+                                        .frame(height: rowHeight * CGFloat(c.periodSpan) - 2)
+                                        .padding(1)
                                     }
-                                    .frame(height: rowHeight * CGFloat(c.periodSpan) - 2)
-                                    .padding(1)
-                                }
-                        } else if let c = courseStartingNotThisWeek(day: day, period: period, week: week) {
-                            Color.clear
-                                .frame(maxWidth: .infinity)
-                                .frame(height: rowHeight)
-                                .overlay(alignment: .top) {
-                                    CourseCellView(course: c, rowHeight: rowHeight, isNotThisWeek: true) {
-                                        courseToPreview = c
+                            } else if let c = cNotThisWeek {
+                                Color.clear
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: rowHeight)
+                                    .overlay(alignment: .top) {
+                                        CourseCellView(course: c, rowHeight: rowHeight, isNotThisWeek: true) {
+                                            courseToPreview = c
+                                        }
+                                        .frame(height: rowHeight * CGFloat(c.periodSpan) - 2)
+                                        .padding(1)
                                     }
-                                    .frame(height: rowHeight * CGFloat(c.periodSpan) - 2)
-                                    .padding(1)
-                                }
-                        } else {
-                            Color.clear
-                                .frame(maxWidth: .infinity)
-                                .frame(height: rowHeight)
-                                .allowsHitTesting(false)
+                            } else {
+                                Color.clear
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: rowHeight)
+                                    .allowsHitTesting(false)
+                            }
                         }
                     }
                 }
                 .frame(height: rowHeight)
             }
         }
+        .drawingGroup(opaque: false, colorMode: .nonLinear)
     }
 
     private var timeColumnHeader: some View {
@@ -355,8 +375,8 @@ struct ScheduleGridView: View {
         .frame(height: 56)
     }
 
-    /// 表格行：只画时间列 + 空位/占位，课程块由 courseBlocksOverlay 统一画在上层
-    private func scheduleRow(periodSlot: TimeSlotItem, week: Int) -> some View {
+    /// 表格行：只画时间列 + 空位/占位，课程块由 courseBlocksOverlay 统一画在上层（使用预计算 grid）
+    private func scheduleRow(periodSlot: TimeSlotItem, grid: WeekCourseGrid?, slotIndex: Int) -> some View {
         let period = periodSlot.periodIndex
         return HStack(alignment: .top, spacing: 0) {
             VStack(alignment: .center, spacing: 2) {
@@ -375,13 +395,16 @@ struct ScheduleGridView: View {
             .padding(.vertical, 6)
 
             ForEach(dayIndices, id: \.self) { day in
-                if course(day: day, period: period, week: week) != nil {
+                let hasCourse = grid?.hasCourse[day - 1][slotIndex] ?? false
+                if hasCourse {
                     Color.clear
                         .frame(maxWidth: .infinity)
                         .frame(height: rowHeight)
                         .contentShape(Rectangle())
                 } else {
-                    emptyCell(day: day, period: period, week: week, periodSlot: periodSlot)
+                    Color.clear
+                        .frame(maxWidth: .infinity)
+                        .frame(height: rowHeight)
                 }
             }
         }
@@ -391,15 +414,9 @@ struct ScheduleGridView: View {
             Divider()
         }
     }
-
-    private func emptyCell(day: Int, period: Int, week: Int, periodSlot: TimeSlotItem) -> some View {
-        Color.clear
-            .frame(maxWidth: .infinity)
-            .frame(height: rowHeight)
-    }
 }
 
-// MARK: - 课程块色板（插画风，按课程名取模选用；前景白字）
+// MARK: - 课程块色板（插画风，由课程名稳定哈希决定颜色；前景白字）
 private enum MacaronPalette {
     /// 插画风色系：草莓红、南瓜橙、蜂蜜黄、牛油果绿、青柠绿、天空蓝、湖水蓝、葡萄紫、蓝莓紫、覆盆子粉、可可棕
     static let colors: [Color] = [
@@ -416,8 +433,17 @@ private enum MacaronPalette {
         Color(red: 141/255.0, green: 85/255.0, blue: 36/255.0),   // 可可棕 #8D5524
     ]
 
+    /// 由课程名字符串计算稳定哈希值（同一课程名在任何时候都得到相同颜色）
+    private static func stableHash(for string: String) -> Int {
+        var hash = 5381
+        for codeUnit in string.utf8 {
+            hash = ((hash << 5) &+ hash) &+ Int(codeUnit)
+        }
+        return hash
+    }
+
     static func color(forCourseName name: String) -> Color {
-        let index = abs(name.hashValue) % colors.count
+        let index = abs(stableHash(for: name)) % colors.count
         return colors[index]
     }
 }
@@ -574,16 +600,6 @@ private struct CourseCellView: View {
                     .lineLimit(5)
                     .multilineTextAlignment(.leading)
                     .foregroundStyle(.white)
-//                if isNotThisWeek {
-//                    Text("[非本周]")
-//                        .font(.caption2)
-//                        .fontWeight(.medium)
-//                        .foregroundStyle(.secondary)
-//                }
-//                Text(course.teacher)
-//                    .font(.caption2)
-//                    .foregroundStyle(.secondary)
-//                    .lineLimit(1)
                 Text(course.location)
                     .font(.caption2)
                     .foregroundStyle(.white.opacity(0.9))
@@ -593,11 +609,11 @@ private struct CourseCellView: View {
             .padding(6)
             .background(courseCellColor)
             .clipShape(RoundedRectangle(cornerRadius: 12))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.white, lineWidth: 2)
-            )
-            .opacity(isNotThisWeek ? 0.55 : 1)
+//            .overlay(
+//                RoundedRectangle(cornerRadius: 12)
+//                    .stroke(Color.white, lineWidth: 1)
+//            )
+            .opacity(isNotThisWeek ? 0.55 : 0.9)
         }
         .buttonStyle(.plain)
     }

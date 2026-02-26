@@ -62,9 +62,11 @@ struct ScheduleListView: View {
             }
             // 每次进入课程表列表都同步到小组件，保证名称与课程是最新的
             refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
+            scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
         }
         .onChange(of: activeScheduleName) { _, newName in
             refreshWidgetData(modelContext: modelContext, activeScheduleName: newName)
+            scheduleCourseReminders(modelContext: modelContext, activeScheduleName: newName)
         }
     }
 
@@ -212,6 +214,7 @@ struct ScheduleEditSheet: View {
         if wasActiveSchedule {
             activeScheduleName = n
             refreshWidgetData(modelContext: modelContext, activeScheduleName: n)
+            scheduleCourseReminders(modelContext: modelContext, activeScheduleName: n)
         }
         dismiss()
     }

@@ -58,6 +58,11 @@ struct ContentView: View {
         ZStack {
             appBackground
             TabView {
+                TodayView()
+                    .tabItem {
+                        Label("今天", systemImage: "list.bullet.rectangle")
+                    }
+
                 ScheduleGridView()
                     .tabItem {
                         Label("课程表", systemImage: "calendar")
@@ -75,10 +80,34 @@ struct ContentView: View {
     }
 }
 
-// MARK: - 设置根视图：课程表 / 时间段预设
+// MARK: - 设置根视图：外观 / 课程表 / 时间段预设
 struct SettingsRootView: View {
+    @AppStorage(kAppearanceModeKey) private var appearanceModeRaw: String = AppearanceMode.system.rawValue
+
+    private var appearanceBinding: Binding<AppearanceMode> {
+        Binding(
+            get: { AppearanceMode(rawValue: appearanceModeRaw) ?? .system },
+            set: { appearanceModeRaw = $0.rawValue }
+        )
+    }
+
     var body: some View {
         List {
+            Section {
+                Picker(selection: appearanceBinding) {
+                    ForEach(AppearanceMode.allCases, id: \.rawValue) { mode in
+                        Text(mode.displayName).tag(mode)
+                    }
+                } label: {
+                    Label("外观", systemImage: "circle.lefthalf.filled")
+                }
+                .pickerStyle(.menu)
+            } header: {
+                Text("外观")
+            } footer: {
+                Text("选择浅色、深色或跟随系统外观。")
+            }
+
             Section {
                 NavigationLink {
                     ScheduleListView()
