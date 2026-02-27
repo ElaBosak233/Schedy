@@ -154,7 +154,7 @@ struct ScheduleGridView: View {
         return p.slots.sorted { $0.periodIndex < $1.periodIndex }
     }
 
-    private let rowHeight: CGFloat = 52
+    private let rowHeight: CGFloat = 64
     /// 时间列宽度，表头/表格行/课程块 overlay 共用，保证对齐
     private let timeColumnWidth: CGFloat = 48
 
@@ -591,6 +591,9 @@ private struct CoursePreviewSheet: View {
                                 row(icon: "mappin.circle.fill", text: course.location)
                                 row(icon: "calendar", text: course.weekRangesDisplayString)
                                 row(icon: "clock.fill", text: "\(course.dayOfWeekName) · 第 \(course.periodIndex)–\(course.effectivePeriodEnd) 节")
+                                if let credits = course.credits {
+                                    row(icon: "number.circle.fill", text: String(format: "%g", credits) + " 学分")
+                                }
                             }
                             .padding(.vertical, 4)
                         }
@@ -733,16 +736,15 @@ private struct CourseCellView: View {
                 Text(course.location)
                     .font(.caption2)
                     .foregroundStyle(.white.opacity(0.9))
+                Text(course.teacher)
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.9))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .frame(maxHeight: .infinity)
             .padding(6)
             .background(courseCellColor)
             .clipShape(RoundedRectangle(cornerRadius: 12))
-//            .overlay(
-//                RoundedRectangle(cornerRadius: 12)
-//                    .stroke(Color.white, lineWidth: 1)
-//            )
             .opacity(isNotThisWeek ? 0.55 : 0.9)
         }
         .buttonStyle(.plain)

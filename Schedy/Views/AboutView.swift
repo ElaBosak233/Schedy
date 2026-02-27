@@ -45,6 +45,14 @@ struct AboutView: View {
 
             // 开源
             Section {
+                HStack {
+                    Label("仓库", systemImage: "chevron.left.forwardslash.chevron.right")
+                    Spacer()
+                    Text("ElaBosak233/Schedy")
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
                 Link(destination: URL(string: repoURLString)!) {
                     HStack {
                         Label("开源地址", systemImage: "link")
@@ -55,15 +63,6 @@ struct AboutView: View {
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
-                }
-
-                HStack {
-                    Label("仓库", systemImage: "chevron.left.forwardslash.chevron.right")
-                    Spacer()
-                    Text("ElaBosak233/Schedy")
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
                 }
             } header: {
                 Text("开源")

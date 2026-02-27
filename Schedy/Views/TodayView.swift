@@ -55,6 +55,11 @@ private struct TodayCourseCard: View {
                     Label(course.location, systemImage: "mappin.circle.fill")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                    if let credits = course.credits {
+                        Label(String(format: "%g", credits) + " 学分", systemImage: "number.circle.fill")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
             .padding(16)

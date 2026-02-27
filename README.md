@@ -1,3 +1,2 @@
-# Schedy
+# Schedy 课程表
 
-A minimalist schedule

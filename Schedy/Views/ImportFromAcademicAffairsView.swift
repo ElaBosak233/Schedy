@@ -100,44 +100,46 @@ struct ImportFromAcademicAffairsView: View {
     }
 
     private var chooseActionView: some View {
-        VStack(spacing: 24) {
-            Text("请选择导入方式")
-                .font(.headline)
-            VStack(spacing: 12) {
+        List {
+            Section {
                 Button {
                     importAction = .overwrite
                     step = .chooseSchool
                 } label: {
-                    HStack {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("覆盖当前课表")
+                            Text("替换「\(activeSchedule?.name ?? "当前课表")」中的课程")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    } icon: {
                         Image(systemName: "doc.on.doc.fill")
-                        Text("覆盖当前课表")
-                        Spacer()
                     }
-                    .padding()
-                    .background(Color.accentColor.opacity(0.12))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                .buttonStyle(.plain)
 
                 Button {
                     importAction = .newSchedule
                     step = .chooseSchool
                 } label: {
-                    HStack {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("新建课表")
+                            Text("创建新课表并导入，保留现有课表不变")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    } icon: {
                         Image(systemName: "plus.rectangle.on.folder")
-                        Text("新建课表")
-                        Spacer()
                     }
-                    .padding()
-                    .background(Color.accentColor.opacity(0.12))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                .buttonStyle(.plain)
+            } header: {
+                Text("导入方式")
+            } footer: {
+                Text("选择将课程导入到当前课表（覆盖）或新建一个课表。")
             }
-            .padding(.horizontal)
-            Spacer()
         }
-        .padding(.top, 32)
+        .listStyle(.insetGrouped)
     }
 
     private var chooseSchoolView: some View {

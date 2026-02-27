@@ -180,7 +180,7 @@ private final class AcademicAffairsWebViewController: UIViewController, WKNaviga
 
     // MARK: - WKUIDelegate
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
-        if navigationAction.targetFrame == nil, let url = navigationAction.request.url {
+        if navigationAction.targetFrame == nil, navigationAction.request.url != nil {
             webView.load(navigationAction.request)
         }
         return nil

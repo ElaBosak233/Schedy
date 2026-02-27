@@ -96,7 +96,7 @@ private func scheduleCourseRemindersAfterClear(modelContext: ModelContext, activ
                 guard let dayDate = cal.date(byAdding: .day, value: (week - 1) * 7 + (dayOfWeek - 1), to: semesterStart) else { continue }
                 for course in courses where course.appliesToWeek(week) && course.dayOfWeek == dayOfWeek {
                     guard let start = startTime(for: course) else { continue }
-                    var comps = DateComponents(calendar: cal, year: cal.component(.year, from: dayDate), month: cal.component(.month, from: dayDate), day: cal.component(.day, from: dayDate), hour: start.hour, minute: start.minute)
+                    let comps = DateComponents(calendar: cal, year: cal.component(.year, from: dayDate), month: cal.component(.month, from: dayDate), day: cal.component(.day, from: dayDate), hour: start.hour, minute: start.minute)
                     guard let courseStart = cal.date(from: comps) else { continue }
                     let reminderDate = cal.date(byAdding: .minute, value: -kReminderMinutes, to: courseStart)!
                     if reminderDate <= now { continue }
