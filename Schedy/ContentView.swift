@@ -5,10 +5,14 @@
 //  主界面：课程表 + 设置（课程表列表、时间段预设）
 //
 
+import SwiftData
 import SwiftUI
 
 struct ContentView: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.scenePhase) private var scenePhase
+    @AppStorage("activeScheduleName") private var activeScheduleName: String = "我的课程表"
 
     /// 全屏朦胧背景：柔和渐变，课程表会透明透出此背景
     private var appBackground: some View {
@@ -76,11 +80,22 @@ struct ContentView: View {
                 }
             }
             .tint(.accentColor)
+            .onAppear {
+                // 每次打开应用都重新排期课程提醒，即使用户只停留在「今天」标签
+                if !activeScheduleName.isEmpty {
+                    scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
+                }
+            }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active, !activeScheduleName.isEmpty {
+                    scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
+                }
+            }
         }
     }
 }
 
-// MARK: - 设置根视图：外观 / 课程表 / 时间段预设
+// MARK: - 设置根视图：外观 / 课程表 / 时间段预设 / 权限 / 关于
 struct SettingsRootView: View {
     @AppStorage(kAppearanceModeKey) private var appearanceModeRaw: String = AppearanceMode.system.rawValue
 
@@ -102,10 +117,13 @@ struct SettingsRootView: View {
                     Label("外观", systemImage: "circle.lefthalf.filled")
                 }
                 .pickerStyle(.menu)
+                NavigationLink {
+                    ScheduleDisplaySettingsView()
+                } label: {
+                    Label("课表显示", systemImage: "tablecells")
+                }
             } header: {
                 Text("外观")
-            } footer: {
-                Text("选择浅色、深色或跟随系统外观。")
             }
 
             Section {
@@ -119,13 +137,28 @@ struct SettingsRootView: View {
                 } label: {
                     Label("时间段预设", systemImage: "clock")
                 }
+            } header: {
+                Text("课程表")
             }
+
+            Section {
+                NavigationLink {
+                    PermissionsView()
+                } label: {
+                    Label("权限", systemImage: "hand.raised.fill")
+                }
+            } header: {
+                Text("权限")
+            }
+
             Section {
                 NavigationLink {
                     AboutView()
                 } label: {
                     Label("关于", systemImage: "info.circle")
                 }
+            } header: {
+                Text("关于")
             }
         }
         .navigationTitle("设置")

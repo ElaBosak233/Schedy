@@ -41,6 +41,7 @@ struct SchedyApp: App {
         let schema = Schema([
             Schedule.self,
             Course.self,
+            CourseReschedule.self,
             TimeSlotPreset.self,
             TimeSlotItem.self,
         ])

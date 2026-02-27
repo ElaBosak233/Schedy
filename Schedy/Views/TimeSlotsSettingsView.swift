@@ -219,53 +219,64 @@ struct PresetRenameSheet: View {
 
 // MARK: - 单节时间段编辑
 struct TimeSlotEditView: View {
+    @Environment(\.modelContext) private var modelContext
+    @AppStorage("activeScheduleName") private var activeScheduleName: String = "我的课程表"
     @Bindable var slot: TimeSlotItem
 
     var body: some View {
         Form {
             Section("第 \(slot.periodIndex) 节") {
-                HStack {
-                    Text("开始")
-                    Spacer()
-                    TimePicker(hour: $slot.startHour, minute: $slot.startMinute)
-                }
-                HStack {
-                    Text("结束")
-                    Spacer()
-                    TimePicker(hour: $slot.endHour, minute: $slot.endMinute)
-                }
+                TimePickerRow(label: "开始", hour: $slot.startHour, minute: $slot.startMinute)
+                TimePickerRow(label: "结束", hour: $slot.endHour, minute: $slot.endMinute)
             }
         }
         .navigationTitle("编辑时间段")
         .navigationBarTitleDisplayMode(.inline)
+        .onDisappear {
+            try? modelContext.save()
+            if !activeScheduleName.isEmpty {
+                scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
+            }
+        }
     }
 }
 
-// MARK: - 时间选择器（时:分）
-struct TimePicker: View {
+// MARK: - 时间选择器（滚轮样式，类似 iPhone 计时器）
+struct TimePickerRow: View {
+    var label: String
     @Binding var hour: Int
     @Binding var minute: Int
 
     var body: some View {
-        HStack(spacing: 4) {
-            Picker("时", selection: $hour) {
-                ForEach(0..<24, id: \.self) { h in
-                    Text(String(format: "%02d", h)).tag(h)
+        VStack(alignment: .leading, spacing: 8) {
+            Text(label)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            HStack(spacing: 0) {
+                Picker("时", selection: $hour) {
+                    ForEach(0..<24, id: \.self) { h in
+                        Text(String(format: "%02d", h)).tag(h)
+                    }
                 }
-            }
-            .pickerStyle(.menu)
-            .frame(width: 70)
+                .pickerStyle(.wheel)
+                .frame(maxWidth: .infinity)
 
-            Text(":")
+                Text(":")
+                    .font(.title2)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.secondary)
 
-            Picker("分", selection: $minute) {
-                ForEach(0..<60, id: \.self) { m in
-                    Text(String(format: "%02d", m)).tag(m)
+                Picker("分", selection: $minute) {
+                    ForEach(0..<60, id: \.self) { m in
+                        Text(String(format: "%02d", m)).tag(m)
+                    }
                 }
+                .pickerStyle(.wheel)
+                .frame(maxWidth: .infinity)
             }
-            .pickerStyle(.menu)
-            .frame(width: 70)
+            .frame(height: 120)
         }
+        .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16))
     }
 }
 

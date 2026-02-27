@@ -224,5 +224,5 @@ struct TodayView: View {
 
 #Preview {
     TodayView()
-        .modelContainer(for: [Schedule.self, Course.self, TimeSlotPreset.self, TimeSlotItem.self], inMemory: true)
+        .modelContainer(for: [Schedule.self, Course.self, CourseReschedule.self, TimeSlotPreset.self, TimeSlotItem.self], inMemory: true)
 }

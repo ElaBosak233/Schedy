@@ -13,6 +13,7 @@ struct AcademicAffairsWebView: View {
     @Binding var urlBarText: String
     @Binding var pendingLoadURL: URL?
     @Binding var requestHTML: Bool
+    @State private var loadProgress: Double = 1
     let onHTMLReceived: (String) -> Void
 
     var body: some View {
@@ -23,8 +24,17 @@ struct AcademicAffairsWebView: View {
                 urlBarText: $urlBarText,
                 pendingLoadURL: $pendingLoadURL,
                 requestHTML: $requestHTML,
+                loadProgress: $loadProgress,
                 onHTMLReceived: onHTMLReceived
             )
+            .overlay(alignment: .top) {
+                if loadProgress < 1 {
+                    ProgressView(value: loadProgress)
+                        .progressViewStyle(.linear)
+                        .tint(.accentColor)
+                        .frame(height: 3)
+                }
+            }
         }
         .ignoresSafeArea(.container, edges: .bottom)
     }
@@ -65,6 +75,7 @@ private struct AcademicAffairsWebViewRepresentable: UIViewControllerRepresentabl
     @Binding var urlBarText: String
     @Binding var pendingLoadURL: URL?
     @Binding var requestHTML: Bool
+    @Binding var loadProgress: Double
     let onHTMLReceived: (String) -> Void
 
     func makeUIViewController(context: Context) -> AcademicAffairsWebViewController {
@@ -73,6 +84,11 @@ private struct AcademicAffairsWebViewRepresentable: UIViewControllerRepresentabl
         vc.onURLChange = { url in
             DispatchQueue.main.async {
                 urlBarText = url?.absoluteString ?? ""
+            }
+        }
+        vc.onProgressChange = { progress in
+            DispatchQueue.main.async {
+                loadProgress = progress
             }
         }
         return vc
@@ -97,8 +113,11 @@ private struct AcademicAffairsWebViewRepresentable: UIViewControllerRepresentabl
 private final class AcademicAffairsWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
     private var webView: WKWebView!
     private let initialURL: URL
+    private var progressObservation: NSKeyValueObservation?
+    private var pendingDisplayURL: URL?
     var onHTMLReceived: ((String) -> Void)?
     var onURLChange: ((URL?) -> Void)?
+    var onProgressChange: ((Double) -> Void)?
 
     init(initialURL: URL) {
         self.initialURL = initialURL
@@ -115,7 +134,14 @@ private final class AcademicAffairsWebViewController: UIViewController, WKNaviga
         webView.navigationDelegate = self
         webView.uiDelegate = self
         view.addSubview(webView)
+        progressObservation = webView.observe(\.estimatedProgress, options: [.new]) { [weak self] webView, _ in
+            self?.onProgressChange?(webView.estimatedProgress)
+        }
         webView.load(URLRequest(url: initialURL))
+    }
+
+    deinit {
+        progressObservation?.invalidate()
     }
 
     func loadURL(_ url: URL) {
@@ -124,11 +150,32 @@ private final class AcademicAffairsWebViewController: UIViewController, WKNaviga
 
     // MARK: - WKNavigationDelegate
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        if navigationAction.targetFrame?.isMainFrame != false, let url = navigationAction.request.url {
+            pendingDisplayURL = url
+        }
         decisionHandler(.allow)
+    }
+
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        onURLChange?(pendingDisplayURL ?? webView.url)
+        onProgressChange?(0)
+    }
+
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        onURLChange?(webView.url)
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         onURLChange?(webView.url)
+        onProgressChange?(1)
+    }
+
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        onProgressChange?(1)
+    }
+
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        onProgressChange?(1)
     }
 
     // MARK: - WKUIDelegate

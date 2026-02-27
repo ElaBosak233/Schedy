@@ -18,7 +18,7 @@
                BlueprintIdentifier = "65B690372F50104A001C550A"
                BuildableName = "Schedy.app"
                BlueprintName = "Schedy"
-               ReferencedContainer = "container:schedy.xcodeproj">
+               ReferencedContainer = "container:Schedy.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -47,7 +47,7 @@
             BlueprintIdentifier = "65B690372F50104A001C550A"
             BuildableName = "Schedy.app"
             BlueprintName = "Schedy"
-            ReferencedContainer = "container:schedy.xcodeproj">
+            ReferencedContainer = "container:Schedy.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -64,7 +64,7 @@
             BlueprintIdentifier = "65B690372F50104A001C550A"
             BuildableName = "Schedy.app"
             BlueprintName = "Schedy"
-            ReferencedContainer = "container:schedy.xcodeproj">
+            ReferencedContainer = "container:Schedy.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

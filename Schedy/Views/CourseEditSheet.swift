@@ -299,5 +299,5 @@ struct CourseEditSheet: View {
 
 #Preview {
     CourseEditSheet(course: nil, schedule: nil, preset: nil, defaultWeek: 1, defaultDay: 1, defaultPeriod: 1)
-        .modelContainer(for: [Schedule.self, Course.self, TimeSlotPreset.self, TimeSlotItem.self], inMemory: true)
+        .modelContainer(for: [Schedule.self, Course.self, CourseReschedule.self, TimeSlotPreset.self, TimeSlotItem.self], inMemory: true)
 }
