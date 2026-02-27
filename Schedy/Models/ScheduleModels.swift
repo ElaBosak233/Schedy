@@ -28,6 +28,14 @@ final class Schedule {
         self.semesterStartDate = semesterStartDate
         self.timeSlotPreset = timeSlotPreset
     }
+
+    /// 课表显示周数上限：有课的最大周 + 1（无课时为 1 周）。用于课表滑动范围、调课可选周等。
+    var effectiveMaxWeeks: Int {
+        let fromRanges = courses.flatMap(\.parsedWeekRanges).map(\.end).max() ?? 0
+        let fromReschedules = courses.flatMap(\.reschedules).flatMap { [$0.week, $0.effectiveNewWeek] }.max() ?? 0
+        let maxCourseWeek = max(fromRanges, fromReschedules)
+        return max(1, maxCourseWeek + 1)
+    }
 }
 
 // MARK: - 周次奇偶

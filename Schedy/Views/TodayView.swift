@@ -8,8 +8,6 @@
 import SwiftData
 import SwiftUI
 
-private let maxWeeks = 25
-
 /// 今日课程卡片：课程名、节次时间、老师、地点，与课程表一致的配色
 private struct TodayCourseCard: View {
     let course: Course
@@ -106,7 +104,7 @@ struct TodayView: View {
         if today < start { return 1 }
         let days = cal.dateComponents([.day], from: start, to: today).day ?? 0
         let week = days / 7 + 1
-        return min(max(1, week), maxWeeks)
+        return min(max(1, week), activeSchedule?.effectiveMaxWeeks ?? 25)
     }
 
     /// 今天、当前周有课的课程，按节次排序

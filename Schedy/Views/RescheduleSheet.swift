@@ -14,8 +14,6 @@ private func dayName(_ day: Int) -> String {
     return names[day]
 }
 
-private let maxWeeksForReschedule = 25
-
 struct RescheduleSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
@@ -24,6 +22,8 @@ struct RescheduleSheet: View {
     /// 来源周次（用户点进来时所在周），固定不可改
     let sourceWeek: Int
     let preset: TimeSlotPreset?
+    /// 可选目标周上限，与课表 effectiveMaxWeeks 一致；未传时从 course.schedule 计算
+    var maxWeeks: Int { course.schedule?.effectiveMaxWeeks ?? 25 }
 
     @State private var newWeek: Int
     @State private var newDayOfWeek: Int
@@ -45,9 +45,9 @@ struct RescheduleSheet: View {
         return sortedPeriods.filter { $0.periodIndex <= max(1, maxStart) }
     }
 
-    /// 可选目标周：任意周（可往以前调，便于误调后改回）
+    /// 可选目标周：1 到 maxWeeks（与课表一致）
     private var targetWeekOptions: [Int] {
-        Array(1...maxWeeksForReschedule)
+        Array(1...maxWeeks)
     }
 
     init(course: Course, week: Int, preset: TimeSlotPreset?) {

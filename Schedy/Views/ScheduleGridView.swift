@@ -8,8 +8,6 @@
 import SwiftData
 import SwiftUI
 
-private let maxWeeks = 25
-
 /// 课程预览的上下文：课程 + 来源周 + 是否非本周（半透明），用于 sheet(item:) 保证周次一致
 private struct CoursePreviewContext: Identifiable {
     let course: Course
@@ -154,6 +152,9 @@ struct ScheduleGridView: View {
         return p.slots.sorted { $0.periodIndex < $1.periodIndex }
     }
 
+    /// 课表显示周数：1 到 effectiveMaxWeeks（有课的最大周 + 1，空课表为 1 周）
+    private var effectiveMaxWeeks: Int { activeSchedule?.effectiveMaxWeeks ?? 1 }
+
     private let rowHeight: CGFloat = 64
     /// 时间列宽度，表头/表格行/课程块 overlay 共用，保证对齐
     private let timeColumnWidth: CGFloat = 48
@@ -186,7 +187,7 @@ struct ScheduleGridView: View {
         if today < start { return "未开学" }
         let days = cal.dateComponents([.day], from: start, to: today).day ?? 0
         let week = days / 7 + 1
-        if week > maxWeeks { return "学期已结束" }
+        if week > effectiveMaxWeeks { return "学期已结束" }
         return "第 \(week) 周"
     }
 
@@ -199,14 +200,14 @@ struct ScheduleGridView: View {
         if today < start { return 1 }
         let days = cal.dateComponents([.day], from: start, to: today).day ?? 0
         let week = days / 7 + 1
-        if week > maxWeeks { return 1 }
-        return min(max(1, week), maxWeeks)
+        if week > effectiveMaxWeeks { return 1 }
+        return min(max(1, week), effectiveMaxWeeks)
     }
 
     var body: some View {
         NavigationStack {
             TabView(selection: $viewingWeek) {
-                ForEach(1...maxWeeks, id: \.self) { week in
+                ForEach(1...effectiveMaxWeeks, id: \.self) { week in
                     scheduleTable(week: week, viewingWeek: viewingWeek)
                         .tag(week)
                 }
@@ -341,7 +342,7 @@ struct ScheduleGridView: View {
     }
 
     private func scheduleTable(week: Int, viewingWeek: Int) -> some View {
-        let grid = WeekCourseGrid(week: week, schedule: activeSchedule, sortedSlots: sortedSlots, maxWeeks: maxWeeks)
+        let grid = WeekCourseGrid(week: week, schedule: activeSchedule, sortedSlots: sortedSlots, maxWeeks: effectiveMaxWeeks)
         return VStack(spacing: 0) {
             // 固定表头：不随滚动
             HStack(alignment: .top, spacing: 0) {
