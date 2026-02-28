@@ -58,11 +58,12 @@ enum WeekParity: Int, CaseIterable {
 /// 一门课程所需的数据：课程名、课程时间（周次范围 + 星期 + 节次）、任课老师、地点、学分
 /// 支持跨节次：periodIndex 为起始节，periodEnd 为结束节（含），未设则单节
 /// 周次：weekRangesString 格式为 "1-1,5-8" 表示第1周 + 第5~8周；可配合 weekParity 单双周
+/// teacher、location 可选，为空时界面不展示对应项
 @Model
 final class Course {
     var name: String
-    var teacher: String
-    var location: String
+    var teacher: String?
+    var location: String?
     /// 学分（可选，兼容旧数据）
     var credits: Double?
     /// 周次范围字符串，如 "1-1,5-8"（兼容旧数据：nil 或空时用 weekIndex）
@@ -85,8 +86,8 @@ final class Course {
 
     init(
         name: String,
-        teacher: String,
-        location: String,
+        teacher: String? = nil,
+        location: String? = nil,
         credits: Double? = nil,
         weekRangesString: String = "",
         weekParity: WeekParity = .all,
@@ -97,8 +98,8 @@ final class Course {
         schedule: Schedule? = nil
     ) {
         self.name = name
-        self.teacher = teacher
-        self.location = location
+        self.teacher = teacher?.isEmpty == true ? nil : teacher
+        self.location = location?.isEmpty == true ? nil : location
         self.credits = credits
         self.weekRangesString = weekRangesString.isEmpty ? nil : weekRangesString
         self.weekParityRaw = weekParity == .all ? nil : weekParity.rawValue

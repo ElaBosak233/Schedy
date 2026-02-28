@@ -47,12 +47,16 @@ private struct TodayCourseCard: View {
                 }
 
                 HStack(spacing: 16) {
-                    Label(course.teacher, systemImage: "person.fill")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Label(course.location, systemImage: "mappin.circle.fill")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    if let t = course.teacher, !t.isEmpty {
+                        Label(t, systemImage: "person.fill")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    if let loc = course.location, !loc.isEmpty {
+                        Label(loc, systemImage: "mappin.circle.fill")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     if let credits = course.credits {
                         Label(String(format: "%g", credits) + " 学分", systemImage: "number.circle.fill")
                             .font(.caption)

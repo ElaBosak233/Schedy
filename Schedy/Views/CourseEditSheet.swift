@@ -56,8 +56,8 @@ struct CourseEditSheet: View {
 
         if let c = course {
             _name = State(initialValue: c.name)
-            _teacher = State(initialValue: c.teacher)
-            _location = State(initialValue: c.location)
+            _teacher = State(initialValue: c.teacher ?? "")
+            _location = State(initialValue: c.location ?? "")
             _creditsText = State(initialValue: c.credits.map { String(format: "%g", $0) } ?? "")
             _weekRanges = State(initialValue: Self.parseRanges(c.weekRangesString ?? "", fallbackWeek: c.weekIndex))
             _weekParity = State(initialValue: c.weekParity)
@@ -253,10 +253,12 @@ struct CourseEditSheet: View {
         let endPeriod = periodEnd >= periodStart ? periodEnd : periodStart
         let creditsValue = Double(creditsText.trimmingCharacters(in: .whitespaces)).flatMap { $0 >= 0 ? $0 : nil }
 
+        let teacherTrimmed = teacher.trimmingCharacters(in: .whitespaces)
+        let locationTrimmed = location.trimmingCharacters(in: .whitespaces)
         if let c = course {
             c.name = n
-            c.teacher = teacher
-            c.location = location
+            c.teacher = teacherTrimmed.isEmpty ? nil : teacherTrimmed
+            c.location = locationTrimmed.isEmpty ? nil : locationTrimmed
             c.credits = creditsValue
             c.weekRangesString = rangesString
             c.weekParity = weekParity
@@ -267,8 +269,8 @@ struct CourseEditSheet: View {
         } else {
             let newCourse = Course(
                 name: n,
-                teacher: teacher,
-                location: location,
+                teacher: teacherTrimmed.isEmpty ? nil : teacherTrimmed,
+                location: locationTrimmed.isEmpty ? nil : locationTrimmed,
                 credits: creditsValue,
                 weekRangesString: rangesString,
                 weekParity: weekParity,

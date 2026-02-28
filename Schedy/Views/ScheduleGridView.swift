@@ -588,8 +588,12 @@ private struct CoursePreviewSheet: View {
                                 .fontWeight(.semibold)
                                 .foregroundStyle(.primary)
                             VStack(alignment: .leading, spacing: 12) {
-                                row(icon: "person.fill", text: course.teacher)
-                                row(icon: "mappin.circle.fill", text: course.location)
+                                if let t = course.teacher, !t.isEmpty {
+                                    row(icon: "person.fill", text: t)
+                                }
+                                if let loc = course.location, !loc.isEmpty {
+                                    row(icon: "mappin.circle.fill", text: loc)
+                                }
                                 row(icon: "calendar", text: course.weekRangesDisplayString)
                                 row(icon: "clock.fill", text: "\(course.dayOfWeekName) · 第 \(course.periodIndex)–\(course.effectivePeriodEnd) 节")
                                 if let credits = course.credits {
@@ -734,12 +738,16 @@ private struct CourseCellView: View {
                     .lineLimit(5)
                     .multilineTextAlignment(.leading)
                     .foregroundStyle(.white)
-                Text(course.location)
-                    .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.9))
-                Text(course.teacher)
-                    .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.9))
+                if let loc = course.location, !loc.isEmpty {
+                    Text(loc)
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.9))
+                }
+                if let t = course.teacher, !t.isEmpty {
+                    Text(t)
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.9))
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .frame(maxHeight: .infinity)

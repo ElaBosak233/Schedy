@@ -11,7 +11,7 @@ struct AboutView: View {
     private let appName = "Schedy"
     private let appSubtitle = "课程表"
     private let repoURLString = "https://github.com/ElaBosak233/Schedy"
-    private let gpl3URLString = "https://www.gnu.org/licenses/gpl-3.0.html"
+    private let licenseURLString = "https://github.com/ElaBosak233/Schedy/blob/main/LICENSE"
 
     var body: some View {
         List {
@@ -70,19 +70,19 @@ struct AboutView: View {
                 Text("Schedy 为开源项目，欢迎在 GitHub 上 star 与参与贡献。")
             }
 
-            // 协议 GPL-3
+            // 协议
             Section {
                 HStack {
                     Label("开源协议", systemImage: "doc.text")
                     Spacer()
-                    Text("GPL-3.0")
+                    Text("Schedy 协议")
                         .fontWeight(.medium)
                         .foregroundStyle(.secondary)
                 }
 
-                Link(destination: URL(string: gpl3URLString)!) {
+                Link(destination: URL(string: licenseURLString)!) {
                     HStack {
-                        Label("GNU 通用公共许可证 v3.0", systemImage: "safari")
+                        Label("查看完整协议", systemImage: "safari")
                         Spacer()
                         Image(systemName: "arrow.up.right.square")
                             .font(.caption)
@@ -92,7 +92,7 @@ struct AboutView: View {
             } header: {
                 Text("协议")
             } footer: {
-                Text("本软件采用 GNU General Public License v3.0 (GPL-3.0) 开源。您可自由使用、修改与分发，分发时须保留相同协议并公开源代码。")
+                Text("本软件采用 Schedy 开源协议。可自由使用、修改与基于本代码开发衍生产品；须保留原作者署名，衍生产品须开源；以应用形式分发须通过 App Store。详见仓库 LICENSE。")
             }
         }
         .navigationTitle("关于")

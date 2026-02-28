@@ -259,8 +259,8 @@ struct ImportFromAcademicAffairsView: View {
         for item in items {
             let course = Course(
                 name: item.name,
-                teacher: item.teacher,
-                location: item.location,
+                teacher: item.teacher.trimmingCharacters(in: .whitespaces).isEmpty ? nil : item.teacher,
+                location: item.location.trimmingCharacters(in: .whitespaces).isEmpty ? nil : item.location,
                 credits: item.credits,
                 weekRangesString: item.weekRangesString,
                 weekParity: item.weekParity,

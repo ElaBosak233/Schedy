@@ -122,13 +122,13 @@ func refreshWidgetData(modelContext: ModelContext, activeScheduleName: String) {
             if let c = display.first {
                 course1Name = c.name
                 course1Time = startTime(for: c).map { String(format: "%02d:%02d", $0.hour, $0.minute) } ?? ""
-                course1Location = c.location
+                course1Location = c.location ?? ""
             }
             if display.count > 1 {
                 let c = display[1]
                 course2Name = c.name
                 course2Time = startTime(for: c).map { String(format: "%02d:%02d", $0.hour, $0.minute) } ?? ""
-                course2Location = c.location
+                course2Location = c.location ?? ""
             }
         } else {
             status = todayCourses.isEmpty ? "noClass" : "allDone"
@@ -138,13 +138,13 @@ func refreshWidgetData(modelContext: ModelContext, activeScheduleName: String) {
                 if let c = lastTwo.first {
                     course1Name = c.name
                     course1Time = startTime(for: c).map { String(format: "%02d:%02d", $0.hour, $0.minute) } ?? ""
-                    course1Location = c.location
+                    course1Location = c.location ?? ""
                 }
                 if lastTwo.count > 1 {
                     let c = lastTwo[1]
                     course2Name = c.name
                     course2Time = startTime(for: c).map { String(format: "%02d:%02d", $0.hour, $0.minute) } ?? ""
-                    course2Location = c.location
+                    course2Location = c.location ?? ""
                 }
             }
         }
