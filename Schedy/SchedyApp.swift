@@ -45,7 +45,14 @@ struct SchedyApp: App {
             TimeSlotPreset.self,
             TimeSlotItem.self,
         ])
-        let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        // 先尝试仅本地存储，避免与已有数据库 schema 冲突导致 loadIssueModelContainer
+        // 若需启用 iCloud 同步，需在 Xcode 中临时移除 CloudKit capability 后删除 app 重装，
+        // 再恢复 capability 后全新安装即可使用 CloudKit
+        let config = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false,
+            cloudKitDatabase: .none
+        )
         do {
             return try ModelContainer(for: schema, configurations: [config])
         } catch {
