@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-/// AppStorage 键：课表网格与显示、全局当前时间段预设
+/// AppStorage 键：课表网格与显示、全局当前时间段
 enum ScheduleDisplayKeys {
     static let showHorizontalLines = "scheduleGridShowHorizontalLines"
     static let showVerticalLines = "scheduleGridShowVerticalLines"
     static let showWeekends = "scheduleShowWeekends"
     static let firstWeekday = "scheduleFirstWeekday"
-    /// 当前使用的时间段预设名称（全局可切换，所有课程表共用）
+    /// 当前使用的时间段名称（全局可切换，所有课程表共用）
     static let activeTimeSlotPresetName = "activeTimeSlotPresetName"
 }
 

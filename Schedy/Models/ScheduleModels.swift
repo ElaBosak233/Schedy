@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 // MARK: - 课程表
-/// 一张独立的课程表：名称、本学期第一天。时间段由全局「当前时间段预设」决定，不绑定在课表上。
+/// 一张独立的课程表：名称、本学期第一天。时间段由全局「当前时间段」决定，不绑定在课表上。
 @Model
 final class Schedule {
     var name: String
@@ -71,7 +71,7 @@ final class Course {
     var weekIndex: Int
     /// 周几（1 = 周一 … 7 = 周日）
     var dayOfWeek: Int
-    /// 起始节（1 起算，对应时间段预设中的节次）
+    /// 起始节（1 起算，对应时间段中的节次）
     var periodIndex: Int
     /// 结束节（含）；nil 或等于 periodIndex 表示单节
     var periodEnd: Int?
@@ -234,7 +234,7 @@ final class CourseReschedule {
     var periodSpan: Int { max(1, newPeriodEnd - newPeriodStart + 1) }
 }
 
-// MARK: - 单节时间段（用于预设内）
+// MARK: - 单节时间段（用于时间段内）
 /// 某一节课的起止时间，如 8:00~8:40
 @Model
 final class TimeSlotItem {
@@ -267,8 +267,8 @@ final class TimeSlotItem {
     }
 }
 
-// MARK: - 时间段预设
-/// 一套时间段预设，如「冬令时」「夏令时」，包含多节课的起止时间
+// MARK: - 时间段
+/// 一套时间段，如「冬令时」「夏令时」，包含多节课的起止时间
 @Model
 final class TimeSlotPreset {
     var name: String

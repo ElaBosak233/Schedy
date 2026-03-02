@@ -145,7 +145,7 @@ struct ScheduleGridView: View {
         schedules.first { $0.name == activeScheduleName } ?? schedules.first
     }
 
-    /// 全局当前使用的时间段预设（在「时间段预设」设置中切换）
+    /// 全局当前使用的时间段（在「时间段」设置中切换）
     private var activePreset: TimeSlotPreset? {
         if !activeTimeSlotPresetName.isEmpty {
             return presets.first { $0.name == activeTimeSlotPresetName }

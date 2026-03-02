@@ -88,7 +88,7 @@ struct TodayView: View {
         schedules.first { $0.name == activeScheduleName } ?? schedules.first
     }
 
-    /// 全局当前使用的时间段预设
+    /// 全局当前使用的时间段
     private var activePreset: TimeSlotPreset? {
         if !activeTimeSlotPresetName.isEmpty {
             return presets.first { $0.name == activeTimeSlotPresetName }
@@ -123,7 +123,7 @@ struct TodayView: View {
     /// 今天、当前周的有效课次（含调课：排除被调出、包含被调入），按节次排序
     @State private var effectiveOccurrences: [EffectiveCourseOccurrence] = []
 
-    /// 从预设取节次对应的时间范围文案
+    /// 从时间段取节次对应的时间范围文案
     private func timeRangeString(periodStart: Int, periodEnd: Int) -> String {
         let startSlot = sortedSlots.first { $0.periodIndex == periodStart }
         let endSlot = sortedSlots.first { $0.periodIndex == periodEnd }

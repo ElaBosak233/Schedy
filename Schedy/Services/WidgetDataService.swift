@@ -28,11 +28,11 @@ enum WidgetDataKeys {
     static let scheduleNamesList = "widgetScheduleNamesList"
     /// App 当前选中的课表名称（小组件默认显示此项；课表被删除时回退用）
     static let defaultScheduleName = "widgetDefaultScheduleName"
-    /// 小组件可选时间预设名称列表
+    /// 小组件可选时间段名称列表
     static let presetNamesList = "widgetPresetNamesList"
-    /// App 当前选中的时间预设名称（小组件默认使用此项）
+    /// App 当前选中的时间段名称（小组件默认使用此项）
     static let defaultPresetName = "widgetDefaultPresetName"
-    /// 单张课表+预设数据在 suite 里的 key：entryPrefix + "__SEP__" + scheduleName + "__SEP__" + presetName
+    /// 单张课表+时间段数据在 suite 里的 key：entryPrefix + "__SEP__" + scheduleName + "__SEP__" + presetName
     static let entryPrefix = "widgetEntry"
     static let entrySeparator = "__SEP__"
 }
@@ -180,7 +180,7 @@ func refreshWidgetData(modelContext: ModelContext, activeScheduleName: String) {
         }
     }
 
-    // 删除已不存在的 (课表, 预设) 在 suite 里的旧 key，以及旧版「仅课表名」格式的 key
+    // 删除已不存在的 (课表, 时间段) 在 suite 里的旧 key，以及旧版「仅课表名」格式的 key
     let validEntryPrefix = WidgetDataKeys.entryPrefix + "_"
     let sep = WidgetDataKeys.entrySeparator
     let existingKeys = suite.dictionaryRepresentation().keys

@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  schedy
 //
-//  主界面：课程表 + 设置（课程表列表、时间段预设）
+//  主界面：课程表 + 设置（课程表列表、时间段）
 //
 
 import SwiftData
@@ -98,7 +98,7 @@ struct ContentView: View {
     }
 }
 
-// MARK: - 设置根视图：外观 / 课程表 / 时间段预设 / 权限 / 关于
+// MARK: - 设置根视图：外观 / 课程表 / 时间段 / 权限 / 关于
 struct SettingsRootView: View {
     @AppStorage(kAppearanceModeKey) private var appearanceModeRaw: String = AppearanceMode.system.rawValue
 
@@ -138,7 +138,7 @@ struct SettingsRootView: View {
                 NavigationLink {
                     TimeSlotsSettingsView()
                 } label: {
-                    Label("时间段预设", systemImage: "clock")
+                    Label("时间段", systemImage: "clock")
                 }
             } header: {
                 Text("课程表")

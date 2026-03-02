@@ -2,7 +2,7 @@
 //  ScheduleDataService.swift
 //  schedy
 //
-//  初始化默认时间段预设、默认课程表及迁移
+//  初始化默认时间段、默认课程表及迁移
 //
 
 import Foundation
@@ -47,7 +47,7 @@ func seedDefaultPresetsIfNeeded(modelContext: ModelContext) {
     try? modelContext.save()
 }
 
-/// 若预设的节次不足，则按「上一节结束 + 10 分钟」为下一节开始、每节 40 分钟，补齐到 requiredPeriodCount 节
+/// 若时间段的节次不足，则按「上一节结束 + 10 分钟」为下一节开始、每节 40 分钟，补齐到 requiredPeriodCount 节
 @MainActor
 func extendPresetToCoverPeriodIfNeeded(preset: TimeSlotPreset?, requiredPeriodCount: Int, modelContext: ModelContext) {
     guard let preset = preset, requiredPeriodCount > 0 else { return }

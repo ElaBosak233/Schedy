@@ -2,7 +2,7 @@
 //  ScheduleListView.swift
 //  schedy
 //
-//  课程表列表：切换当前课程表、添加、编辑（名称 / 学期第一天 / 绑定时间段预设）
+//  课程表列表：切换当前课程表、添加、编辑（名称 / 学期第一天 / 绑定时间段）
 //
 
 import SwiftData
@@ -32,7 +32,7 @@ struct ScheduleListView: View {
             } header: {
                 Text("课程表")
             } footer: {
-                Text("点击选择当前使用的课程表。每张课程表可单独设置名称与学期第一天；时间段在「时间段预设」中全局切换。")
+                Text("点击选择当前使用的课程表。每张课程表可单独设置名称与学期第一天；时间段在「时间段」中全局切换。")
             }
         }
         .navigationTitle("课程表")

@@ -16,7 +16,7 @@ struct SchedyWidgetConfigIntent: AppIntent, WidgetConfigurationIntent {
     @Parameter(title: "课表", optionsProvider: ScheduleOptionsProvider())
     var scheduleName: String?
 
-    @Parameter(title: "时间预设", optionsProvider: PresetOptionsProvider())
+    @Parameter(title: "时间段", optionsProvider: PresetOptionsProvider())
     var presetName: String?
 
     init() {

@@ -2,7 +2,7 @@
 //  TimeSlotsSettingsView.swift
 //  schedy
 //
-//  时间段预设设置：切换冬令时/夏令时、自定义每节课的起止时间
+//  时间段设置：切换冬令时/夏令时、自定义每节课的起止时间
 //
 
 import SwiftData
@@ -23,17 +23,17 @@ struct TimeSlotsSettingsView: View {
         )
     }
 
-    /// 当前选中的预设（用于下方时间段明细）
+    /// 当前选中的时间段（用于下方时间段明细）
     private var activePreset: TimeSlotPreset? {
         presets.first { $0.name == activeTimeSlotPresetName }
     }
 
     var body: some View {
         listContent
-            .navigationTitle("时间段预设")
+            .navigationTitle("时间段")
             .navigationBarTitleDisplayMode(.large)
             .toolbar { toolbarContent }
-            .alert("新建预设", isPresented: $showAddPreset) { addPresetAlertContent } message: { addPresetAlertMessage }
+            .alert("新建时间段", isPresented: $showAddPreset) { addPresetAlertContent } message: { addPresetAlertMessage }
             .sheet(isPresented: presetSheetBinding) { presetEditSheetContent }
             .onAppear {
                 seedDefaultPresetsIfNeeded(modelContext: modelContext)
@@ -51,9 +51,9 @@ struct TimeSlotsSettingsView: View {
                     presetRow(preset: preset)
                 }
             } header: {
-                Text("时间段预设")
+                Text("时间段")
             } footer: {
-                Text("点击选择当前使用的时间段预设。所有课程表将统一使用该预设显示上课时间。下方可管理该预设各节的起止时间。")
+                Text("点击选择当前使用的时间段。所有课程表将统一使用该时间段显示上课时间。下方可管理各节的起止时间。")
             }
             slotsDetailSection
         }
@@ -123,7 +123,7 @@ struct TimeSlotsSettingsView: View {
 
     @ViewBuilder
     private var addPresetAlertContent: some View {
-        TextField("预设名称", text: $newPresetName)
+        TextField("时间段名称", text: $newPresetName)
             .textInputAutocapitalization(.words)
         Button("取消", role: .cancel) {
             newPresetName = ""
@@ -186,7 +186,7 @@ struct TimeSlotsSettingsView: View {
     }
 }
 
-// MARK: - 预设重命名（用于编辑预设名称）
+// MARK: - 时间段重命名（用于编辑时间段名称）
 struct PresetRenameSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
@@ -196,9 +196,9 @@ struct PresetRenameSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                TextField("预设名称", text: $name)
+                TextField("时间段名称", text: $name)
             }
-            .navigationTitle("编辑预设")
+            .navigationTitle("编辑时间段")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear { name = preset.name }
             .toolbar {

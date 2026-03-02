@@ -12,7 +12,7 @@ let kWidgetAppGroupSuiteName = "group.dev.e23.schedy"
 /// 跟随 App 当前选中的课表（设置里显示的选项值；若用户某张课表恰好同名则选该选项时仍视为「跟随」）
 let kWidgetScheduleOptionFollowApp = "跟随 App 当前选中"
 
-/// 跟随 App 当前选中的时间预设
+/// 跟随 App 当前选中的时间段
 let kWidgetPresetOptionFollowApp = "跟随 App 当前选中"
 
 enum WidgetDataKeys {
@@ -43,7 +43,7 @@ struct WidgetEntry {
     let course1: (name: String, time: String, location: String)?
     let course2: (name: String, time: String, location: String)?
 
-    /// 从 suite 读取「课表+预设」的缓存数据（key 为 entryPrefix_scheduleName__SEP__presetName）
+    /// 从 suite 读取「课表+时间段」的缓存数据（key 为 entryPrefix_scheduleName__SEP__presetName）
     static func load(from suite: UserDefaults?, scheduleName name: String, presetName preset: String) -> WidgetEntry {
         guard let suite = suite else {
             return WidgetEntry(scheduleName: "课程表", dateString: "", weekdayString: "", status: "noClass", course1: nil, course2: nil)
@@ -95,7 +95,7 @@ struct WidgetEntry {
         return list.first ?? ""
     }
 
-    /// 解析「小组件要使用的预设名」：若为跟随 App 或该预设已不存在，则回退到默认/第一个
+    /// 解析「小组件要使用的时间段名」：若为跟随 App 或该时间段已不存在，则回退到默认/第一个
     static func resolvePresetNameToShow(suite: UserDefaults?, configuredPreset: String) -> String {
         let list = suite?.stringArray(forKey: WidgetDataKeys.presetNamesList) ?? []
         let defaultPreset = suite?.string(forKey: WidgetDataKeys.defaultPresetName) ?? ""
@@ -117,7 +117,7 @@ struct WidgetEntry {
 }
 
 extension WidgetEntry {
-    /// 兼容旧版：按课表名读取 key "widgetEntry_\(scheduleName)"（无预设时的单课表 key）
+    /// 兼容旧版：按课表名读取 key "widgetEntry_\(scheduleName)"（无时间段时的单课表 key）
     static func loadLegacy(from suite: UserDefaults?, scheduleName name: String) -> WidgetEntry? {
         guard let suite = suite else { return nil }
         let key = "\(WidgetDataKeys.entryPrefix)_\(name)"

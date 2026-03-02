@@ -196,7 +196,7 @@ struct SchedyWidget: Widget {
             SchedyWidgetView(entry: entry.entry)
         }
         .configurationDisplayName("今日课程")
-        .description("选择课表与时间预设，展示日期与接下来两节课。")
+        .description("选择课表与时间段，展示日期与接下来两节课。")
         .supportedFamilies([WidgetFamily.systemSmall, WidgetFamily.systemMedium])
     }
 }
