@@ -113,7 +113,9 @@ struct ScheduleGridView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
     @Query(sort: \Schedule.name) private var schedules: [Schedule]
+    @Query(sort: \TimeSlotPreset.name) private var presets: [TimeSlotPreset]
     @AppStorage("activeScheduleName") private var activeScheduleName: String = "我的课程表"
+    @AppStorage(ScheduleDisplayKeys.activeTimeSlotPresetName) private var activeTimeSlotPresetName: String = ""
     @AppStorage(ScheduleDisplayKeys.showHorizontalLines) private var showHorizontalLines: Bool = true
     @AppStorage(ScheduleDisplayKeys.showVerticalLines) private var showVerticalLines: Bool = true
     @AppStorage(ScheduleDisplayKeys.showWeekends) private var showWeekends: Bool = true
@@ -143,8 +145,12 @@ struct ScheduleGridView: View {
         schedules.first { $0.name == activeScheduleName } ?? schedules.first
     }
 
+    /// 全局当前使用的时间段预设（在「时间段预设」设置中切换）
     private var activePreset: TimeSlotPreset? {
-        activeSchedule?.timeSlotPreset
+        if !activeTimeSlotPresetName.isEmpty {
+            return presets.first { $0.name == activeTimeSlotPresetName }
+        }
+        return presets.first
     }
 
     private var sortedSlots: [TimeSlotItem] {

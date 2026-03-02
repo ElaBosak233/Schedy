@@ -80,14 +80,20 @@ private struct TodayCourseCard: View {
 struct TodayView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Schedule.name) private var schedules: [Schedule]
+    @Query(sort: \TimeSlotPreset.name) private var presets: [TimeSlotPreset]
     @AppStorage("activeScheduleName") private var activeScheduleName: String = "我的课程表"
+    @AppStorage(ScheduleDisplayKeys.activeTimeSlotPresetName) private var activeTimeSlotPresetName: String = ""
 
     private var activeSchedule: Schedule? {
         schedules.first { $0.name == activeScheduleName } ?? schedules.first
     }
 
+    /// 全局当前使用的时间段预设
     private var activePreset: TimeSlotPreset? {
-        activeSchedule?.timeSlotPreset
+        if !activeTimeSlotPresetName.isEmpty {
+            return presets.first { $0.name == activeTimeSlotPresetName }
+        }
+        return presets.first
     }
 
     private var sortedSlots: [TimeSlotItem] {

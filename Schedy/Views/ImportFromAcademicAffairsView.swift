@@ -20,6 +20,7 @@ struct ImportFromAcademicAffairsView: View {
     @Query(sort: \Schedule.name) private var schedules: [Schedule]
     @Query(sort: \TimeSlotPreset.name) private var presets: [TimeSlotPreset]
     @AppStorage("activeScheduleName") private var activeScheduleName: String = "我的课程表"
+    @AppStorage(ScheduleDisplayKeys.activeTimeSlotPresetName) private var activeTimeSlotPresetName: String = ""
 
     @State private var step: Step = .chooseAction
     @State private var importAction: ImportAction = .overwrite
@@ -219,7 +220,7 @@ struct ImportFromAcademicAffairsView: View {
         }
         seedDefaultPresetsIfNeeded(modelContext: modelContext)
         let presetsList = (try? modelContext.fetch(FetchDescriptor<TimeSlotPreset>())) ?? []
-        let preset = presetsList.first
+        let preset = presetsList.first { $0.name == activeTimeSlotPresetName } ?? presetsList.first
 
         let maxPeriodNeeded = parsed.map { $0.periodEnd }.max() ?? 0
 
@@ -229,8 +230,7 @@ struct ImportFromAcademicAffairsView: View {
                 importError = "未找到当前课表。"
                 return
             }
-            let presetToUse = schedule.timeSlotPreset ?? preset
-            extendPresetToCoverPeriodIfNeeded(preset: presetToUse, requiredPeriodCount: maxPeriodNeeded, modelContext: modelContext)
+            extendPresetToCoverPeriodIfNeeded(preset: preset, requiredPeriodCount: maxPeriodNeeded, modelContext: modelContext)
             for c in schedule.courses {
                 modelContext.delete(c)
             }
@@ -244,7 +244,7 @@ struct ImportFromAcademicAffairsView: View {
             extendPresetToCoverPeriodIfNeeded(preset: preset, requiredPeriodCount: maxPeriodNeeded, modelContext: modelContext)
             let semesterStart = defaultSemesterStartDate()
             let newName = newScheduleName()
-            let newSchedule = Schedule(name: newName, semesterStartDate: semesterStart, timeSlotPreset: preset)
+            let newSchedule = Schedule(name: newName, semesterStartDate: semesterStart)
             modelContext.insert(newSchedule)
             addParsedCourses(parsed, to: newSchedule, preset: preset)
             try? modelContext.save()

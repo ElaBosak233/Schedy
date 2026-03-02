@@ -62,10 +62,11 @@ private func scheduleCourseRemindersAfterClear(modelContext: ModelContext, activ
     let now = Date()
 
     do {
+        let activePresetName = UserDefaults.standard.string(forKey: ScheduleDisplayKeys.activeTimeSlotPresetName) ?? ""
         var scheduleDescriptor = FetchDescriptor<Schedule>()
         scheduleDescriptor.predicate = #Predicate<Schedule> { $0.name == activeScheduleName }
         scheduleDescriptor.fetchLimit = 1
-        scheduleDescriptor.relationshipKeyPathsForPrefetching = [\Schedule.courses, \Schedule.timeSlotPreset]
+        scheduleDescriptor.relationshipKeyPathsForPrefetching = [\Schedule.courses]
         let schedules = try modelContext.fetch(scheduleDescriptor)
         guard let schedule = schedules.first else { return }
 
@@ -74,7 +75,9 @@ private func scheduleCourseRemindersAfterClear(modelContext: ModelContext, activ
         let courses = allCourses.filter { $0.schedule?.persistentModelID == scheduleID }
         guard !courses.isEmpty else { return }
 
-        let presetID = schedule.timeSlotPreset?.persistentModelID
+        let allPresets = try modelContext.fetch(FetchDescriptor<TimeSlotPreset>())
+        let activePreset = allPresets.first { $0.name == activePresetName } ?? allPresets.first
+        let presetID = activePreset?.persistentModelID
         let allSlots = try modelContext.fetch(FetchDescriptor<TimeSlotItem>())
         let slots = allSlots
             .filter { presetID != nil && $0.preset?.persistentModelID == presetID }

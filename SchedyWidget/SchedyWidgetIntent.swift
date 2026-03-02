@@ -16,12 +16,17 @@ struct SchedyWidgetConfigIntent: AppIntent, WidgetConfigurationIntent {
     @Parameter(title: "课表", optionsProvider: ScheduleOptionsProvider())
     var scheduleName: String?
 
+    @Parameter(title: "时间预设", optionsProvider: PresetOptionsProvider())
+    var presetName: String?
+
     init() {
         self.scheduleName = kWidgetScheduleOptionFollowApp
+        self.presetName = kWidgetPresetOptionFollowApp
     }
 
-    init(scheduleName: String?) {
+    init(scheduleName: String?, presetName: String?) {
         self.scheduleName = scheduleName ?? kWidgetScheduleOptionFollowApp
+        self.presetName = presetName ?? kWidgetPresetOptionFollowApp
     }
 }
 
@@ -32,6 +37,14 @@ extension SchedyWidgetConfigIntent {
             let suite = UserDefaults(suiteName: kWidgetAppGroupSuiteName)
             let list = suite?.stringArray(forKey: WidgetDataKeys.scheduleNamesList) ?? []
             return [kWidgetScheduleOptionFollowApp] + list
+        }
+    }
+
+    struct PresetOptionsProvider: DynamicOptionsProvider {
+        func results() async throws -> [String] {
+            let suite = UserDefaults(suiteName: kWidgetAppGroupSuiteName)
+            let list = suite?.stringArray(forKey: WidgetDataKeys.presetNamesList) ?? []
+            return [kWidgetPresetOptionFollowApp] + list
         }
     }
 }

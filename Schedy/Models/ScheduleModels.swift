@@ -9,24 +9,21 @@ import Foundation
 import SwiftData
 
 // MARK: - 课程表
-/// 一张独立的课程表：名称、本学期第一天、绑定的时间段预设
+/// 一张独立的课程表：名称、本学期第一天。时间段由全局「当前时间段预设」决定，不绑定在课表上。
 @Model
 final class Schedule {
     var name: String
     /// 本学期第一天（用于按周计算日期，周一为第一天）
     var semesterStartDate: Date
-    /// 绑定的时间段预设（冬令时/夏令时等）
-    var timeSlotPreset: TimeSlotPreset?
     @Relationship(deleteRule: .cascade, inverse: \Course.schedule)
     var courses: [Course] = []
     /// 该课程表下所有调课记录（独立数据结构，便于按课程表溯源与还原）
     @Relationship(deleteRule: .cascade, inverse: \CourseReschedule.schedule)
     var reschedules: [CourseReschedule] = []
 
-    init(name: String, semesterStartDate: Date, timeSlotPreset: TimeSlotPreset? = nil) {
+    init(name: String, semesterStartDate: Date) {
         self.name = name
         self.semesterStartDate = semesterStartDate
-        self.timeSlotPreset = timeSlotPreset
     }
 
     /// 课表显示周数上限：有课的最大周 + 1（无课时为 1 周）。用于课表滑动范围、调课可选周等。

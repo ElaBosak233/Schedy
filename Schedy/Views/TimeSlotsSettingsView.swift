@@ -11,16 +11,21 @@ import SwiftUI
 struct TimeSlotsSettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \TimeSlotPreset.name) private var presets: [TimeSlotPreset]
+    @AppStorage(ScheduleDisplayKeys.activeTimeSlotPresetName) private var activeTimeSlotPresetName: String = ""
     @State private var showAddPreset = false
     @State private var presetToEdit: TimeSlotPreset?
     @State private var newPresetName = ""
-    @State private var selectedPresetForSlots: TimeSlotPreset?
 
     private var presetSheetBinding: Binding<Bool> {
         Binding(
             get: { presetToEdit != nil },
             set: { if !$0 { presetToEdit = nil } }
         )
+    }
+
+    /// 当前选中的预设（用于下方时间段明细）
+    private var activePreset: TimeSlotPreset? {
+        presets.first { $0.name == activeTimeSlotPresetName }
     }
 
     var body: some View {
@@ -32,8 +37,8 @@ struct TimeSlotsSettingsView: View {
             .sheet(isPresented: presetSheetBinding) { presetEditSheetContent }
             .onAppear {
                 seedDefaultPresetsIfNeeded(modelContext: modelContext)
-                if selectedPresetForSlots == nil, let first = presets.first {
-                    selectedPresetForSlots = first
+                if activeTimeSlotPresetName.isEmpty, let first = presets.first {
+                    activeTimeSlotPresetName = first.name
                 }
             }
     }
@@ -41,21 +46,16 @@ struct TimeSlotsSettingsView: View {
     @ViewBuilder
     private var listContent: some View {
         List {
-            presetListSection
-            slotsDetailSection
-        }
-    }
-
-    @ViewBuilder
-    private var presetListSection: some View {
-        Section {
-            ForEach(presets, id: \.name) { preset in
-                presetRow(preset: preset)
+            Section {
+                ForEach(presets, id: \.name) { preset in
+                    presetRow(preset: preset)
+                }
+            } header: {
+                Text("时间段预设")
+            } footer: {
+                Text("点击选择当前使用的时间段预设。所有课程表将统一使用该预设显示上课时间。下方可管理该预设各节的起止时间。")
             }
-        } header: {
-            Text("预设列表")
-        } footer: {
-            Text("每张课程表可在「课程表」设置中绑定一个预设。此处仅管理预设的起止时间。")
+            slotsDetailSection
         }
     }
 
@@ -69,14 +69,14 @@ struct TimeSlotsSettingsView: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            if selectedPresetForSlots?.name == preset.name {
-                Image(systemName: "chevron.right.circle.fill")
-                    .foregroundStyle(.secondary)
+            if preset.name == activeTimeSlotPresetName {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
             }
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            selectedPresetForSlots = preset
+            activeTimeSlotPresetName = preset.name
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             Button("编辑", systemImage: "pencil") {
@@ -92,7 +92,7 @@ struct TimeSlotsSettingsView: View {
 
     @ViewBuilder
     private var slotsDetailSection: some View {
-        if let preset = selectedPresetForSlots, !preset.slots.isEmpty {
+        if let preset = activePreset, !preset.slots.isEmpty {
             Section("\(preset.name) 时间段明细") {
                 ForEach(preset.slots.sorted(by: { $0.periodIndex < $1.periodIndex }), id: \.periodIndex) { slot in
                     NavigationLink {
@@ -174,8 +174,9 @@ struct TimeSlotsSettingsView: View {
     }
 
     private func deletePreset(_ preset: TimeSlotPreset) {
-        if selectedPresetForSlots?.name == preset.name {
-            selectedPresetForSlots = presets.first(where: { $0.name != preset.name })
+        if activeTimeSlotPresetName == preset.name,
+           let other = presets.first(where: { $0.name != preset.name }) {
+            activeTimeSlotPresetName = other.name
         }
         for slot in preset.slots {
             modelContext.delete(slot)

@@ -12,6 +12,9 @@ let kWidgetAppGroupSuiteName = "group.dev.e23.schedy"
 /// 跟随 App 当前选中的课表（设置里显示的选项值；若用户某张课表恰好同名则选该选项时仍视为「跟随」）
 let kWidgetScheduleOptionFollowApp = "跟随 App 当前选中"
 
+/// 跟随 App 当前选中的时间预设
+let kWidgetPresetOptionFollowApp = "跟随 App 当前选中"
+
 enum WidgetDataKeys {
     static let scheduleName = "widgetScheduleName"
     static let date = "widgetDate"
@@ -26,7 +29,10 @@ enum WidgetDataKeys {
 
     static let scheduleNamesList = "widgetScheduleNamesList"
     static let defaultScheduleName = "widgetDefaultScheduleName"
+    static let presetNamesList = "widgetPresetNamesList"
+    static let defaultPresetName = "widgetDefaultPresetName"
     static let entryPrefix = "widgetEntry"
+    static let entrySeparator = "__SEP__"
 }
 
 struct WidgetEntry {
@@ -37,16 +43,24 @@ struct WidgetEntry {
     let course1: (name: String, time: String, location: String)?
     let course2: (name: String, time: String, location: String)?
 
-    /// 从 suite 读取「单张课表」的缓存数据（key 为 "widgetEntry_\(scheduleName)"）
-    static func load(from suite: UserDefaults?, scheduleName name: String) -> WidgetEntry {
+    /// 从 suite 读取「课表+预设」的缓存数据（key 为 entryPrefix_scheduleName__SEP__presetName）
+    static func load(from suite: UserDefaults?, scheduleName name: String, presetName preset: String) -> WidgetEntry {
         guard let suite = suite else {
             return WidgetEntry(scheduleName: "课程表", dateString: "", weekdayString: "", status: "noClass", course1: nil, course2: nil)
         }
-        let key = "\(WidgetDataKeys.entryPrefix)_\(name)"
-        guard let dict = suite.dictionary(forKey: key) as? [String: String] else {
-            return WidgetEntry(scheduleName: name.isEmpty ? "课程表" : name, dateString: "", weekdayString: "", status: "noClass", course1: nil, course2: nil)
+        let key = "\(WidgetDataKeys.entryPrefix)_\(name)\(WidgetDataKeys.entrySeparator)\(preset)"
+        if let dict = suite.dictionary(forKey: key) as? [String: String] {
+            return parseEntryDict(dict: dict, fallbackScheduleName: name)
         }
-        let scheduleName = dict[WidgetDataKeys.scheduleName] ?? name
+        // 兼容旧版：仅课表名的 key（主 App 未刷新前）
+        if let legacy = loadLegacy(from: suite, scheduleName: name) {
+            return legacy
+        }
+        return WidgetEntry(scheduleName: name.isEmpty ? "课程表" : name, dateString: "", weekdayString: "", status: "noClass", course1: nil, course2: nil)
+    }
+
+    private static func parseEntryDict(dict: [String: String], fallbackScheduleName: String) -> WidgetEntry {
+        let scheduleName = dict[WidgetDataKeys.scheduleName] ?? fallbackScheduleName
         let dateString = dict[WidgetDataKeys.date] ?? ""
         let weekdayString = dict[WidgetDataKeys.weekday] ?? ""
         let status = dict[WidgetDataKeys.status] ?? "noClass"
@@ -56,18 +70,9 @@ struct WidgetEntry {
         let c2Name = dict[WidgetDataKeys.course2Name] ?? ""
         let c2Time = dict[WidgetDataKeys.course2Time] ?? ""
         let c2Location = dict[WidgetDataKeys.course2Location] ?? ""
-
         let course1: (name: String, time: String, location: String)? = c1Name.isEmpty ? nil : (c1Name, c1Time, c1Location)
         let course2: (name: String, time: String, location: String)? = c2Name.isEmpty ? nil : (c2Name, c2Time, c2Location)
-
-        return WidgetEntry(
-            scheduleName: scheduleName,
-            dateString: dateString,
-            weekdayString: weekdayString,
-            status: status,
-            course1: course1,
-            course2: course2
-        )
+        return WidgetEntry(scheduleName: scheduleName, dateString: dateString, weekdayString: weekdayString, status: status, course1: course1, course2: course2)
     }
 
     /// 解析「小组件要显示的课表名」：若为跟随 App 或该课表已不存在，则回退到默认/第一张
@@ -89,9 +94,37 @@ struct WidgetEntry {
         }
         return list.first ?? ""
     }
+
+    /// 解析「小组件要使用的预设名」：若为跟随 App 或该预设已不存在，则回退到默认/第一个
+    static func resolvePresetNameToShow(suite: UserDefaults?, configuredPreset: String) -> String {
+        let list = suite?.stringArray(forKey: WidgetDataKeys.presetNamesList) ?? []
+        let defaultPreset = suite?.string(forKey: WidgetDataKeys.defaultPresetName) ?? ""
+
+        let presetToUse: String
+        if configuredPreset == kWidgetPresetOptionFollowApp {
+            presetToUse = defaultPreset
+        } else {
+            presetToUse = configuredPreset
+        }
+        if list.contains(presetToUse) {
+            return presetToUse
+        }
+        if !defaultPreset.isEmpty && list.contains(defaultPreset) {
+            return defaultPreset
+        }
+        return list.first ?? ""
+    }
 }
 
 extension WidgetEntry {
+    /// 兼容旧版：按课表名读取 key "widgetEntry_\(scheduleName)"（无预设时的单课表 key）
+    static func loadLegacy(from suite: UserDefaults?, scheduleName name: String) -> WidgetEntry? {
+        guard let suite = suite else { return nil }
+        let key = "\(WidgetDataKeys.entryPrefix)_\(name)"
+        guard let dict = suite.dictionary(forKey: key) as? [String: String] else { return nil }
+        return parseEntryDict(dict: dict, fallbackScheduleName: name)
+    }
+
     /// 兼容旧版 App：从旧版扁平 key（无 widgetEntry_*）读取
     static func loadLegacy(from suite: UserDefaults?) -> WidgetEntry? {
         guard let suite = suite else { return nil }

@@ -11,7 +11,6 @@ import SwiftUI
 struct ScheduleListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Schedule.name) private var schedules: [Schedule]
-    @Query(sort: \TimeSlotPreset.name) private var presets: [TimeSlotPreset]
     @AppStorage("activeScheduleName") private var activeScheduleName: String = "我的课程表"
 
     @State private var showAddSchedule = false
@@ -33,7 +32,7 @@ struct ScheduleListView: View {
             } header: {
                 Text("课程表")
             } footer: {
-                Text("点击选择当前使用的课程表。每张课程表可单独设置学期第一天和绑定的时间段预设。")
+                Text("点击选择当前使用的课程表。每张课程表可单独设置名称与学期第一天；时间段在「时间段预设」中全局切换。")
             }
         }
         .navigationTitle("课程表")
@@ -48,11 +47,11 @@ struct ScheduleListView: View {
             }
         }
         .sheet(isPresented: $showAddSchedule) {
-            ScheduleEditSheet(schedule: nil, presets: presets)
+            ScheduleEditSheet(schedule: nil)
         }
         .sheet(isPresented: presetSheetBinding) {
             if let s = scheduleToEdit {
-                ScheduleEditSheet(schedule: s, presets: presets)
+                ScheduleEditSheet(schedule: s)
             }
         }
         .onAppear {
@@ -78,11 +77,6 @@ struct ScheduleListView: View {
                 Text(semesterStartText(schedule.semesterStartDate))
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                if let p = schedule.timeSlotPreset {
-                    Text("时间段：\(p.name)")
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
-                }
             }
             Spacer()
             if schedule.name == activeScheduleName {
@@ -131,11 +125,9 @@ struct ScheduleEditSheet: View {
     @AppStorage("activeScheduleName") private var activeScheduleName: String = "我的课程表"
 
     let schedule: Schedule?
-    let presets: [TimeSlotPreset]
 
     @State private var name: String = ""
     @State private var semesterStartDate: Date = Date()
-    @State private var selectedPresetName: String = ""
 
     private var isEditing: Bool { schedule != nil }
 
@@ -149,14 +141,6 @@ struct ScheduleEditSheet: View {
                 Section("本学期第一天") {
                     DatePicker("学期第一天", selection: $semesterStartDate, displayedComponents: .date)
                 }
-                Section("时间段预设") {
-                    Picker("绑定预设", selection: $selectedPresetName) {
-                        Text("无").tag("")
-                        ForEach(presets, id: \.name) { p in
-                            Text(p.name).tag(p.name)
-                        }
-                    }
-                }
             }
             .navigationTitle(isEditing ? "编辑课程表" : "新建课程表")
             .navigationBarTitleDisplayMode(.inline)
@@ -164,11 +148,9 @@ struct ScheduleEditSheet: View {
                 if let s = schedule {
                     name = s.name
                     semesterStartDate = s.semesterStartDate
-                    selectedPresetName = s.timeSlotPreset?.name ?? ""
                 } else {
                     name = ""
                     semesterStartDate = defaultSemesterStartForPicker()
-                    selectedPresetName = presets.first?.name ?? ""
                 }
             }
             .toolbar {
@@ -197,15 +179,13 @@ struct ScheduleEditSheet: View {
         let n = name.trimmingCharacters(in: .whitespaces)
         guard !n.isEmpty else { return }
 
-        let preset = presets.first { $0.name == selectedPresetName }
         let wasActiveSchedule = schedule?.name == activeScheduleName
 
         if let s = schedule {
             s.name = n
             s.semesterStartDate = semesterStartDate
-            s.timeSlotPreset = preset
         } else {
-            let newSchedule = Schedule(name: n, semesterStartDate: semesterStartDate, timeSlotPreset: preset)
+            let newSchedule = Schedule(name: n, semesterStartDate: semesterStartDate)
             modelContext.insert(newSchedule)
         }
         try? modelContext.save()

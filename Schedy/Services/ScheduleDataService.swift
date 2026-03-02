@@ -94,14 +94,16 @@ func seedDefaultScheduleIfNeeded(modelContext: ModelContext) {
     if schedules.isEmpty {
         seedDefaultPresetsIfNeeded(modelContext: modelContext)
         let presets = (try? modelContext.fetch(FetchDescriptor<TimeSlotPreset>())) ?? []
-        let firstPreset = presets.first
         let start = defaultSemesterStartDate()
         let defaultName = "我的课程表"
-        let schedule = Schedule(name: defaultName, semesterStartDate: start, timeSlotPreset: firstPreset)
+        let schedule = Schedule(name: defaultName, semesterStartDate: start)
         modelContext.insert(schedule)
         try? modelContext.save()
-        // 确保默认课程表被选中，否则小组件用 activeScheduleName 查不到课表
         UserDefaults.standard.set(defaultName, forKey: "activeScheduleName")
+        if UserDefaults.standard.string(forKey: ScheduleDisplayKeys.activeTimeSlotPresetName)?.isEmpty != false,
+           let firstPresetName = presets.first?.name {
+            UserDefaults.standard.set(firstPresetName, forKey: ScheduleDisplayKeys.activeTimeSlotPresetName)
+        }
     }
 
     // 迁移：把没有归属的课程挂到第一张课程表
