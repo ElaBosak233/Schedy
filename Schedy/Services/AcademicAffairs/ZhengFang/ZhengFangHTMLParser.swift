@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum ZhengFangHTMLParser: ScheduleImportParserProtocol {
+enum ZhengFangHTMLParser: AcademicAffairsHTMLParserProtocol {
     /// 从正方教务「个人课表查询」完整 HTML 中解析出课程列表
     static func parse(html: String) -> [ParsedCourseItem] {
         var result: [ParsedCourseItem] = []

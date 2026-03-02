@@ -7,6 +7,7 @@
 
 import SwiftData
 import SwiftUI
+import UIKit
 
 /// 课程预览的上下文：课程 + 来源周 + 是否非本周（半透明），用于 sheet(item:) 保证周次一致
 private struct CoursePreviewContext: Identifiable {
@@ -126,8 +127,11 @@ struct ScheduleGridView: View {
     /// 用于翻页触觉反馈：仅在实际切换周时触发，避免首次进入时震动
     @State private var lastHapticWeek: Int? = nil
     @State private var showAddCourse = false
-    @State private var showAcademicAffairsImport = false
+    @State private var showScheduleImport = false
+    @State private var showScheduleExport = false
     @State private var showHeaderMenu = false
+    /// 导出：生成 CSV 后要分享的临时文件 URL，非 nil 时弹出系统分享面板
+    @State private var shareExportURL: ShareableExportItem?
     /// 点击课程块时带来源周与是否「非本周」，保证调课周次与点击一致；半透明课程仅展示卡片
     @State private var coursePreviewContext: CoursePreviewContext?
     @State private var courseToEdit: Course?
@@ -177,6 +181,23 @@ struct ScheduleGridView: View {
     private func dateString(forWeek week: Int, day: Int) -> String {
         guard let d = date(forWeek: week, day: day) else { return "" }
         return ScheduleDateFormatters.shortMD.string(from: d)
+    }
+
+    /// 导出当前课表为 CSV 并弹出系统分享面板
+    private func performCSVExport() {
+        guard let schedule = activeSchedule else { return }
+        let csv = CSVExport.csvString(from: schedule)
+        let fileName = (schedule.name.isEmpty ? "课程表" : schedule.name)
+            .replacingOccurrences(of: "/", with: "-")
+            + ".csv"
+        let tempDir = FileManager.default.temporaryDirectory
+        let fileURL = tempDir.appendingPathComponent(fileName)
+        do {
+            try csv.write(to: fileURL, atomically: true, encoding: .utf8)
+            shareExportURL = ShareableExportItem(url: fileURL)
+        } catch {
+            // 可后续用 alert 提示失败
+        }
     }
 
     /// 今日日期文案，如 "2月26日"
@@ -234,8 +255,13 @@ struct ScheduleGridView: View {
             .scrollContentBackground(.hidden)
             .background(Color.clear)
             .navigationBarHidden(true)
-            .sheet(isPresented: $showAcademicAffairsImport) {
-                ImportFromAcademicAffairsView()
+            .sheet(isPresented: $showScheduleImport) {
+                ScheduleImportView()
+            }
+            .sheet(isPresented: $showScheduleExport) {
+                ScheduleExportView(onExportCSV: {
+                    performCSVExport()
+                })
             }
             .sheet(isPresented: $showAddCourse) {
                 CourseEditSheet(
@@ -270,9 +296,15 @@ struct ScheduleGridView: View {
                     activeScheduleName: activeScheduleName,
                     onSelectSchedule: { activeScheduleName = $0; showHeaderMenu = false },
                     onAddCourse: { showHeaderMenu = false; showAddCourse = true },
-                    onImport: { showHeaderMenu = false; showAcademicAffairsImport = true },
+                    onImport: { showHeaderMenu = false; showScheduleImport = true },
+                    onExport: { showHeaderMenu = false; showScheduleExport = true },
                     onDismiss: { showHeaderMenu = false }
                 )
+            }
+            .sheet(item: $shareExportURL) { item in
+                ShareSheet(activityItems: [item.url]) {
+                    shareExportURL = nil
+                }
             }
             .onAppear {
                 seedDefaultScheduleIfNeeded(modelContext: modelContext)
@@ -660,6 +692,52 @@ private struct CoursePreviewSheet: View {
     }
 }
 
+/// 用于 .sheet(item:) 的导出项，包装 URL 以符合 Identifiable
+private struct ShareableExportItem: Identifiable {
+    let id = UUID()
+    let url: URL
+}
+
+/// 系统分享面板（保存到文件、发送等），关闭后回调
+private struct ShareSheet: UIViewControllerRepresentable {
+    let activityItems: [Any]
+    var onComplete: () -> Void = {}
+
+    func makeUIViewController(context: Context) -> UIActivityViewControllerWrapper {
+        UIActivityViewControllerWrapper(activityItems: activityItems, onComplete: onComplete)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewControllerWrapper, context: Context) {}
+}
+
+private final class UIActivityViewControllerWrapper: UIViewController {
+    let activityItems: [Any]
+    let onComplete: () -> Void
+
+    init(activityItems: [Any], onComplete: @escaping () -> Void) {
+        self.activityItems = activityItems
+        self.onComplete = onComplete
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    override func loadView() {
+        view = UIView()
+        view.backgroundColor = .clear
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        guard presentedViewController == nil else { return }
+        let vc = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+        vc.completionWithItemsHandler = { [weak self] _, _, _, _ in
+            self?.onComplete()
+        }
+        present(vc, animated: true)
+    }
+}
+
 // MARK: - 顶部栏菜单 Sheet（替代 Menu，避免 safeAreaInset 内 Menu 触发的 _UIReparentingView 警告）
 private struct HeaderMenuSheet: View {
     let schedules: [Schedule]
@@ -667,8 +745,13 @@ private struct HeaderMenuSheet: View {
     let onSelectSchedule: (String) -> Void
     let onAddCourse: () -> Void
     let onImport: () -> Void
+    let onExport: () -> Void
     let onDismiss: () -> Void
     @Environment(\.dismiss) private var dismiss
+
+    private var activeSchedule: Schedule? {
+        schedules.first { $0.name == activeScheduleName } ?? schedules.first
+    }
 
     var body: some View {
         NavigationStack {
@@ -684,10 +767,18 @@ private struct HeaderMenuSheet: View {
                         onImport()
                         dismiss()
                     } label: {
-                        Label("从教务导入", systemImage: "square.and.arrow.down")
+                        Label("导入课表", systemImage: "square.and.arrow.down")
                     }
                 }
-                if schedules.count > 1 {
+                Section {
+                    Button {
+                        onExport()
+                        dismiss()
+                    } label: {
+                        Label("导出课表", systemImage: "square.and.arrow.up")
+                    }
+                }
+                if !schedules.isEmpty {
                     Section {
                         ForEach(schedules, id: \Schedule.name) { (s: Schedule) in
                             Button {
