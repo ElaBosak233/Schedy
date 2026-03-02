@@ -98,7 +98,7 @@ struct TodayView: View {
 
     private var sortedSlots: [TimeSlotItem] {
         guard let p = activePreset else { return [] }
-        return p.slots.sorted { $0.periodIndex < $1.periodIndex }
+        return (p.slots ?? []).sorted { $0.periodIndex < $1.periodIndex }
     }
 
     /// 当前是周几（1=周一 … 7=周日），与 Course.dayOfWeek 一致

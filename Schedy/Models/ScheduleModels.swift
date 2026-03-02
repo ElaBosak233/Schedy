@@ -12,14 +12,14 @@ import SwiftData
 /// 一张独立的课程表：名称、本学期第一天。时间段由全局「当前时间段」决定，不绑定在课表上。
 @Model
 final class Schedule {
-    var name: String
+    var name: String = ""
     /// 本学期第一天（用于按周计算日期，周一为第一天）
-    var semesterStartDate: Date
+    var semesterStartDate: Date = Date()
     @Relationship(deleteRule: .cascade, inverse: \Course.schedule)
-    var courses: [Course] = []
+    var courses: [Course]?
     /// 该课程表下所有调课记录（独立数据结构，便于按课程表溯源与还原）
     @Relationship(deleteRule: .cascade, inverse: \CourseReschedule.schedule)
-    var reschedules: [CourseReschedule] = []
+    var reschedules: [CourseReschedule]?
 
     init(name: String, semesterStartDate: Date) {
         self.name = name
@@ -28,8 +28,9 @@ final class Schedule {
 
     /// 课表显示周数上限：有课的最大周 + 1（无课时为 1 周）。用于课表滑动范围、调课可选周等。
     var effectiveMaxWeeks: Int {
-        let fromRanges = courses.flatMap(\.parsedWeekRanges).map(\.end).max() ?? 0
-        let fromReschedules = courses.flatMap(\.reschedules).flatMap { [$0.week, $0.effectiveNewWeek] }.max() ?? 0
+        let c = courses ?? []
+        let fromRanges = c.flatMap(\.parsedWeekRanges).map(\.end).max() ?? 0
+        let fromReschedules = c.flatMap { ($0.reschedules ?? []) }.flatMap { [$0.week, $0.effectiveNewWeek] }.max() ?? 0
         let maxCourseWeek = max(fromRanges, fromReschedules)
         return max(1, maxCourseWeek + 1)
     }
@@ -58,7 +59,7 @@ enum WeekParity: Int, CaseIterable {
 /// teacher、location 可选，为空时界面不展示对应项
 @Model
 final class Course {
-    var name: String
+    var name: String = ""
     var teacher: String?
     var location: String?
     /// 学分（可选，兼容旧数据）
@@ -68,18 +69,18 @@ final class Course {
     /// 单双周：0=全部，1=单周，2=双周（兼容旧数据：nil 视为 0）
     var weekParityRaw: Int?
     /// 兼容旧数据：仅当 weekRangesString 为空时使用，表示单周
-    var weekIndex: Int
+    var weekIndex: Int = 1
     /// 周几（1 = 周一 … 7 = 周日）
-    var dayOfWeek: Int
+    var dayOfWeek: Int = 1
     /// 起始节（1 起算，对应时间段中的节次）
-    var periodIndex: Int
+    var periodIndex: Int = 1
     /// 结束节（含）；nil 或等于 periodIndex 表示单节
     var periodEnd: Int?
     /// 所属课程表
     var schedule: Schedule?
     /// 单次调课记录（仅影响指定周次的一块课）
     @Relationship(deleteRule: .cascade, inverse: \CourseReschedule.course)
-    var reschedules: [CourseReschedule] = []
+    var reschedules: [CourseReschedule]?
 
     init(
         name: String,
@@ -148,7 +149,7 @@ final class Course {
 
     /// 该课程在指定周次是否已有调课记录（调至其他时间）
     func reschedule(forWeek week: Int) -> CourseReschedule? {
-        reschedules.first { $0.week == week }
+        (reschedules ?? []).first { $0.week == week }
     }
 
     /// 结束节（含），未设则与起始节相同
@@ -185,20 +186,20 @@ final class CourseReschedule {
     var schedule: Schedule?
 
     /// 来源周次：被调走的是第几周的那一次课
-    var week: Int
+    var week: Int = 1
     /// 原时间：来源周的星期几（1 = 周一 … 7 = 周日），用于溯源与还原展示
-    var originalDayOfWeek: Int
+    var originalDayOfWeek: Int = 1
     /// 原时间：起始节、结束节（1 起算），用于溯源与还原展示
-    var originalPeriodStart: Int
-    var originalPeriodEnd: Int
+    var originalPeriodStart: Int = 1
+    var originalPeriodEnd: Int = 1
 
     /// 目标周次：调至第几周
-    var newWeek: Int
+    var newWeek: Int = 1
     /// 调至周几（1 = 周一 … 7 = 周日）
-    var newDayOfWeek: Int
+    var newDayOfWeek: Int = 1
     /// 调至起始节、结束节（1 起算）
-    var newPeriodStart: Int
-    var newPeriodEnd: Int
+    var newPeriodStart: Int = 1
+    var newPeriodEnd: Int = 1
 
     /// 兼容旧数据：若 newWeek 为 0 视为与 week 相同（当周内调课）
     var effectiveNewWeek: Int { newWeek > 0 ? newWeek : week }
@@ -238,11 +239,11 @@ final class CourseReschedule {
 /// 某一节课的起止时间，如 8:00~8:40
 @Model
 final class TimeSlotItem {
-    var periodIndex: Int
-    var startHour: Int
-    var startMinute: Int
-    var endHour: Int
-    var endMinute: Int
+    var periodIndex: Int = 1
+    var startHour: Int = 0
+    var startMinute: Int = 0
+    var endHour: Int = 0
+    var endMinute: Int = 0
 
     var preset: TimeSlotPreset?
 
@@ -271,14 +272,14 @@ final class TimeSlotItem {
 /// 一套时间段，如「冬令时」「夏令时」，包含多节课的起止时间
 @Model
 final class TimeSlotPreset {
-    var name: String
-    var createdAt: Date
-    var slots: [TimeSlotItem] = []
+    var name: String = ""
+    var createdAt: Date = Date()
+    var slots: [TimeSlotItem]?
 
     init(name: String, slots: [TimeSlotItem] = []) {
         self.name = name
         self.createdAt = Date()
-        self.slots = slots
+        self.slots = slots.isEmpty ? nil : slots
     }
 }
 

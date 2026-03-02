@@ -231,10 +231,10 @@ struct ImportFromAcademicAffairsView: View {
                 return
             }
             extendPresetToCoverPeriodIfNeeded(preset: preset, requiredPeriodCount: maxPeriodNeeded, modelContext: modelContext)
-            for c in schedule.courses {
+            for c in schedule.courses ?? [] {
                 modelContext.delete(c)
             }
-            schedule.courses.removeAll()
+            schedule.courses = []
             addParsedCourses(parsed, to: schedule, preset: preset)
             try? modelContext.save()
             refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
@@ -271,7 +271,7 @@ struct ImportFromAcademicAffairsView: View {
                 schedule: schedule
             )
             modelContext.insert(course)
-            schedule.courses.append(course)
+            schedule.courses = (schedule.courses ?? []) + [course]
         }
     }
 

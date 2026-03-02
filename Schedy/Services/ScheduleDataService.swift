@@ -31,7 +31,7 @@ func seedDefaultPresetsIfNeeded(modelContext: ModelContext) {
     let winter = TimeSlotPreset(name: "冬令时", slots: [])
     for slot in makeSlots(DefaultTimeSlots.winter()) {
         slot.preset = winter
-        winter.slots.append(slot)
+        winter.slots = (winter.slots ?? []) + [slot]
         modelContext.insert(slot)
     }
     modelContext.insert(winter)
@@ -39,7 +39,7 @@ func seedDefaultPresetsIfNeeded(modelContext: ModelContext) {
     let summer = TimeSlotPreset(name: "夏令时", slots: [])
     for slot in makeSlots(DefaultTimeSlots.summer()) {
         slot.preset = summer
-        summer.slots.append(slot)
+        summer.slots = (summer.slots ?? []) + [slot]
         modelContext.insert(slot)
     }
     modelContext.insert(summer)
@@ -51,7 +51,7 @@ func seedDefaultPresetsIfNeeded(modelContext: ModelContext) {
 @MainActor
 func extendPresetToCoverPeriodIfNeeded(preset: TimeSlotPreset?, requiredPeriodCount: Int, modelContext: ModelContext) {
     guard let preset = preset, requiredPeriodCount > 0 else { return }
-    let sortedSlots = preset.slots.sorted { $0.periodIndex < $1.periodIndex }
+    let sortedSlots = (preset.slots ?? []).sorted { $0.periodIndex < $1.periodIndex }
     let maxPeriod = sortedSlots.map(\.periodIndex).max() ?? 0
     guard maxPeriod < requiredPeriodCount else { return }
 
@@ -73,7 +73,7 @@ func extendPresetToCoverPeriodIfNeeded(preset: TimeSlotPreset?, requiredPeriodCo
         let endM = cal.component(.minute, from: nextEnd)
         let slot = TimeSlotItem(periodIndex: period, startHour: startH, startMinute: startM, endHour: endH, endMinute: endM)
         slot.preset = preset
-        preset.slots.append(slot)
+        preset.slots = (preset.slots ?? []) + [slot]
         modelContext.insert(slot)
         ref = nextEnd
     }

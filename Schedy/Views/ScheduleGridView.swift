@@ -59,7 +59,7 @@ private struct WeekCourseGrid {
         }
 
         // 1. 正常排课：本周有课且未调课的课程放在原位置
-        for c in schedule.courses {
+        for c in schedule.courses ?? [] {
             let applies = c.appliesToWeek(week)
             let hasFuture = week < maxWeeks && (week + 1...maxWeeks).contains(where: { c.appliesToWeek($0) })
             let dayIndex = c.dayOfWeek - 1
@@ -86,8 +86,8 @@ private struct WeekCourseGrid {
         }
 
         // 2. 调课目标：凡「调至本周」的课程，在本周新时间格显示，并记录是哪条调课（点击时用其来源周）
-        for c in schedule.courses {
-            for r in c.reschedules where r.effectiveNewWeek == week {
+        for c in schedule.courses ?? [] {
+            for r in c.reschedules ?? [] where r.effectiveNewWeek == week {
                 let newDayIndex = r.newDayOfWeek - 1
                 guard newDayIndex >= 0, newDayIndex < 7,
                       let startSlot = slotIndex(forPeriod: r.newPeriodStart) else { continue }
@@ -155,7 +155,7 @@ struct ScheduleGridView: View {
 
     private var sortedSlots: [TimeSlotItem] {
         guard let p = activePreset else { return [] }
-        return p.slots.sorted { $0.periodIndex < $1.periodIndex }
+        return (p.slots ?? []).sorted { $0.periodIndex < $1.periodIndex }
     }
 
     /// 课表显示周数：1 到 effectiveMaxWeeks（有课的最大周 + 1，空课表为 1 周）

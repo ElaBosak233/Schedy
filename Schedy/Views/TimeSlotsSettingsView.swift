@@ -64,7 +64,7 @@ struct TimeSlotsSettingsView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(preset.name)
                     .font(.headline)
-                Text("\(preset.slots.count) 个时间段")
+                Text("\((preset.slots ?? []).count) 个时间段")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -92,9 +92,9 @@ struct TimeSlotsSettingsView: View {
 
     @ViewBuilder
     private var slotsDetailSection: some View {
-        if let preset = activePreset, !preset.slots.isEmpty {
+        if let preset = activePreset, !(preset.slots ?? []).isEmpty {
             Section("\(preset.name) 时间段明细") {
-                ForEach(preset.slots.sorted(by: { $0.periodIndex < $1.periodIndex }), id: \.periodIndex) { slot in
+                ForEach((preset.slots ?? []).sorted(by: { $0.periodIndex < $1.periodIndex }), id: \.periodIndex) { slot in
                     NavigationLink {
                         TimeSlotEditView(slot: slot)
                     } label: {
@@ -164,7 +164,7 @@ struct TimeSlotsSettingsView: View {
                 endMinute: item.end.m
             )
             slot.preset = newPreset
-            newPreset.slots.append(slot)
+            newPreset.slots = (newPreset.slots ?? []) + [slot]
             modelContext.insert(slot)
         }
         modelContext.insert(newPreset)
@@ -178,7 +178,7 @@ struct TimeSlotsSettingsView: View {
            let other = presets.first(where: { $0.name != preset.name }) {
             activeTimeSlotPresetName = other.name
         }
-        for slot in preset.slots {
+        for slot in preset.slots ?? [] {
             modelContext.delete(slot)
         }
         modelContext.delete(preset)

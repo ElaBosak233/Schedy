@@ -113,7 +113,7 @@ struct CourseEditSheet: View {
 
     private var sortedPeriods: [TimeSlotItem] {
         guard let p = preset else { return [] }
-        return p.slots.sorted { $0.periodIndex < $1.periodIndex }
+        return (p.slots ?? []).sorted { $0.periodIndex < $1.periodIndex }
     }
 
     /// 结束节可选范围：起始节及之后

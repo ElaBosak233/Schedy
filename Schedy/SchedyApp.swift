@@ -32,6 +32,7 @@ enum AppearanceMode: String, CaseIterable {
 }
 
 let kAppearanceModeKey = "appearanceMode"
+let kICloudSyncEnabledKey = "iCloudSyncEnabled"
 
 @main
 struct SchedyApp: App {
@@ -45,17 +46,37 @@ struct SchedyApp: App {
             TimeSlotPreset.self,
             TimeSlotItem.self,
         ])
-        // 先尝试仅本地存储，避免与已有数据库 schema 冲突导致 loadIssueModelContainer
-        // 若需启用 iCloud 同步，需在 Xcode 中临时移除 CloudKit capability 后删除 app 重装，
-        // 再恢复 capability 后全新安装即可使用 CloudKit
+
+        // iCloud 可用性：模拟器或未登录 Apple ID 时不可用
+        let iCloudAvailable = FileManager.default.ubiquityIdentityToken != nil
+
+        // 首次启动：根据 iCloud 是否可用设置默认；iCloud 不可用时默认关闭
+        if UserDefaults.standard.object(forKey: kICloudSyncEnabledKey) == nil {
+            UserDefaults.standard.set(iCloudAvailable, forKey: kICloudSyncEnabledKey)
+        }
+
+        let useICloud = UserDefaults.standard.bool(forKey: kICloudSyncEnabledKey) && iCloudAvailable
+
         let config = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false,
-            cloudKitDatabase: .none
+            cloudKitDatabase: useICloud ? .automatic : .none
         )
         do {
             return try ModelContainer(for: schema, configurations: [config])
         } catch {
+            // CloudKit 初始化失败时回退到仅本地存储
+            if useICloud {
+                UserDefaults.standard.set(false, forKey: kICloudSyncEnabledKey)
+                let fallbackConfig = ModelConfiguration(
+                    schema: schema,
+                    isStoredInMemoryOnly: false,
+                    cloudKitDatabase: .none
+                )
+                if let fallback = try? ModelContainer(for: schema, configurations: [fallbackConfig]) {
+                    return fallback
+                }
+            }
             fatalError("无法创建 ModelContainer: \(error)")
         }
     }()

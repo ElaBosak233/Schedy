@@ -37,7 +37,7 @@ struct RescheduleSheet: View {
 
     private var sortedPeriods: [TimeSlotItem] {
         guard let p = preset else { return [] }
-        return p.slots.sorted { $0.periodIndex < $1.periodIndex }
+        return (p.slots ?? []).sorted { $0.periodIndex < $1.periodIndex }
     }
 
     private var startPeriodOptions: [TimeSlotItem] {

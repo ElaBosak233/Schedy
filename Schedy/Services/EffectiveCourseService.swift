@@ -45,7 +45,7 @@ enum EffectiveCourseService {
 
         // 2. 调课调入：被调到「本周该日」的课
         for c in courses {
-            for r in c.reschedules where r.effectiveNewWeek == week && r.newDayOfWeek == dayOfWeek {
+            for r in c.reschedules ?? [] where r.effectiveNewWeek == week && r.newDayOfWeek == dayOfWeek {
                 result.append(EffectiveCourseOccurrence(
                     course: c,
                     periodStart: r.newPeriodStart,
