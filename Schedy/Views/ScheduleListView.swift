@@ -89,13 +89,14 @@ struct ScheduleListView: View {
             activeScheduleName = schedule.name
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            Button("编辑", systemImage: "pencil") {
-                scheduleToEdit = schedule
-            }
             if schedules.count > 1 {
                 Button("删除", systemImage: "trash", role: .destructive) {
                     deleteSchedule(schedule)
                 }
+                .tint(.red)
+            }
+            Button("编辑", systemImage: "pencil") {
+                scheduleToEdit = schedule
             }
         }
     }

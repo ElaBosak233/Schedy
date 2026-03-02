@@ -14,12 +14,20 @@ struct TimeSlotsSettingsView: View {
     @AppStorage(ScheduleDisplayKeys.activeTimeSlotPresetName) private var activeTimeSlotPresetName: String = ""
     @State private var showAddPreset = false
     @State private var presetToEdit: TimeSlotPreset?
+    @State private var slotToEdit: TimeSlotItem?
     @State private var newPresetName = ""
 
     private var presetSheetBinding: Binding<Bool> {
         Binding(
             get: { presetToEdit != nil },
             set: { if !$0 { presetToEdit = nil } }
+        )
+    }
+
+    private var slotSheetBinding: Binding<Bool> {
+        Binding(
+            get: { slotToEdit != nil },
+            set: { if !$0 { slotToEdit = nil } }
         )
     }
 
@@ -35,6 +43,7 @@ struct TimeSlotsSettingsView: View {
             .toolbar { toolbarContent }
             .alert("新建时间段", isPresented: $showAddPreset) { addPresetAlertContent } message: { addPresetAlertMessage }
             .sheet(isPresented: presetSheetBinding) { presetEditSheetContent }
+            .sheet(isPresented: slotSheetBinding) { slotEditSheetContent }
             .onAppear {
                 seedDefaultPresetsIfNeeded(modelContext: modelContext)
                 if activeTimeSlotPresetName.isEmpty, let first = presets.first {
@@ -79,22 +88,23 @@ struct TimeSlotsSettingsView: View {
             activeTimeSlotPresetName = preset.name
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            Button("编辑", systemImage: "pencil") {
-                presetToEdit = preset
-            }
             if presets.count > 1 {
                 Button("删除", systemImage: "trash", role: .destructive) {
                     deletePreset(preset)
                 }
+                .tint(.red)
+            }
+            Button("编辑", systemImage: "pencil") {
+                presetToEdit = preset
             }
         }
     }
 
     @ViewBuilder
     private var slotsDetailSection: some View {
-        if let preset = activePreset, !(preset.slots ?? []).isEmpty {
-            Section("\(preset.name) 时间段明细") {
-                ForEach((preset.slots ?? []).sorted(by: { $0.periodIndex < $1.periodIndex }), id: \.periodIndex) { slot in
+        if let preset = activePreset {
+            Section {
+                ForEach((preset.slots ?? []).sorted(by: { $0.periodIndex < $1.periodIndex }), id: \.persistentModelID) { slot in
                     NavigationLink {
                         TimeSlotEditView(slot: slot)
                     } label: {
@@ -105,7 +115,23 @@ struct TimeSlotsSettingsView: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button("删除", systemImage: "trash", role: .destructive) {
+                            deleteSlot(slot, from: preset)
+                        }
+                        .tint(.red)
+                        Button("编辑", systemImage: "pencil") {
+                            slotToEdit = slot
+                        }
+                    }
                 }
+                Button {
+                    addSlot(to: preset)
+                } label: {
+                    Label("添加时间节", systemImage: "plus.circle")
+                }
+            } header: {
+                Text("\(preset.name) 时间段明细")
             }
         }
     }
@@ -145,6 +171,20 @@ struct TimeSlotsSettingsView: View {
         }
     }
 
+    @ViewBuilder
+    private var slotEditSheetContent: some View {
+        if let s = slotToEdit {
+            NavigationStack {
+                TimeSlotEditView(slot: s)
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("完成") { slotToEdit = nil }
+                        }
+                    }
+            }
+        }
+    }
+
     private func createPreset() {
         let name = newPresetName.trimmingCharacters(in: .whitespaces)
         guard !name.isEmpty else { return }
@@ -154,7 +194,7 @@ struct TimeSlotsSettingsView: View {
         }
 
         let newPreset = TimeSlotPreset(name: name, slots: [])
-        let defaultData = DefaultTimeSlots.winter()
+        let defaultData = TimeSlotPreset.Default.winter()
         for item in defaultData {
             let slot = TimeSlotItem(
                 periodIndex: item.period,
@@ -183,6 +223,83 @@ struct TimeSlotsSettingsView: View {
         }
         modelContext.delete(preset)
         try? modelContext.save()
+    }
+
+    private func addSlot(to preset: TimeSlotPreset) {
+        let existingSlots = preset.slots ?? []
+        let nextPeriodIndex = (existingSlots.map(\.periodIndex).max() ?? 0) + 1
+
+        let (startH, startM, endH, endM): (Int, Int, Int, Int)
+        if let lastSlot = existingSlots.sorted(by: { $0.periodIndex < $1.periodIndex }).last {
+            var endMinutes = lastSlot.endHour * 60 + lastSlot.endMinute + 45
+            if endMinutes >= 24 * 60 { endMinutes = 23 * 60 }
+            let endHour = endMinutes / 60
+            let endMin = endMinutes % 60
+            let startMinutes = endMinutes - 40
+            let startHour = max(0, startMinutes / 60)
+            let startMin = max(0, startMinutes % 60)
+            (startH, startM, endH, endM) = (startHour, startMin, endHour, endMin)
+        } else {
+            (startH, startM, endH, endM) = (8, 0, 8, 40)
+        }
+
+        let slot = TimeSlotItem(
+            periodIndex: nextPeriodIndex,
+            startHour: startH,
+            startMinute: startM,
+            endHour: endH,
+            endMinute: endM
+        )
+        slot.preset = preset
+        preset.slots = existingSlots + [slot]
+        modelContext.insert(slot)
+        try? modelContext.save()
+    }
+
+    private func deleteSlot(_ slot: TimeSlotItem, from preset: TimeSlotPreset) {
+        let deletedPeriod = slot.periodIndex
+        preset.slots = (preset.slots ?? []).filter { $0.periodIndex != deletedPeriod }
+        for s in preset.slots ?? [] where s.periodIndex > deletedPeriod {
+            s.periodIndex -= 1
+        }
+        renumberCoursesAndReschedules(afterDeletedPeriod: deletedPeriod)
+        modelContext.delete(slot)
+        try? modelContext.save()
+    }
+
+    /// 删除某节后，将引用该节及之后节次的课程、调课记录的节次全部减 1
+    private func renumberCoursesAndReschedules(afterDeletedPeriod deletedPeriod: Int) {
+        let courseDescriptor = FetchDescriptor<Course>()
+        guard let allCourses = try? modelContext.fetch(courseDescriptor) else { return }
+        for c in allCourses {
+            if c.periodIndex > deletedPeriod {
+                c.periodIndex -= 1
+            }
+            if let end = c.periodEnd {
+                if end > deletedPeriod {
+                    c.periodEnd = end - 1
+                } else if end == deletedPeriod {
+                    c.periodEnd = max(c.periodIndex, deletedPeriod - 1)
+                    if c.periodEnd == c.periodIndex { c.periodEnd = nil }
+                }
+            }
+        }
+        let rescheduleDescriptor = FetchDescriptor<CourseReschedule>()
+        guard let allReschedules = try? modelContext.fetch(rescheduleDescriptor) else { return }
+        for r in allReschedules {
+            if r.originalPeriodStart > deletedPeriod { r.originalPeriodStart -= 1 }
+            if r.originalPeriodEnd > deletedPeriod {
+                r.originalPeriodEnd -= 1
+            } else if r.originalPeriodEnd == deletedPeriod {
+                r.originalPeriodEnd = max(r.originalPeriodStart, deletedPeriod - 1)
+            }
+            if r.newPeriodStart > deletedPeriod { r.newPeriodStart -= 1 }
+            if r.newPeriodEnd > deletedPeriod {
+                r.newPeriodEnd -= 1
+            } else if r.newPeriodEnd == deletedPeriod {
+                r.newPeriodEnd = max(r.newPeriodStart, deletedPeriod - 1)
+            }
+        }
     }
 }
 

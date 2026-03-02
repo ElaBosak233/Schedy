@@ -32,7 +32,7 @@ struct CourseEditSheet: View {
     @State private var location = ""
     @State private var creditsText = ""  // 学分，空表示未填
     @State private var weekRanges: [EditableWeekRange]
-    @State private var weekParity: WeekParity
+    @State private var weekParity: Course.WeekParity
     @State private var dayOfWeek: Int
     @State private var periodStart: Int
     @State private var periodEnd: Int
@@ -175,7 +175,7 @@ struct CourseEditSheet: View {
                     }
 
                     Picker("单双周", selection: $weekParity) {
-                        ForEach(WeekParity.allCases, id: \.rawValue) { p in
+                        ForEach(Course.WeekParity.allCases, id: \.rawValue) { p in
                             Text(p.displayName).tag(p)
                         }
                     }

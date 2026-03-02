@@ -115,12 +115,12 @@ enum ZhengFangHTMLParser: ScheduleImportParserProtocol {
     }
 
     /// 从一块 timetable_con 中解析：课程名、教师、地点、周次串、单双周、学分
-    private static func parseOneTimetableCon(html: String) -> (name: String, teacher: String, location: String, weekRangesString: String, weekParity: WeekParity, credits: Double?) {
+    private static func parseOneTimetableCon(html: String) -> (name: String, teacher: String, location: String, weekRangesString: String, weekParity: Course.WeekParity, credits: Double?) {
         var name = ""
         var teacher = ""
         var location = ""
         var weekRangesString = ""
-        var weekParity: WeekParity = .all
+        var weekParity: Course.WeekParity = .all
 
         // 课程名
         if let r = html.range(of: "class=\"title\"", options: .caseInsensitive),
