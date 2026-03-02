@@ -223,11 +223,37 @@ struct TimeSlotEditView: View {
     @AppStorage("activeScheduleName") private var activeScheduleName: String = "我的课程表"
     @Bindable var slot: TimeSlotItem
 
+    private func dateFrom(hour: Int, minute: Int) -> Date {
+        Calendar.current.date(from: DateComponents(hour: hour, minute: minute)) ?? Date()
+    }
+
+    private func startDateBinding() -> Binding<Date> {
+        Binding(
+            get: { dateFrom(hour: slot.startHour, minute: slot.startMinute) },
+            set: { newDate in
+                let comps = Calendar.current.dateComponents([.hour, .minute], from: newDate)
+                slot.startHour = comps.hour ?? 0
+                slot.startMinute = comps.minute ?? 0
+            }
+        )
+    }
+
+    private func endDateBinding() -> Binding<Date> {
+        Binding(
+            get: { dateFrom(hour: slot.endHour, minute: slot.endMinute) },
+            set: { newDate in
+                let comps = Calendar.current.dateComponents([.hour, .minute], from: newDate)
+                slot.endHour = comps.hour ?? 0
+                slot.endMinute = comps.minute ?? 0
+            }
+        )
+    }
+
     var body: some View {
         Form {
             Section("第 \(slot.periodIndex) 节") {
-                TimePickerRow(label: "开始", hour: $slot.startHour, minute: $slot.startMinute)
-                TimePickerRow(label: "结束", hour: $slot.endHour, minute: $slot.endMinute)
+                DatePicker("开始", selection: startDateBinding(), displayedComponents: .hourAndMinute)
+                DatePicker("结束", selection: endDateBinding(), displayedComponents: .hourAndMinute)
             }
         }
         .navigationTitle("编辑时间段")
@@ -238,45 +264,6 @@ struct TimeSlotEditView: View {
                 scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
             }
         }
-    }
-}
-
-// MARK: - 时间选择器（滚轮样式，类似 iPhone 计时器）
-struct TimePickerRow: View {
-    var label: String
-    @Binding var hour: Int
-    @Binding var minute: Int
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(label)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            HStack(spacing: 0) {
-                Picker("时", selection: $hour) {
-                    ForEach(0..<24, id: \.self) { h in
-                        Text(String(format: "%02d", h)).tag(h)
-                    }
-                }
-                .pickerStyle(.wheel)
-                .frame(maxWidth: .infinity)
-
-                Text(":")
-                    .font(.title2)
-                    .fontWeight(.medium)
-                    .foregroundStyle(.secondary)
-
-                Picker("分", selection: $minute) {
-                    ForEach(0..<60, id: \.self) { m in
-                        Text(String(format: "%02d", m)).tag(m)
-                    }
-                }
-                .pickerStyle(.wheel)
-                .frame(maxWidth: .infinity)
-            }
-            .frame(height: 120)
-        }
-        .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16))
     }
 }
 
