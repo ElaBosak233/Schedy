@@ -81,14 +81,17 @@ struct ContentView: View {
             }
             .tint(.accentColor)
             .onAppear {
-                // 每次打开应用都重新排期课程提醒，即使用户只停留在「今天」标签
                 if !activeScheduleName.isEmpty {
                     scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
                 }
+                refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
             }
             .onChange(of: scenePhase) { _, phase in
-                if phase == .active, !activeScheduleName.isEmpty {
-                    scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
+                if phase == .active {
+                    if !activeScheduleName.isEmpty {
+                        scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
+                    }
+                    refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
                 }
             }
         }
@@ -145,7 +148,7 @@ struct SettingsRootView: View {
                 NavigationLink {
                     PermissionsView()
                 } label: {
-                    Label("权限", systemImage: "hand.raised.fill")
+                    Label("权限", systemImage: "hand.raised")
                 }
             } header: {
                 Text("权限")

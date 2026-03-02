@@ -2,7 +2,7 @@
 //  SchedyWidget.swift
 //  SchedyWidget
 //
-//  课程表小组件：1x1（小方）与 2x1（长条），显示课程表名 | 日期 星期几，以及接下来两节课或提示文案。
+//  课程表小组件：1x1（小方）与 2x1（长条），可设置显示哪张课表，显示日期与接下来两节课。
 //
 
 import WidgetKit
@@ -15,48 +15,50 @@ struct SchedyWidgetEntry: TimelineEntry {
     let entry: WidgetEntry
 }
 
-struct SchedyWidgetProvider: TimelineProvider {
+private let sampleEntry = WidgetEntry(
+    scheduleName: "我的课程表",
+    dateString: "2月26日",
+    weekdayString: "周四",
+    status: "next",
+    course1: ("高等数学", "08:00", "A101"),
+    course2: ("英语", "09:50", "B202")
+)
+
+@available(iOS 17.0, macOS 14.0, watchOS 10.0, *)
+struct SchedyWidgetProvider: AppIntentTimelineProvider {
+    typealias Entry = SchedyWidgetEntry
+    typealias Intent = SchedyWidgetConfigIntent
+
     func placeholder(in context: Context) -> SchedyWidgetEntry {
-        SchedyWidgetEntry(
-            date: Date(),
-            entry: WidgetEntry(
-                scheduleName: "我的课程表",
-                dateString: "2月26日",
-                weekdayString: "周四",
-                status: "next",
-                course1: ("高等数学", "08:00", "A101"),
-                course2: ("英语", "09:50", "B202")
-            )
-        )
+        SchedyWidgetEntry(date: Date(), entry: sampleEntry)
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (SchedyWidgetEntry) -> Void) {
-        // 预览 / 小组件选择器里显示示例数据，避免只看到“今天没课”
+    func snapshot(for configuration: SchedyWidgetConfigIntent, in context: Context) async -> SchedyWidgetEntry {
         if context.isPreview {
-            let sample = WidgetEntry(
-                scheduleName: "我的课程表",
-                dateString: "2月26日",
-                weekdayString: "周四",
-                status: "next",
-                course1: ("高等数学", "08:00", "A101"),
-                course2: ("英语", "09:50", "B202")
-            )
-            completion(SchedyWidgetEntry(date: Date(), entry: sample))
-            return
+            return SchedyWidgetEntry(date: Date(), entry: sampleEntry)
         }
         let suite = UserDefaults(suiteName: kWidgetAppGroupSuiteName)
-        let entry = WidgetEntry.load(from: suite)
-        completion(SchedyWidgetEntry(date: Date(), entry: entry))
+        let resolved = WidgetEntry.resolveScheduleNameToShow(suite: suite, configuredName: configuration.scheduleName ?? kWidgetScheduleOptionFollowApp)
+        var widgetEntry = WidgetEntry.load(from: suite, scheduleName: resolved)
+        if widgetEntry.dateString.isEmpty, let legacy = WidgetEntry.loadLegacy(from: suite) {
+            widgetEntry = legacy
+        }
+        return SchedyWidgetEntry(date: Date(), entry: widgetEntry)
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<SchedyWidgetEntry>) -> Void) {
+    func timeline(for configuration: SchedyWidgetConfigIntent, in context: Context) async -> Timeline<SchedyWidgetEntry> {
         let suite = UserDefaults(suiteName: kWidgetAppGroupSuiteName)
-        let entry = WidgetEntry.load(from: suite)
-        let widgetEntry = SchedyWidgetEntry(date: Date(), entry: entry)
-        // 每 15 分钟刷新一次；主 App 写入数据后会调用 reloadTimelines，小组件会即时更新
-        let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: Date()) ?? Date()
-        let timeline = Timeline(entries: [widgetEntry], policy: .after(nextUpdate))
-        completion(timeline)
+        let resolved = WidgetEntry.resolveScheduleNameToShow(suite: suite, configuredName: configuration.scheduleName ?? kWidgetScheduleOptionFollowApp)
+        var widgetEntry = WidgetEntry.load(from: suite, scheduleName: resolved)
+        if widgetEntry.dateString.isEmpty, let legacy = WidgetEntry.loadLegacy(from: suite) {
+            widgetEntry = legacy
+        }
+        let entry = SchedyWidgetEntry(date: Date(), entry: widgetEntry)
+        let now = Date()
+        let nextFifteen = Calendar.current.date(byAdding: .minute, value: 15, to: now) ?? now
+        let nextMidnight = Calendar.current.startOfDay(for: Calendar.current.date(byAdding: .day, value: 1, to: now) ?? now)
+        let nextUpdate = min(nextFifteen, nextMidnight)
+        return Timeline(entries: [entry], policy: .after(nextUpdate))
     }
 }
 
@@ -184,11 +186,11 @@ struct SchedyWidget: Widget {
     let kind: String = "SchedyWidget"
 
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: SchedyWidgetProvider()) { entry in
+        AppIntentConfiguration(kind: kind, intent: SchedyWidgetConfigIntent.self, provider: SchedyWidgetProvider()) { entry in
             SchedyWidgetView(entry: entry.entry)
         }
         .configurationDisplayName("今日课程")
-        .description("显示当前课程表名称、日期与接下来两节课。")
+        .description("选择要显示的课表，展示日期与接下来两节课。")
         .supportedFamilies([WidgetFamily.systemSmall, WidgetFamily.systemMedium])
     }
 }
@@ -204,21 +206,12 @@ struct SchedyWidgetBundle: WidgetBundle {
 
 // MARK: - Previews
 
-private let previewEntry = WidgetEntry(
-    scheduleName: "我的课程表",
-    dateString: "2月26日",
-    weekdayString: "周四",
-    status: "next",
-    course1: ("高等数学", "08:00", "A101"),
-    course2: ("英语", "09:50", "B202")
-)
-
 struct SchedyWidget_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            SchedyWidgetSmallView(entry: previewEntry)
+            SchedyWidgetSmallView(entry: sampleEntry)
                 .previewContext(WidgetPreviewContext(family: .systemSmall))
-            SchedyWidgetMediumView(entry: previewEntry)
+            SchedyWidgetMediumView(entry: sampleEntry)
                 .previewContext(WidgetPreviewContext(family: .systemMedium))
         }
     }

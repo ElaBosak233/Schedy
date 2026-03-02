@@ -8,9 +8,12 @@
 import SwiftData
 import SwiftUI
 
-/// 今日课程卡片：课程名、节次时间、老师、地点，与课程表一致的配色
+/// 今日课程卡片：课程名、节次时间、老师、地点，与课程表一致的配色（支持调课后的节次）
 private struct TodayCourseCard: View {
     let course: Course
+    /// 本次显示的节次范围（正常排课或调课后的新节次）
+    let periodStart: Int
+    let periodEnd: Int
     let timeRangeString: String
 
     private var cardAccent: Color {
@@ -36,7 +39,7 @@ private struct TodayCourseCard: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer(minLength: 8)
-                    Text("第 \(course.periodIndex)–\(course.effectivePeriodEnd) 节")
+                    Text("第 \(periodStart)–\(periodEnd) 节")
                         .font(.caption)
                         .fontWeight(.medium)
                         .foregroundStyle(cardAccent)
@@ -111,24 +114,17 @@ struct TodayView: View {
         return min(max(1, week), activeSchedule?.effectiveMaxWeeks ?? 25)
     }
 
-    /// 今天、当前周有课的课程，按节次排序
-    private var todayCourses: [Course] {
-        guard let schedule = activeSchedule else { return [] }
-        return schedule.courses
-            .filter { $0.dayOfWeek == todayDayOfWeek && $0.appliesToWeek(currentWeek) }
-            .sorted { $0.periodIndex < $1.periodIndex }
-    }
+    /// 今天、当前周的有效课次（含调课：排除被调出、包含被调入），按节次排序
+    @State private var effectiveOccurrences: [EffectiveCourseOccurrence] = []
 
-    /// 某节课的时间范围文案（从预设中取起止节的时间）
-    private func timeRangeString(for course: Course) -> String {
-        let startPeriod = course.periodIndex
-        let endPeriod = course.effectivePeriodEnd
-        let startSlot = sortedSlots.first { $0.periodIndex == startPeriod }
-        let endSlot = sortedSlots.first { $0.periodIndex == endPeriod }
+    /// 从预设取节次对应的时间范围文案
+    private func timeRangeString(periodStart: Int, periodEnd: Int) -> String {
+        let startSlot = sortedSlots.first { $0.periodIndex == periodStart }
+        let endSlot = sortedSlots.first { $0.periodIndex == periodEnd }
         if let start = startSlot, let end = endSlot {
             return "\(start.startTimeString) ~ \(end.endTimeString)"
         }
-        return "第 \(startPeriod)–\(endPeriod) 节"
+        return "第 \(periodStart)–\(periodEnd) 节"
     }
 
     /// 今日日期文案
@@ -142,7 +138,7 @@ struct TodayView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if todayCourses.isEmpty {
+                if effectiveOccurrences.isEmpty {
                     emptyState
                 } else {
                     ScrollView {
@@ -153,10 +149,12 @@ struct TodayView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.bottom, 4)
 
-                            ForEach(todayCourses, id: \.id) { course in
+                            ForEach(effectiveOccurrences) { occurrence in
                                 TodayCourseCard(
-                                    course: course,
-                                    timeRangeString: timeRangeString(for: course)
+                                    course: occurrence.course,
+                                    periodStart: occurrence.periodStart,
+                                    periodEnd: occurrence.periodEnd,
+                                    timeRangeString: timeRangeString(periodStart: occurrence.periodStart, periodEnd: occurrence.periodEnd)
                                 )
                             }
                         }
@@ -176,6 +174,22 @@ struct TodayView: View {
                 if activeScheduleName.isEmpty {
                     activeScheduleName = schedules.first?.name ?? "我的课程表"
                 }
+            }
+            .task(id: "\(activeSchedule?.name ?? "")_\(currentWeek)_\(todayDayOfWeek)") {
+                guard let schedule = activeSchedule else {
+                    effectiveOccurrences = []
+                    return
+                }
+                var descriptor = FetchDescriptor<Course>()
+                descriptor.relationshipKeyPathsForPrefetching = [\Course.reschedules]
+                let allCourses = (try? modelContext.fetch(descriptor)) ?? []
+                let scheduleID = schedule.persistentModelID
+                let courses = allCourses.filter { $0.schedule?.persistentModelID == scheduleID }
+                effectiveOccurrences = EffectiveCourseService.effectiveCourseOccurrences(
+                    courses: courses,
+                    week: currentWeek,
+                    dayOfWeek: todayDayOfWeek
+                )
             }
         }
     }

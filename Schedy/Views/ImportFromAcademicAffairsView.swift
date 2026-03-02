@@ -188,7 +188,7 @@ struct ImportFromAcademicAffairsView: View {
                         urlBarText: $urlBarText,
                         pendingLoadURL: $pendingLoadURL,
                         requestHTML: $requestHTML
-                    ) { html in
+                    ) { _, html in
                         performImport(html: html, school: school)
                     }
                 }

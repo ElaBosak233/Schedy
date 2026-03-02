@@ -11,6 +11,8 @@
 		65283F0F2F4F4D45006BE09E /* WidgetDataKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65283F0B2F4F4D45006BE09E /* WidgetDataKeys.swift */; };
 		65283F1C2F4F4D45006BE09E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65283F1B2F4F4D45006BE09E /* WidgetKit.framework */; };
 		65B690652F50106D001C550A /* SchedyWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 65283F0C2F4F4D45006BE09E /* SchedyWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		65B6906B2F501200001C550A /* SchedyWidgetIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B6906C2F501200001C550A /* SchedyWidgetIntent.swift */; };
+		65B6906D2F501200001C550A /* AppIntents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65B6906E2F501200001C550A /* AppIntents.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +53,9 @@
 		65283F1B2F4F4D45006BE09E /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		65283F1D2F4F4D45006BE09E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		65B690382F50104A001C550A /* Schedy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Schedy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		65B6906C2F501200001C550A /* SchedyWidgetIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedyWidgetIntent.swift; sourceTree = "<group>"; };
+		65B6906E2F501200001C550A /* AppIntents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppIntents.framework; path = System/Library/Frameworks/AppIntents.framework; sourceTree = SDKROOT; };
+		65B690702F501400001C550A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -67,6 +72,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				65283F1C2F4F4D45006BE09E /* WidgetKit.framework in Frameworks */,
+				65B6906D2F501200001C550A /* AppIntents.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,6 +91,7 @@
 			children = (
 				65283EED2F4F4D44006BE09E /* Schedy */,
 				65283F0D2F4F4D45006BE09E /* SchedyWidget */,
+				65B690702F501400001C550A /* Info.plist */,
 				65283EEC2F4F4D44006BE09E /* Products */,
 				65B68F4B2F500DB7001C550A /* Recovered References */,
 				65B690642F50106D001C550A /* Frameworks */,
@@ -105,6 +112,7 @@
 			children = (
 				65283F0A2F4F4D45006BE09E /* SchedyWidget.swift */,
 				65283F0B2F4F4D45006BE09E /* WidgetDataKeys.swift */,
+				65B6906C2F501200001C550A /* SchedyWidgetIntent.swift */,
 				65283F1D2F4F4D45006BE09E /* Info.plist */,
 			);
 			path = SchedyWidget;
@@ -114,6 +122,7 @@
 			isa = PBXGroup;
 			children = (
 				65283F1B2F4F4D45006BE09E /* WidgetKit.framework */,
+				65B6906E2F501200001C550A /* AppIntents.framework */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -178,7 +187,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2620;
-				LastUpgradeCheck = 2620;
+				LastUpgradeCheck = 2630;
 				TargetAttributes = {
 					65283F142F4F4D45006BE09E = {
 						CreatedOnToolsVersion = 26.2;
@@ -232,6 +241,7 @@
 			files = (
 				65283F0E2F4F4D45006BE09E /* SchedyWidget.swift in Sources */,
 				65283F0F2F4F4D45006BE09E /* WidgetDataKeys.swift in Sources */,
+				65B6906B2F501200001C550A /* SchedyWidgetIntent.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -293,6 +303,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 65S2BJ2U84;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -316,6 +327,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -356,6 +368,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 65S2BJ2U84;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -372,6 +385,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -383,7 +397,6 @@
 				CODE_SIGN_ENTITLEMENTS = SchedyWidget/SchedyWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 65S2BJ2U84;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SchedyWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -408,7 +421,6 @@
 				CODE_SIGN_ENTITLEMENTS = SchedyWidget/SchedyWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 65S2BJ2U84;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SchedyWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -435,9 +447,9 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Schedy/schedyDebug.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 65S2BJ2U84;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Schedy 课程表";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -471,9 +483,9 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Schedy/schedy.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 65S2BJ2U84;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Schedy 课程表";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

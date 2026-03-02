@@ -14,7 +14,7 @@ struct AcademicAffairsWebView: View {
     @Binding var pendingLoadURL: URL?
     @Binding var requestHTML: Bool
     @State private var loadProgress: Double = 1
-    let onHTMLReceived: (String) -> Void
+    let onHTMLReceived: (URL?, String) -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -28,7 +28,7 @@ struct AcademicAffairsWebView: View {
                 onHTMLReceived: onHTMLReceived
             )
             .overlay(alignment: .top) {
-                if loadProgress < 1 {
+                if loadProgress < 0.99 {
                     ProgressView(value: loadProgress)
                         .progressViewStyle(.linear)
                         .tint(.accentColor)
@@ -43,7 +43,7 @@ struct AcademicAffairsWebView: View {
         HStack(spacing: 8) {
             TextField("输入或粘贴网址", text: $urlBarText)
                 .textFieldStyle(.roundedBorder)
-                .autocapitalization(.none)
+                .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .keyboardType(.URL)
                 .submitLabel(.go)
@@ -59,14 +59,15 @@ struct AcademicAffairsWebView: View {
     }
 
     private func tryLoadURL() {
-        let raw = urlBarText.trimmingCharacters(in: .whitespaces)
-        guard !raw.isEmpty else { return }
-        var s = raw
-        if !s.hasPrefix("http://"), !s.hasPrefix("https://") {
-            s = "https://" + s
-        }
-        guard let url = URL(string: s) else { return }
+        guard let url = normalizeURL(from: urlBarText) else { return }
         pendingLoadURL = url
+    }
+
+    private func normalizeURL(from raw: String) -> URL? {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+        if let url = URL(string: trimmed), url.scheme != nil { return url }
+        return URL(string: "http://" + trimmed)
     }
 }
 
@@ -76,11 +77,12 @@ private struct AcademicAffairsWebViewRepresentable: UIViewControllerRepresentabl
     @Binding var pendingLoadURL: URL?
     @Binding var requestHTML: Bool
     @Binding var loadProgress: Double
-    let onHTMLReceived: (String) -> Void
+    let onHTMLReceived: (URL?, String) -> Void
 
     func makeUIViewController(context: Context) -> AcademicAffairsWebViewController {
         let vc = AcademicAffairsWebViewController(initialURL: initialURL)
         vc.onHTMLReceived = onHTMLReceived
+        vc.onHTMLRequestConsumed = { DispatchQueue.main.async { requestHTML = false } }
         vc.onURLChange = { url in
             DispatchQueue.main.async {
                 urlBarText = url?.absoluteString ?? ""
@@ -100,12 +102,7 @@ private struct AcademicAffairsWebViewRepresentable: UIViewControllerRepresentabl
             DispatchQueue.main.async { pendingLoadURL = nil }
         }
         if requestHTML {
-            uiViewController.captureHTML { [onHTMLReceived] html in
-                DispatchQueue.main.async {
-                    onHTMLReceived(html)
-                    requestHTML = false
-                }
-            }
+            uiViewController.requestHTMLCapture()
         }
     }
 }
@@ -114,8 +111,9 @@ private final class AcademicAffairsWebViewController: UIViewController, WKNaviga
     private var webView: WKWebView!
     private let initialURL: URL
     private var progressObservation: NSKeyValueObservation?
-    private var pendingDisplayURL: URL?
-    var onHTMLReceived: ((String) -> Void)?
+    private var pendingHTMLRequest = false
+    var onHTMLReceived: ((URL?, String) -> Void)?
+    var onHTMLRequestConsumed: (() -> Void)?
     var onURLChange: ((URL?) -> Void)?
     var onProgressChange: ((Double) -> Void)?
 
@@ -150,33 +148,28 @@ private final class AcademicAffairsWebViewController: UIViewController, WKNaviga
 
     // MARK: - WKNavigationDelegate
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        if navigationAction.targetFrame?.isMainFrame != false, let url = navigationAction.request.url {
-            pendingDisplayURL = url
-        }
         decisionHandler(.allow)
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        onURLChange?(pendingDisplayURL ?? webView.url)
-        onProgressChange?(0)
+        onURLChange?(webView.url)
     }
 
-    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+    func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
         onURLChange?(webView.url)
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         onURLChange?(webView.url)
-        onProgressChange?(1)
+        if pendingHTMLRequest {
+            pendingHTMLRequest = false
+            captureHTMLNow()
+        }
     }
 
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        onProgressChange?(1)
-    }
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {}
 
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        onProgressChange?(1)
-    }
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {}
 
     // MARK: - WKUIDelegate
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
@@ -186,13 +179,65 @@ private final class AcademicAffairsWebViewController: UIViewController, WKNaviga
         return nil
     }
 
-    func captureHTML(completion: @escaping (String) -> Void) {
-        webView.evaluateJavaScript("document.documentElement.outerHTML") { result, error in
-            if let html = result as? String {
-                completion(html)
-            } else {
-                completion("")
-            }
+    func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in completionHandler() })
+        present(alert, animated: true)
+    }
+
+    func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Void) {
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "取消", style: .cancel) { _ in completionHandler(false) })
+        alert.addAction(UIAlertAction(title: "确定", style: .default) { _ in completionHandler(true) })
+        present(alert, animated: true)
+    }
+
+    func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String, defaultText: String?, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (String?) -> Void) {
+        let alert = UIAlertController(title: nil, message: prompt, preferredStyle: .alert)
+        alert.addTextField { textField in
+            textField.text = defaultText
+        }
+        alert.addAction(UIAlertAction(title: "取消", style: .cancel) { _ in completionHandler(nil) })
+        alert.addAction(UIAlertAction(title: "确定", style: .default) { _ in
+            completionHandler(alert.textFields?.first?.text)
+        })
+        present(alert, animated: true)
+    }
+
+    // MARK: - HTML capture
+    func requestHTMLCapture() {
+        onHTMLRequestConsumed?()
+        if webView.isLoading {
+            pendingHTMLRequest = true
+            return
+        }
+        captureHTMLNow()
+    }
+
+    private func captureHTMLNow() {
+        captureHTML { [weak self] url, html in
+            self?.onHTMLReceived?(url, html)
+        }
+    }
+
+    func captureHTML(completion: @escaping (URL?, String) -> Void) {
+        let js = """
+        (function() {
+          var html = document.documentElement ? document.documentElement.outerHTML : "";
+          if (html && html.length > 100) return html;
+          var body = document.body ? document.body.innerText : "";
+          return body ? "<pre>" + body + "</pre>" : html;
+        })();
+        """
+        webView.evaluateJavaScript(js) { [weak self] result, _ in
+            let html = (result as? String) ?? ""
+            completion(self?.webView.url, html)
+        }
+    }
+
+    func captureWebArchive(completion: @escaping (Data?) -> Void) {
+        webView.createWebArchiveData { result in
+            completion(try? result.get())
         }
     }
 }

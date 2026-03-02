@@ -103,7 +103,7 @@ private func scheduleCourseRemindersAfterClear(modelContext: ModelContext, activ
                     let id = "\(kNotificationPrefix)\(course.persistentModelID.hashValue)-\(week)-\(dayOfWeek)"
                     let content = UNMutableNotificationContent()
                     content.title = "课程提醒"
-                    content.body = "「\(course.name)」将在 \(kReminderMinutes) 分钟后开始"
+                    content.body = "「\(course.name)」快要开始啦"
                     content.sound = .default
                     let triggerComps = cal.dateComponents([.year, .month, .day, .hour, .minute], from: reminderDate)
                     let trigger = UNCalendarNotificationTrigger(dateMatching: triggerComps, repeats: false)
