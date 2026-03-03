@@ -307,8 +307,10 @@ struct TimeSlotsSettingsView: View {
 struct PresetRenameSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @Query private var allPresets: [TimeSlotPreset]
     let preset: TimeSlotPreset
     @State private var name: String = ""
+    @State private var nameConflict = false
 
     var body: some View {
         NavigationStack {
@@ -324,12 +326,20 @@ struct PresetRenameSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("保存") {
-                        preset.name = name.trimmingCharacters(in: .whitespaces)
+                        let n = name.trimmingCharacters(in: .whitespaces)
+                        let conflict = allPresets.contains { $0.name == n && $0 !== preset }
+                        guard !conflict else { nameConflict = true; return }
+                        preset.name = n
                         try? modelContext.save()
                         dismiss()
                     }
                     .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
+            }
+            .alert("名称已存在", isPresented: $nameConflict) {
+                Button("好") {}
+            } message: {
+                Text("已有同名时间段，请使用其他名称。")
             }
         }
     }

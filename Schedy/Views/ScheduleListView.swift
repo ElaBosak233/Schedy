@@ -125,6 +125,7 @@ struct ScheduleEditSheet: View {
     @AppStorage("activeScheduleName") private var activeScheduleName: String = "我的课程表"
     @AppStorage(ScheduleDisplayKeys.activeTimeSlotPresetName) private var activeTimeSlotPresetName: String = ""
     @Query(sort: \TimeSlotPreset.name) private var presets: [TimeSlotPreset]
+    @Query private var allSchedules: [Schedule]
 
     let schedule: Schedule?
 
@@ -132,6 +133,7 @@ struct ScheduleEditSheet: View {
     @State private var semesterStartDate: Date = Date()
     /// 新建课表时选择的时间预设名称（编辑时直接读写 schedule.timeSlotPreset）
     @State private var selectedPresetName: String = ""
+    @State private var nameConflict = false
 
     private var isEditing: Bool { schedule != nil }
 
@@ -192,6 +194,11 @@ struct ScheduleEditSheet: View {
                     .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
+            .alert("名称已存在", isPresented: $nameConflict) {
+                Button("好") {}
+            } message: {
+                Text("已有同名课程表，请使用其他名称。")
+            }
         }
     }
 
@@ -219,6 +226,10 @@ struct ScheduleEditSheet: View {
     private func save() {
         let n = name.trimmingCharacters(in: .whitespaces)
         guard !n.isEmpty else { return }
+
+        // 重名检查：排除自身（编辑时）
+        let conflict = allSchedules.contains { $0.name == n && $0 !== schedule }
+        guard !conflict else { nameConflict = true; return }
 
         let wasActiveSchedule = schedule?.name == activeScheduleName
 

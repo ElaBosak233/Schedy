@@ -90,17 +90,52 @@ private func defaultSemesterStartDate() -> Date {
     return cal.date(byAdding: .day, value: daysUntilMonday, to: today) ?? today
 }
 
+/// 去重：合并同名 TimeSlotPreset（保留最早创建的，迁移 slots/schedules），合并同名 Schedule（保留第一个，迁移 courses/reschedules）
+@MainActor
+func deduplicateIfNeeded(modelContext: ModelContext) {
+    // 去重 TimeSlotPreset
+    let allPresets = (try? modelContext.fetch(FetchDescriptor<TimeSlotPreset>())) ?? []
+    var seenPresets: [String: TimeSlotPreset] = [:]
+    for preset in allPresets.sorted(by: { $0.createdAt < $1.createdAt }) {
+        if let existing = seenPresets[preset.name] {
+            // 把 slots 和 schedules 迁移到 existing，删除重复
+            for slot in preset.slots ?? [] { slot.preset = existing }
+            for schedule in preset.schedules ?? [] { schedule.timeSlotPreset = existing }
+            modelContext.delete(preset)
+        } else {
+            seenPresets[preset.name] = preset
+        }
+    }
+
+    // 去重 Schedule
+    let allSchedules = (try? modelContext.fetch(FetchDescriptor<Schedule>())) ?? []
+    var seenSchedules: [String: Schedule] = [:]
+    for schedule in allSchedules {
+        if let existing = seenSchedules[schedule.name] {
+            for course in schedule.courses ?? [] { course.schedule = existing }
+            for reschedule in schedule.reschedules ?? [] { reschedule.schedule = existing }
+            modelContext.delete(schedule)
+        } else {
+            seenSchedules[schedule.name] = schedule
+        }
+    }
+
+    try? modelContext.save()
+}
+
 /// 若尚无任何课程表，则先创建预设再创建默认课程表并写入 activeScheduleName；并迁移无 schedule 的课程到第一张课表
+/// iCloud 同步启用时跳过 seed，避免在 CloudKit 同步完成前创建本地数据导致重复
 @MainActor
 func seedDefaultScheduleIfNeeded(modelContext: ModelContext) {
-    let scheduleDescriptor = FetchDescriptor<Schedule>()
-    let schedules = (try? modelContext.fetch(scheduleDescriptor)) ?? []
-    if schedules.isEmpty {
+    let iCloudEnabled = UserDefaults.standard.bool(forKey: kICloudSyncEnabledKey)
+        && FileManager.default.ubiquityIdentityToken != nil
+
+    let schedules = (try? modelContext.fetch(FetchDescriptor<Schedule>())) ?? []
+    if schedules.isEmpty && !iCloudEnabled {
         seedDefaultPresetsIfNeeded(modelContext: modelContext)
         let presets = (try? modelContext.fetch(FetchDescriptor<TimeSlotPreset>())) ?? []
-        let start = defaultSemesterStartDate()
         let defaultName = "我的课程表"
-        let schedule = Schedule(name: defaultName, semesterStartDate: start)
+        let schedule = Schedule(name: defaultName, semesterStartDate: defaultSemesterStartDate())
         schedule.timeSlotPreset = presets.first
         modelContext.insert(schedule)
         try? modelContext.save()
@@ -109,16 +144,15 @@ func seedDefaultScheduleIfNeeded(modelContext: ModelContext) {
            let firstPresetName = presets.first?.name {
             UserDefaults.standard.set(firstPresetName, forKey: ScheduleDisplayKeys.activeTimeSlotPresetName)
         }
+    } else {
+        deduplicateIfNeeded(modelContext: modelContext)
     }
 
     // 迁移：把没有归属的课程挂到第一张课程表
-    let courseDescriptor = FetchDescriptor<Course>()
-    let allCourses = (try? modelContext.fetch(courseDescriptor)) ?? []
     let firstSchedule = (try? modelContext.fetch(FetchDescriptor<Schedule>()))?.first
     if let s = firstSchedule {
-        for c in allCourses where c.schedule == nil {
-            c.schedule = s
-        }
+        let allCourses = (try? modelContext.fetch(FetchDescriptor<Course>())) ?? []
+        for c in allCourses where c.schedule == nil { c.schedule = s }
         try? modelContext.save()
     }
 }

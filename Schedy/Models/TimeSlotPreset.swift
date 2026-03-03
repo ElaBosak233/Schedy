@@ -14,6 +14,8 @@ final class TimeSlotPreset {
     var name: String = ""
     var createdAt: Date = Date()
     var slots: [TimeSlotItem]?
+    @Relationship(inverse: \Schedule.timeSlotPreset)
+    var schedules: [Schedule]?
 
     init(name: String, slots: [TimeSlotItem] = []) {
         self.name = name
