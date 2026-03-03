@@ -111,6 +111,9 @@ private struct WeekCourseGrid {
 }
 
 struct ScheduleGridView: View {
+    /// 非 nil 时在顶部显示「关闭」按钮（如从课程表 Tab 列表全屏打开时）
+    var onDismiss: (() -> Void)? = nil
+
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
     @Query(sort: \Schedule.name) private var schedules: [Schedule]
@@ -344,6 +347,11 @@ struct ScheduleGridView: View {
                     .lineLimit(1)
                     .frame(maxWidth: .infinity)
                 HStack {
+                    if onDismiss != nil {
+                        Button("关闭") {
+                            onDismiss?()
+                        }
+                    }
                     Spacer(minLength: 0)
                     Button {
                         showHeaderMenu = true
