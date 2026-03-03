@@ -284,7 +284,7 @@ struct CourseEditSheet: View {
         }
         try? modelContext.save()
         refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
-        scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
+        scheduleCourseReminders(modelContext: modelContext)
         dismiss()
     }
 
@@ -294,7 +294,7 @@ struct CourseEditSheet: View {
             try? modelContext.save()
         }
         refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
-        scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
+        scheduleCourseReminders(modelContext: modelContext)
         dismiss()
     }
 }

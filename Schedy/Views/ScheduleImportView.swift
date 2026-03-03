@@ -342,7 +342,7 @@ struct ScheduleImportView: View {
     private func importFromParsedCourses(_ parsed: [ParsedCourseItem]) {
         seedDefaultPresetsIfNeeded(modelContext: modelContext)
         let presetsList = (try? modelContext.fetch(FetchDescriptor<TimeSlotPreset>())) ?? []
-        let preset = presetsList.first { $0.name == activeTimeSlotPresetName } ?? presetsList.first
+        let preset = presetForImport(presetsList: presetsList)
         let maxPeriodNeeded = parsed.map { $0.periodEnd }.max() ?? 0
 
         switch importAction {
@@ -359,20 +359,31 @@ struct ScheduleImportView: View {
             addParsedCourses(parsed, to: schedule, preset: preset)
             try? modelContext.save()
             refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
-            scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
+            scheduleCourseReminders(modelContext: modelContext)
             importSuccessCount = parsed.count
         case .newSchedule:
             extendPresetToCoverPeriodIfNeeded(preset: preset, requiredPeriodCount: maxPeriodNeeded, modelContext: modelContext)
             let semesterStart = defaultSemesterStartDate()
             let newName = newScheduleName()
             let newSchedule = Schedule(name: newName, semesterStartDate: semesterStart)
+            newSchedule.timeSlotPreset = preset
             modelContext.insert(newSchedule)
             addParsedCourses(parsed, to: newSchedule, preset: preset)
             try? modelContext.save()
             activeScheduleName = newName
             refreshWidgetData(modelContext: modelContext, activeScheduleName: newName)
-            scheduleCourseReminders(modelContext: modelContext, activeScheduleName: newName)
+            scheduleCourseReminders(modelContext: modelContext)
             importSuccessCount = parsed.count
+        }
+    }
+
+    /// 导入时使用的时间预设：覆盖当前课表时用该课表绑定的预设，新建时用全局默认
+    private func presetForImport(presetsList: [TimeSlotPreset]) -> TimeSlotPreset? {
+        switch importAction {
+        case .overwrite:
+            return activeSchedule?.timeSlotPreset ?? presetsList.first { $0.name == activeTimeSlotPresetName } ?? presetsList.first
+        case .newSchedule:
+            return presetsList.first { $0.name == activeTimeSlotPresetName } ?? presetsList.first
         }
     }
 
@@ -502,8 +513,7 @@ struct ScheduleImportView: View {
         }
         seedDefaultPresetsIfNeeded(modelContext: modelContext)
         let presetsList = (try? modelContext.fetch(FetchDescriptor<TimeSlotPreset>())) ?? []
-        let preset = presetsList.first { $0.name == activeTimeSlotPresetName } ?? presetsList.first
-
+        let preset = presetForImport(presetsList: presetsList)
         let maxPeriodNeeded = parsed.map { $0.periodEnd }.max() ?? 0
 
         switch importAction {
@@ -520,19 +530,20 @@ struct ScheduleImportView: View {
             addParsedCourses(parsed, to: schedule, preset: preset)
             try? modelContext.save()
             refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
-            scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
+            scheduleCourseReminders(modelContext: modelContext)
             importSuccessCount = parsed.count
         case .newSchedule:
             extendPresetToCoverPeriodIfNeeded(preset: preset, requiredPeriodCount: maxPeriodNeeded, modelContext: modelContext)
             let semesterStart = defaultSemesterStartDate()
             let newName = newScheduleName()
             let newSchedule = Schedule(name: newName, semesterStartDate: semesterStart)
+            newSchedule.timeSlotPreset = preset
             modelContext.insert(newSchedule)
             addParsedCourses(parsed, to: newSchedule, preset: preset)
             try? modelContext.save()
             activeScheduleName = newName
             refreshWidgetData(modelContext: modelContext, activeScheduleName: newName)
-            scheduleCourseReminders(modelContext: modelContext, activeScheduleName: newName)
+            scheduleCourseReminders(modelContext: modelContext)
             importSuccessCount = parsed.count
         }
     }

@@ -62,7 +62,7 @@ struct TimeSlotsSettingsView: View {
             } header: {
                 Text("时间段")
             } footer: {
-                Text("点击选择当前使用的时间段。所有课程表将统一使用该时间段显示上课时间。下方可管理各节的起止时间。")
+                Text("此处为「默认时间段」：未单独绑定时间段的课表将使用此项；新建课表时也可选此项。各课表可在「课程表」中编辑并绑定自己的时间段。下方可管理各节的起止时间。")
             }
             slotsDetailSection
         }
@@ -378,9 +378,7 @@ struct TimeSlotEditView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onDisappear {
             try? modelContext.save()
-            if !activeScheduleName.isEmpty {
-                scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
-            }
+            scheduleCourseReminders(modelContext: modelContext)
         }
     }
 }

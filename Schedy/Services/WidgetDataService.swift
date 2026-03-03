@@ -32,9 +32,11 @@ enum WidgetDataKeys {
     static let presetNamesList = "widgetPresetNamesList"
     /// App 当前选中的时间段名称（小组件默认使用此项）
     static let defaultPresetName = "widgetDefaultPresetName"
-    /// 单张课表+时间段数据在 suite 里的 key：entryPrefix + "__SEP__" + scheduleName + "__SEP__" + presetName
+    /// 单张课表+时间段数据在 suite 里的 key：entryPrefix + "_" + scheduleName + "__SEP__" + presetName（每张课表仅写其绑定预设的一条）
     static let entryPrefix = "widgetEntry"
     static let entrySeparator = "__SEP__"
+    /// 课表名 → 绑定预设名，供小组件根据选中的课表解析预设：schedulePreset_ + 课表名
+    static let schedulePresetPrefix = "schedulePreset_"
 }
 
 /// 根据学期第一天和当前日期计算当前周（1-based）
@@ -69,7 +71,7 @@ func refreshWidgetData(modelContext: ModelContext, activeScheduleName: String) {
     let weekdayString = dayOfWeek >= 1 && dayOfWeek <= 7 ? weekdayNames[dayOfWeek] : ""
 
     var scheduleDescriptor = FetchDescriptor<Schedule>()
-    scheduleDescriptor.relationshipKeyPathsForPrefetching = [\Schedule.courses]
+    scheduleDescriptor.relationshipKeyPathsForPrefetching = [\Schedule.courses, \Schedule.timeSlotPreset]
     let allSchedules = (try? modelContext.fetch(scheduleDescriptor)) ?? []
     let scheduleNames = allSchedules.map(\.name)
 
@@ -78,10 +80,8 @@ func refreshWidgetData(modelContext: ModelContext, activeScheduleName: String) {
 
     let activePresetName = UserDefaults.standard.string(forKey: ScheduleDisplayKeys.activeTimeSlotPresetName) ?? ""
     let allPresets = (try? modelContext.fetch(FetchDescriptor<TimeSlotPreset>())) ?? []
-    let presetNames = allPresets.map(\.name)
-    suite.set(presetNames, forKey: WidgetDataKeys.presetNamesList)
-    let activePreset = allPresets.first { $0.name == activePresetName } ?? allPresets.first
-    suite.set(activePreset?.name ?? "", forKey: WidgetDataKeys.defaultPresetName)
+    let defaultPreset = allPresets.first { $0.name == activePresetName } ?? allPresets.first
+    suite.set(defaultPreset?.name ?? "", forKey: WidgetDataKeys.defaultPresetName)
 
     var courseDescriptor = FetchDescriptor<Course>()
     courseDescriptor.relationshipKeyPathsForPrefetching = [\Course.reschedules]
@@ -92,6 +92,9 @@ func refreshWidgetData(modelContext: ModelContext, activeScheduleName: String) {
         let scheduleName = schedule.name
         let scheduleID = schedule.persistentModelID
         let week = currentWeek(semesterStart: schedule.semesterStartDate, calendar: cal)
+        let preset = schedule.timeSlotPreset ?? defaultPreset
+        let presetName = preset?.name ?? ""
+        suite.set(presetName, forKey: WidgetDataKeys.schedulePresetPrefix + scheduleName)
 
         let scheduleCourses = allCourses.filter { $0.schedule?.persistentModelID == scheduleID }
         let occurrences = EffectiveCourseService.effectiveCourseOccurrences(
@@ -101,98 +104,108 @@ func refreshWidgetData(modelContext: ModelContext, activeScheduleName: String) {
         )
         let courseItems: [(name: String, location: String, periodStart: Int, periodEnd: Int)] = occurrences.map { (name: $0.course.name, location: $0.course.location ?? "", periodStart: $0.periodStart, periodEnd: $0.periodEnd) }
 
-        for preset in allPresets {
-            let presetID = preset.persistentModelID
-            let slots = allSlots
-                .filter { $0.preset?.persistentModelID == presetID }
-                .sorted { $0.periodIndex < $1.periodIndex }
+        guard let preset = preset else { continue }
+        let presetID = preset.persistentModelID
+        let slots = allSlots
+            .filter { $0.preset?.persistentModelID == presetID }
+            .sorted { $0.periodIndex < $1.periodIndex }
 
-            func startTime(period: Int) -> (hour: Int, minute: Int)? {
-                slots.first(where: { $0.periodIndex == period }).map { ($0.startHour, $0.startMinute) }
+        func startTime(period: Int) -> (hour: Int, minute: Int)? {
+            slots.first(where: { $0.periodIndex == period }).map { ($0.startHour, $0.startMinute) }
+        }
+        func endTime(period: Int) -> (hour: Int, minute: Int)? {
+            slots.first(where: { $0.periodIndex == period }).map { ($0.endHour, $0.endMinute) }
+        }
+
+        var status = "noClass"
+        var c1Name = ""
+        var c1Time = ""
+        var c1Location = ""
+        var c2Name = ""
+        var c2Time = ""
+        var c2Location = ""
+
+        let nowComponents = cal.dateComponents([.hour, .minute], from: today)
+        let nowMinutes = (nowComponents.hour ?? 0) * 60 + (nowComponents.minute ?? 0)
+
+        let notEnded = courseItems.filter { item in
+            guard let end = endTime(period: item.periodEnd) else { return true }
+            let endMinutes = end.hour * 60 + end.minute
+            return endMinutes > nowMinutes
+        }
+
+        if !notEnded.isEmpty {
+            status = "next"
+            let display = Array(notEnded.prefix(2))
+            if let first = display.first {
+                c1Name = first.name
+                c1Time = startTime(period: first.periodStart).map { String(format: "%02d:%02d", $0.hour, $0.minute) } ?? ""
+                c1Location = first.location
             }
-            func endTime(period: Int) -> (hour: Int, minute: Int)? {
-                slots.first(where: { $0.periodIndex == period }).map { ($0.endHour, $0.endMinute) }
+            if display.count > 1 {
+                let second = display[1]
+                c2Name = second.name
+                c2Time = startTime(period: second.periodStart).map { String(format: "%02d:%02d", $0.hour, $0.minute) } ?? ""
+                c2Location = second.location
             }
-
-            var status = "noClass"
-            var c1Name = ""
-            var c1Time = ""
-            var c1Location = ""
-            var c2Name = ""
-            var c2Time = ""
-            var c2Location = ""
-
-            let nowComponents = cal.dateComponents([.hour, .minute], from: today)
-            let nowMinutes = (nowComponents.hour ?? 0) * 60 + (nowComponents.minute ?? 0)
-
-            let notEnded = courseItems.filter { item in
-                guard let end = endTime(period: item.periodEnd) else { return true }
-                let endMinutes = end.hour * 60 + end.minute
-                return endMinutes > nowMinutes
-            }
-
-            if !notEnded.isEmpty {
-                status = "next"
-                let display = Array(notEnded.prefix(2))
-                if let first = display.first {
+        } else {
+            status = courseItems.isEmpty ? "noClass" : "allDone"
+            if !courseItems.isEmpty {
+                let lastTwo = Array(courseItems.suffix(2))
+                if let first = lastTwo.first {
                     c1Name = first.name
                     c1Time = startTime(period: first.periodStart).map { String(format: "%02d:%02d", $0.hour, $0.minute) } ?? ""
                     c1Location = first.location
                 }
-                if display.count > 1 {
-                    let second = display[1]
+                if lastTwo.count > 1 {
+                    let second = lastTwo[1]
                     c2Name = second.name
                     c2Time = startTime(period: second.periodStart).map { String(format: "%02d:%02d", $0.hour, $0.minute) } ?? ""
                     c2Location = second.location
                 }
-            } else {
-                status = courseItems.isEmpty ? "noClass" : "allDone"
-                if !courseItems.isEmpty {
-                    let lastTwo = Array(courseItems.suffix(2))
-                    if let first = lastTwo.first {
-                        c1Name = first.name
-                        c1Time = startTime(period: first.periodStart).map { String(format: "%02d:%02d", $0.hour, $0.minute) } ?? ""
-                        c1Location = first.location
-                    }
-                    if lastTwo.count > 1 {
-                        let second = lastTwo[1]
-                        c2Name = second.name
-                        c2Time = startTime(period: second.periodStart).map { String(format: "%02d:%02d", $0.hour, $0.minute) } ?? ""
-                        c2Location = second.location
-                    }
-                }
             }
-
-            let entryKey = "\(WidgetDataKeys.entryPrefix)_\(scheduleName)\(WidgetDataKeys.entrySeparator)\(preset.name)"
-            let dict: [String: String] = [
-                WidgetDataKeys.scheduleName: scheduleName,
-                WidgetDataKeys.date: dateString,
-                WidgetDataKeys.weekday: weekdayString,
-                WidgetDataKeys.status: status,
-                WidgetDataKeys.course1Name: c1Name,
-                WidgetDataKeys.course1Time: c1Time,
-                WidgetDataKeys.course1Location: c1Location,
-                WidgetDataKeys.course2Name: c2Name,
-                WidgetDataKeys.course2Time: c2Time,
-                WidgetDataKeys.course2Location: c2Location,
-            ]
-            suite.set(dict, forKey: entryKey)
         }
+
+        let entryKey = "\(WidgetDataKeys.entryPrefix)_\(scheduleName)\(WidgetDataKeys.entrySeparator)\(presetName)"
+        let dict: [String: String] = [
+            WidgetDataKeys.scheduleName: scheduleName,
+            WidgetDataKeys.date: dateString,
+            WidgetDataKeys.weekday: weekdayString,
+            WidgetDataKeys.status: status,
+            WidgetDataKeys.course1Name: c1Name,
+            WidgetDataKeys.course1Time: c1Time,
+            WidgetDataKeys.course1Location: c1Location,
+            WidgetDataKeys.course2Name: c2Name,
+            WidgetDataKeys.course2Time: c2Time,
+            WidgetDataKeys.course2Location: c2Location,
+        ]
+        suite.set(dict, forKey: entryKey)
     }
 
-    // 删除已不存在的 (课表, 时间段) 在 suite 里的旧 key，以及旧版「仅课表名」格式的 key
+    let presetNames = allPresets.map(\.name)
     let validEntryPrefix = WidgetDataKeys.entryPrefix + "_"
     let sep = WidgetDataKeys.entrySeparator
+    var validSchedulePresets: [String: String] = [:]
+    for s in allSchedules {
+        let p = s.timeSlotPreset?.name ?? defaultPreset?.name ?? ""
+        validSchedulePresets[s.name] = p
+    }
     let existingKeys = suite.dictionaryRepresentation().keys
     for key in existingKeys where key.hasPrefix(validEntryPrefix) {
         let rest = String(key.dropFirst(validEntryPrefix.count))
         guard let sepRange = rest.range(of: sep) else {
-            suite.removeObject(forKey: key) // 旧格式 key，移除
+            suite.removeObject(forKey: key)
             continue
         }
         let namePart = String(rest[..<sepRange.lowerBound])
         let presetPart = String(rest[sepRange.upperBound...])
-        if !scheduleNames.contains(namePart) || !presetNames.contains(presetPart) {
+        if !scheduleNames.contains(namePart) || validSchedulePresets[namePart] != presetPart {
+            suite.removeObject(forKey: key)
+        }
+    }
+    for key in existingKeys where key.hasPrefix(WidgetDataKeys.schedulePresetPrefix) {
+        let namePart = String(key.dropFirst(WidgetDataKeys.schedulePresetPrefix.count))
+        if !scheduleNames.contains(namePart) {
             suite.removeObject(forKey: key)
         }
     }

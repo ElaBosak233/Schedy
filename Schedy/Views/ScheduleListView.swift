@@ -32,7 +32,7 @@ struct ScheduleListView: View {
             } header: {
                 Text("课程表")
             } footer: {
-                Text("点击选择当前使用的课程表。每张课程表可单独设置名称与学期第一天；时间段在「时间段」中全局切换。")
+                Text("点击选择当前使用的课程表。每张课程表可单独设置名称、学期第一天与绑定的时间段；小组件选哪张课表即使用该课表的时间段。")
             }
         }
         .navigationTitle("课程表")
@@ -59,13 +59,12 @@ struct ScheduleListView: View {
             if activeScheduleName.isEmpty {
                 activeScheduleName = schedules.first?.name ?? "我的课程表"
             }
-            // 每次进入课程表列表都同步到小组件，保证名称与课程是最新的
             refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
-            scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
+            scheduleCourseReminders(modelContext: modelContext)
         }
         .onChange(of: activeScheduleName) { _, newName in
             refreshWidgetData(modelContext: modelContext, activeScheduleName: newName)
-            scheduleCourseReminders(modelContext: modelContext, activeScheduleName: newName)
+            scheduleCourseReminders(modelContext: modelContext)
         }
     }
 
@@ -124,11 +123,15 @@ struct ScheduleEditSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @AppStorage("activeScheduleName") private var activeScheduleName: String = "我的课程表"
+    @AppStorage(ScheduleDisplayKeys.activeTimeSlotPresetName) private var activeTimeSlotPresetName: String = ""
+    @Query(sort: \TimeSlotPreset.name) private var presets: [TimeSlotPreset]
 
     let schedule: Schedule?
 
     @State private var name: String = ""
     @State private var semesterStartDate: Date = Date()
+    /// 新建课表时选择的时间预设名称（编辑时直接读写 schedule.timeSlotPreset）
+    @State private var selectedPresetName: String = ""
 
     private var isEditing: Bool { schedule != nil }
 
@@ -142,6 +145,29 @@ struct ScheduleEditSheet: View {
                 Section("本学期第一天") {
                     DatePicker("学期第一天", selection: $semesterStartDate, displayedComponents: .date)
                 }
+                Section {
+                    Picker("时间段", selection: presetPickerBinding) {
+                        Text("使用默认").tag("")
+                        ForEach(presets, id: \.name) { p in
+                            Text(p.name).tag(p.name)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                } header: {
+                    Text("时间段")
+                } footer: {
+                    Text("该课表在网格与小组件中显示时使用此时间段。未设置则使用 App 默认。")
+                }
+                if isEditing, let s = schedule {
+                    Section {
+                        Toggle("课程提醒", isOn: Binding(
+                            get: { s.notificationsEnabled },
+                            set: { s.notificationsEnabled = $0 }
+                        ))
+                    } footer: {
+                        Text("开启后，该课表中有课的时间会提前 15 分钟收到提醒。多张课表可同时开启，适合带多个班的老师。")
+                    }
+                }
             }
             .navigationTitle(isEditing ? "编辑课程表" : "新建课程表")
             .navigationBarTitleDisplayMode(.inline)
@@ -152,6 +178,7 @@ struct ScheduleEditSheet: View {
                 } else {
                     name = ""
                     semesterStartDate = defaultSemesterStartForPicker()
+                    selectedPresetName = activeTimeSlotPresetName.isEmpty ? (presets.first?.name ?? "") : activeTimeSlotPresetName
                 }
             }
             .toolbar {
@@ -166,6 +193,19 @@ struct ScheduleEditSheet: View {
                 }
             }
         }
+    }
+
+    /// 时间段 Picker 的绑定：编辑时读写 schedule.timeSlotPreset，新建时读写 selectedPresetName
+    private var presetPickerBinding: Binding<String> {
+        if let s = schedule {
+            return Binding(
+                get: { s.timeSlotPreset?.name ?? "" },
+                set: { name in
+                    s.timeSlotPreset = name.isEmpty ? nil : presets.first { $0.name == name }
+                }
+            )
+        }
+        return $selectedPresetName
     }
 
     private func defaultSemesterStartForPicker() -> Date {
@@ -187,16 +227,16 @@ struct ScheduleEditSheet: View {
             s.semesterStartDate = semesterStartDate
         } else {
             let newSchedule = Schedule(name: n, semesterStartDate: semesterStartDate)
+            newSchedule.timeSlotPreset = selectedPresetName.isEmpty ? nil : (presets.first { $0.name == selectedPresetName })
             modelContext.insert(newSchedule)
         }
         try? modelContext.save()
 
-        // 若编辑的是当前选中的课程表，同步 AppStorage 并刷新小组件，否则小组件会继续用旧名称查不到数据
         if wasActiveSchedule {
             activeScheduleName = n
-            refreshWidgetData(modelContext: modelContext, activeScheduleName: n)
-            scheduleCourseReminders(modelContext: modelContext, activeScheduleName: n)
         }
+        refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
+        scheduleCourseReminders(modelContext: modelContext)
         dismiss()
     }
 }

@@ -149,8 +149,9 @@ struct ScheduleGridView: View {
         schedules.first { $0.name == activeScheduleName } ?? schedules.first
     }
 
-    /// 全局当前使用的时间段（在「时间段」设置中切换）
+    /// 当前课表绑定的时间段；未绑定时使用全局默认预设
     private var activePreset: TimeSlotPreset? {
+        if let bound = activeSchedule?.timeSlotPreset { return bound }
         if !activeTimeSlotPresetName.isEmpty {
             return presets.first { $0.name == activeTimeSlotPresetName }
         }
@@ -313,7 +314,7 @@ struct ScheduleGridView: View {
                 }
                 viewingWeek = defaultViewingWeek
                 refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
-                scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
+                scheduleCourseReminders(modelContext: modelContext)
                 // 延迟再刷一次，确保 @Query 已就绪、数据已写入 App Group，小组件能读到
                 Task { @MainActor in
                     try? await Task.sleep(for: .milliseconds(600))
@@ -323,12 +324,12 @@ struct ScheduleGridView: View {
             .onChange(of: activeScheduleName) { _, _ in
                 viewingWeek = defaultViewingWeek
                 refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
-                scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
+                scheduleCourseReminders(modelContext: modelContext)
             }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active {
                     refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
-                    scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
+                    scheduleCourseReminders(modelContext: modelContext)
                 }
             }
         }
@@ -787,9 +788,10 @@ private struct HeaderMenuSheet: View {
                             } label: {
                                 HStack {
                                     Text(s.name)
+                                    Spacer()
                                     if s.name == activeScheduleName {
-                                        Image(systemName: "checkmark")
-                                            .foregroundStyle(Color.accentColor)
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundStyle(.green)
                                     }
                                 }
                             }

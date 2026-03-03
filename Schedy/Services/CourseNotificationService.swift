@@ -2,7 +2,7 @@
 //  CourseNotificationService.swift
 //  schedy
 //
-//  在课程开始前 15 分钟发送本地通知提醒用户。
+//  在课程开始前 15 分钟发送本地通知。支持多张课表同时提醒（按「是否通知」），且考虑调课后的有效课次。
 //
 
 import Foundation
@@ -45,74 +45,99 @@ func clearScheduledCourseReminders(completion: @escaping () -> Void) {
     }
 }
 
-/// 为当前选中的课程表安排「开课前 15 分钟」的本地通知；会先清除已有 schedy 提醒再重新排期。
+/// 为所有「允许通知」的课程表安排「开课前 15 分钟」的本地通知（考虑调课后的有效课次）；会先清除已有 schedy 提醒再重新排期。
 @MainActor
-func scheduleCourseReminders(modelContext: ModelContext, activeScheduleName: String) {
+func scheduleCourseReminders(modelContext: ModelContext) {
     requestCourseNotificationPermission()
     clearScheduledCourseReminders {
         Task { @MainActor in
-            scheduleCourseRemindersAfterClear(modelContext: modelContext, activeScheduleName: activeScheduleName)
+            scheduleCourseRemindersAfterClear(modelContext: modelContext)
         }
     }
 }
 
 @MainActor
-private func scheduleCourseRemindersAfterClear(modelContext: ModelContext, activeScheduleName: String) {
+private func scheduleCourseRemindersAfterClear(modelContext: ModelContext) {
     let cal = Calendar.current
     let now = Date()
 
     do {
         let activePresetName = UserDefaults.standard.string(forKey: ScheduleDisplayKeys.activeTimeSlotPresetName) ?? ""
         var scheduleDescriptor = FetchDescriptor<Schedule>()
-        scheduleDescriptor.predicate = #Predicate<Schedule> { $0.name == activeScheduleName }
-        scheduleDescriptor.fetchLimit = 1
-        scheduleDescriptor.relationshipKeyPathsForPrefetching = [\Schedule.courses]
-        let schedules = try modelContext.fetch(scheduleDescriptor)
-        guard let schedule = schedules.first else { return }
+        scheduleDescriptor.predicate = #Predicate<Schedule> { $0.notificationsEnabled == true }
+        scheduleDescriptor.relationshipKeyPathsForPrefetching = [\Schedule.courses, \Schedule.timeSlotPreset]
+        let enabledSchedules = try modelContext.fetch(scheduleDescriptor)
+        guard !enabledSchedules.isEmpty else { return }
 
-        let scheduleID = schedule.persistentModelID
-        let allCourses = try modelContext.fetch(FetchDescriptor<Course>())
-        let courses = allCourses.filter { $0.schedule?.persistentModelID == scheduleID }
-        guard !courses.isEmpty else { return }
-
+        var courseDescriptor = FetchDescriptor<Course>()
+        courseDescriptor.relationshipKeyPathsForPrefetching = [\Course.reschedules]
+        let allCourses = try modelContext.fetch(courseDescriptor)
         let allPresets = try modelContext.fetch(FetchDescriptor<TimeSlotPreset>())
-        let activePreset = allPresets.first { $0.name == activePresetName } ?? allPresets.first
-        let presetID = activePreset?.persistentModelID
+        let defaultPreset = allPresets.first { $0.name == activePresetName } ?? allPresets.first
         let allSlots = try modelContext.fetch(FetchDescriptor<TimeSlotItem>())
-        let slots = allSlots
-            .filter { presetID != nil && $0.preset?.persistentModelID == presetID }
-            .sorted { $0.periodIndex < $1.periodIndex }
 
-        func startTime(for course: Course) -> (hour: Int, minute: Int)? {
-            slots.first(where: { $0.periodIndex == course.periodIndex }).map { ($0.startHour, $0.startMinute) }
+        func slots(for preset: TimeSlotPreset?) -> [TimeSlotItem] {
+            guard let preset = preset else { return [] }
+            let pid = preset.persistentModelID
+            return allSlots
+                .filter { $0.preset?.persistentModelID == pid }
+                .sorted { $0.periodIndex < $1.periodIndex }
+        }
+        func startTime(slots: [TimeSlotItem], forPeriod period: Int) -> (hour: Int, minute: Int)? {
+            slots.first(where: { $0.periodIndex == period }).map { ($0.startHour, $0.startMinute) }
         }
 
-        let semesterStart = cal.startOfDay(for: schedule.semesterStartDate)
-        let currentW = currentWeek(semesterStart: schedule.semesterStartDate, calendar: cal)
-        var scheduledCount = 0
         let maxTotal = 64
+        var scheduledCount = 0
 
-        for week in currentW ..< (currentW + kMaxWeeksAhead) {
+        for schedule in enabledSchedules {
             guard scheduledCount < maxTotal else { break }
-            for dayOfWeek in 1 ... 7 {
+            let scheduleID = schedule.persistentModelID
+            let scheduleName = schedule.name.isEmpty ? "课程表" : schedule.name
+            let courses = allCourses.filter { $0.schedule?.persistentModelID == scheduleID }
+            guard !courses.isEmpty else { continue }
+
+            let preset = schedule.timeSlotPreset ?? defaultPreset
+            let scheduleSlots = slots(for: preset)
+
+            let semesterStart = cal.startOfDay(for: schedule.semesterStartDate)
+            let currentW = currentWeek(semesterStart: schedule.semesterStartDate, calendar: cal)
+
+            for week in currentW ..< (currentW + kMaxWeeksAhead) {
                 guard scheduledCount < maxTotal else { break }
-                guard let dayDate = cal.date(byAdding: .day, value: (week - 1) * 7 + (dayOfWeek - 1), to: semesterStart) else { continue }
-                for course in courses where course.appliesToWeek(week) && course.dayOfWeek == dayOfWeek {
-                    guard let start = startTime(for: course) else { continue }
-                    let comps = DateComponents(calendar: cal, year: cal.component(.year, from: dayDate), month: cal.component(.month, from: dayDate), day: cal.component(.day, from: dayDate), hour: start.hour, minute: start.minute)
-                    guard let courseStart = cal.date(from: comps) else { continue }
-                    let reminderDate = cal.date(byAdding: .minute, value: -kReminderMinutes, to: courseStart)!
-                    if reminderDate <= now { continue }
-                    let id = "\(kNotificationPrefix)\(course.persistentModelID.hashValue)-\(week)-\(dayOfWeek)"
-                    let content = UNMutableNotificationContent()
-                    content.title = "课程提醒"
-                    content.body = "「\(course.name)」快要开始啦"
-                    content.sound = .default
-                    let triggerComps = cal.dateComponents([.year, .month, .day, .hour, .minute], from: reminderDate)
-                    let trigger = UNCalendarNotificationTrigger(dateMatching: triggerComps, repeats: false)
-                    let request = UNNotificationRequest(identifier: id, content: content, trigger: trigger)
-                    UNUserNotificationCenter.current().add(request)
-                    scheduledCount += 1
+                for dayOfWeek in 1 ... 7 {
+                    guard scheduledCount < maxTotal else { break }
+                    let occurrences = EffectiveCourseService.effectiveCourseOccurrences(
+                        courses: courses,
+                        week: week,
+                        dayOfWeek: dayOfWeek
+                    )
+                    guard let dayDate = cal.date(byAdding: .day, value: (week - 1) * 7 + (dayOfWeek - 1), to: semesterStart) else { continue }
+                    for occ in occurrences {
+                        guard let start = startTime(slots: scheduleSlots, forPeriod: occ.periodStart) else { continue }
+                        let comps = DateComponents(
+                            calendar: cal,
+                            year: cal.component(.year, from: dayDate),
+                            month: cal.component(.month, from: dayDate),
+                            day: cal.component(.day, from: dayDate),
+                            hour: start.hour,
+                            minute: start.minute
+                        )
+                        guard let courseStart = cal.date(from: comps) else { continue }
+                        let reminderDate = cal.date(byAdding: .minute, value: -kReminderMinutes, to: courseStart)!
+                        if reminderDate <= now { continue }
+                        let id = "\(kNotificationPrefix)\(occ.course.persistentModelID.hashValue)-\(scheduleID.hashValue)-\(week)-\(dayOfWeek)-\(occ.periodStart)"
+                        let content = UNMutableNotificationContent()
+                        content.title = "课程提醒"
+                        content.body = "「\(scheduleName)」\(occ.course.name) 快要开始啦"
+                        content.sound = .default
+                        let triggerComps = cal.dateComponents([.year, .month, .day, .hour, .minute], from: reminderDate)
+                        let trigger = UNCalendarNotificationTrigger(dateMatching: triggerComps, repeats: false)
+                        let request = UNNotificationRequest(identifier: id, content: content, trigger: trigger)
+                        UNUserNotificationCenter.current().add(request)
+                        scheduledCount += 1
+                        if scheduledCount >= maxTotal { break }
+                    }
                 }
             }
         }

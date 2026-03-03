@@ -13,5 +13,9 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>dev.e23.schedy.refreshNotifications</string>
+	</array>
 </dict>
 </plist>

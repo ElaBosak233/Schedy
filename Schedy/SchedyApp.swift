@@ -91,6 +91,8 @@ struct SchedyApp: App {
                 .preferredColorScheme(appearanceMode.colorScheme)
                 .onAppear {
                     requestCourseNotificationPermission()
+                    registerNotificationRefreshTask()
+                    scheduleNextNotificationRefresh()
                 }
         }
         .modelContainer(sharedModelContainer)

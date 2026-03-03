@@ -81,17 +81,14 @@ struct ContentView: View {
             }
             .tint(.accentColor)
             .onAppear {
-                if !activeScheduleName.isEmpty {
-                    scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
-                }
+                scheduleCourseReminders(modelContext: modelContext)
                 refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
             }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active {
-                    if !activeScheduleName.isEmpty {
-                        scheduleCourseReminders(modelContext: modelContext, activeScheduleName: activeScheduleName)
-                    }
+                    scheduleCourseReminders(modelContext: modelContext)
                     refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
+                    scheduleNextNotificationRefresh()
                 }
             }
         }

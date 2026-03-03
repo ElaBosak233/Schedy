@@ -97,6 +97,7 @@ func seedDefaultScheduleIfNeeded(modelContext: ModelContext) {
         let start = defaultSemesterStartDate()
         let defaultName = "我的课程表"
         let schedule = Schedule(name: defaultName, semesterStartDate: start)
+        schedule.timeSlotPreset = presets.first
         modelContext.insert(schedule)
         try? modelContext.save()
         UserDefaults.standard.set(defaultName, forKey: "activeScheduleName")

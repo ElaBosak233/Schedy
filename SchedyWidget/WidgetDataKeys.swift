@@ -12,9 +12,6 @@ let kWidgetAppGroupSuiteName = "group.dev.e23.schedy"
 /// 跟随 App 当前选中的课表（设置里显示的选项值；若用户某张课表恰好同名则选该选项时仍视为「跟随」）
 let kWidgetScheduleOptionFollowApp = "跟随 App 当前选中"
 
-/// 跟随 App 当前选中的时间段
-let kWidgetPresetOptionFollowApp = "跟随 App 当前选中"
-
 enum WidgetDataKeys {
     static let scheduleName = "widgetScheduleName"
     static let date = "widgetDate"
@@ -29,10 +26,10 @@ enum WidgetDataKeys {
 
     static let scheduleNamesList = "widgetScheduleNamesList"
     static let defaultScheduleName = "widgetDefaultScheduleName"
-    static let presetNamesList = "widgetPresetNamesList"
     static let defaultPresetName = "widgetDefaultPresetName"
     static let entryPrefix = "widgetEntry"
     static let entrySeparator = "__SEP__"
+    static let schedulePresetPrefix = "schedulePreset_"
 }
 
 struct WidgetEntry {
@@ -95,24 +92,12 @@ struct WidgetEntry {
         return list.first ?? ""
     }
 
-    /// 解析「小组件要使用的时间段名」：若为跟随 App 或该时间段已不存在，则回退到默认/第一个
-    static func resolvePresetNameToShow(suite: UserDefaults?, configuredPreset: String) -> String {
-        let list = suite?.stringArray(forKey: WidgetDataKeys.presetNamesList) ?? []
-        let defaultPreset = suite?.string(forKey: WidgetDataKeys.defaultPresetName) ?? ""
-
-        let presetToUse: String
-        if configuredPreset == kWidgetPresetOptionFollowApp {
-            presetToUse = defaultPreset
-        } else {
-            presetToUse = configuredPreset
-        }
-        if list.contains(presetToUse) {
-            return presetToUse
-        }
-        if !defaultPreset.isEmpty && list.contains(defaultPreset) {
-            return defaultPreset
-        }
-        return list.first ?? ""
+    /// 根据选中的课表名解析其绑定的时间段名（选哪张课表即用该课表的时间预设）
+    static func resolvePresetName(forScheduleName scheduleName: String, suite: UserDefaults?) -> String {
+        guard let suite = suite else { return "" }
+        let bound = suite.string(forKey: WidgetDataKeys.schedulePresetPrefix + scheduleName)
+        if let b = bound, !b.isEmpty { return b }
+        return suite.string(forKey: WidgetDataKeys.defaultPresetName) ?? ""
     }
 }
 

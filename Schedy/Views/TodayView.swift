@@ -88,8 +88,9 @@ struct TodayView: View {
         schedules.first { $0.name == activeScheduleName } ?? schedules.first
     }
 
-    /// 全局当前使用的时间段
+    /// 当前课表绑定的时间段；未绑定时使用全局默认预设
     private var activePreset: TimeSlotPreset? {
+        if let bound = activeSchedule?.timeSlotPreset { return bound }
         if !activeTimeSlotPresetName.isEmpty {
             return presets.first { $0.name == activeTimeSlotPresetName }
         }

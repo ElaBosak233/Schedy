@@ -39,9 +39,8 @@ struct SchedyWidgetProvider: AppIntentTimelineProvider {
         }
         let suite = UserDefaults(suiteName: kWidgetAppGroupSuiteName)
         let scheduleChoice = configuration.scheduleName.flatMap { $0.isEmpty ? nil : $0 } ?? kWidgetScheduleOptionFollowApp
-        let presetChoice = configuration.presetName.flatMap { $0.isEmpty ? nil : $0 } ?? kWidgetPresetOptionFollowApp
         let resolvedSchedule = WidgetEntry.resolveScheduleNameToShow(suite: suite, configuredName: scheduleChoice)
-        let resolvedPreset = WidgetEntry.resolvePresetNameToShow(suite: suite, configuredPreset: presetChoice)
+        let resolvedPreset = WidgetEntry.resolvePresetName(forScheduleName: resolvedSchedule, suite: suite)
         var widgetEntry = WidgetEntry.load(from: suite, scheduleName: resolvedSchedule, presetName: resolvedPreset)
         if widgetEntry.dateString.isEmpty, let legacy = WidgetEntry.loadLegacy(from: suite) {
             widgetEntry = legacy
@@ -52,9 +51,8 @@ struct SchedyWidgetProvider: AppIntentTimelineProvider {
     func timeline(for configuration: SchedyWidgetConfigIntent, in context: Context) async -> Timeline<SchedyWidgetEntry> {
         let suite = UserDefaults(suiteName: kWidgetAppGroupSuiteName)
         let scheduleChoice = configuration.scheduleName.flatMap { $0.isEmpty ? nil : $0 } ?? kWidgetScheduleOptionFollowApp
-        let presetChoice = configuration.presetName.flatMap { $0.isEmpty ? nil : $0 } ?? kWidgetPresetOptionFollowApp
         let resolvedSchedule = WidgetEntry.resolveScheduleNameToShow(suite: suite, configuredName: scheduleChoice)
-        let resolvedPreset = WidgetEntry.resolvePresetNameToShow(suite: suite, configuredPreset: presetChoice)
+        let resolvedPreset = WidgetEntry.resolvePresetName(forScheduleName: resolvedSchedule, suite: suite)
         var widgetEntry = WidgetEntry.load(from: suite, scheduleName: resolvedSchedule, presetName: resolvedPreset)
         if widgetEntry.dateString.isEmpty, let legacy = WidgetEntry.loadLegacy(from: suite) {
             widgetEntry = legacy
@@ -196,7 +194,7 @@ struct SchedyWidget: Widget {
             SchedyWidgetView(entry: entry.entry)
         }
         .configurationDisplayName("今日课程")
-        .description("选择课表与时间段，展示日期与接下来两节课。")
+        .description("选择要显示的课表，将使用该课表绑定的时间段展示日期与接下来两节课。")
         .supportedFamilies([WidgetFamily.systemSmall, WidgetFamily.systemMedium])
     }
 }
