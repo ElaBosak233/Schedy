@@ -21,5 +21,11 @@ struct SchoolInfo: Identifiable {
             academicAffairsType: .zhengFang,
             entryURL: URL(string: "https://jwc.tzc.edu.cn")!
         ),
+        SchoolInfo(
+            id: "kdcnu",
+            name: "首都师范大学科德学院",
+            academicAffairsType: .qiangZhi,
+            entryURL: URL(string: "http://jw.kdcnu.com/sdsfdxkdxy_jsxsd/")!
+        )
     ]
 }

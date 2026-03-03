@@ -10,8 +10,8 @@ import Foundation
 /// 解析出的一门课（来自 CSV 或教务 HTML），尚未写入 SwiftData；dayOfWeek 与 Course 一致（1=周一…7=周日）
 struct ParsedCourseItem {
     var name: String
-    var teacher: String
-    var location: String
+    var teacher: String?
+    var location: String?
     /// 学分（可选）
     var credits: Double?
     var weekRangesString: String

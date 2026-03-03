@@ -49,6 +49,7 @@ struct ScheduleImportView: View {
     @State private var urlBarText = ""
     @State private var pendingLoadURL: URL?
     @State private var showCSVFileImporter = false
+    @State private var showHTMLFileImporter = false
     @State private var showTemplateCopied = false
     @State private var showPromptCopied = false
 
@@ -470,7 +471,7 @@ struct ScheduleImportView: View {
         Group {
             if let config = importConfig {
                 VStack(spacing: 0) {
-                    Text("请登录并进入「个人课表查询」页面后，点击右上角下载按钮导入。可修改上方网址跳转。")
+                    Text("请登录并进入课表页面后，点击右上角下载按钮导入；或使用下方「从本地 HTML 导入」选择已保存的课表页面。")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .padding(8)
@@ -484,6 +485,21 @@ struct ScheduleImportView: View {
                     ) { _, html in
                         performImport(html: html, config: config)
                     }
+                    Button {
+                        showHTMLFileImporter = true
+                    } label: {
+                        Label("从本地 HTML 导入", systemImage: "doc.badge.arrow.up")
+                    }
+                    .buttonStyle(.bordered)
+                    .padding(.vertical, 8)
+                    .disabled(isImporting)
+                }
+                .fileImporter(
+                    isPresented: $showHTMLFileImporter,
+                    allowedContentTypes: [UTType.html, .plainText],
+                    allowsMultipleSelection: false
+                ) { result in
+                    handleHTMLFileResult(result, config: config)
                 }
             } else {
                 ContentUnavailableView("未选择来源", systemImage: "building.2")
@@ -500,15 +516,70 @@ struct ScheduleImportView: View {
         }
     }
 
-    private func performImport(html: String, config: ImportConfig) {
-        defer { isImporting = false }
-        let parsed: [ParsedCourseItem]
-        switch config.academicAffairsType {
-        case .zhengFang:
-            parsed = ZhengFangHTMLParser.parse(html: html)
+    private func handleHTMLFileResult(_ result: Result<[URL], Error>, config: ImportConfig) {
+        switch result {
+        case .success(let urls):
+            guard let url = urls.first else { return }
+            guard url.startAccessingSecurityScopedResource() else {
+                importError = "无法访问所选文件"
+                return
+            }
+            isImporting = true
+            do {
+                let data = try Data(contentsOf: url)
+                let html = String(data: data, encoding: .utf8)
+                    ?? String(data: data, encoding: .utf16)
+                    ?? ""
+                url.stopAccessingSecurityScopedResource()
+                // 在后台解析，避免大 HTML 阻塞主线程导致卡死
+                let type = config.academicAffairsType
+                DispatchQueue.global(qos: .userInitiated).async { [html] in
+                    let parsed: [ParsedCourseItem]
+                    switch type {
+                    case .zhengFang: parsed = ZhengFangHTMLParser.parse(html: html)
+                    case .qiangZhi: parsed = QiangZhiHTMLParser.parse(html: html)
+                    }
+                    DispatchQueue.main.async {
+                        self.isImporting = false
+                        self.performImport(html: nil, config: config, preParsed: parsed)
+                    }
+                }
+            } catch {
+                url.stopAccessingSecurityScopedResource()
+                isImporting = false
+                importError = "读取文件失败：\(error.localizedDescription)"
+            }
+        case .failure(let error):
+            importError = error.localizedDescription
         }
+    }
+
+    private func performImport(html: String?, config: ImportConfig, preParsed: [ParsedCourseItem]? = nil) {
+        if let pre = preParsed {
+            // 已在后台解析完毕，直接在主线程写入
+            finishImport(parsed: pre, config: config)
+        } else if let h = html {
+            // HTML 解析是 CPU 密集型操作，必须放到后台线程，否则阻塞主线程导致卡死
+            isImporting = true
+            let type = config.academicAffairsType
+            DispatchQueue.global(qos: .userInitiated).async { [h] in
+                let parsed: [ParsedCourseItem]
+                switch type {
+                case .zhengFang: parsed = ZhengFangHTMLParser.parse(html: h)
+                case .qiangZhi: parsed = QiangZhiHTMLParser.parse(html: h)
+                }
+                DispatchQueue.main.async {
+                    self.isImporting = false
+                    self.finishImport(parsed: parsed, config: config)
+                }
+            }
+        }
+    }
+
+    private func finishImport(parsed: [ParsedCourseItem], config: ImportConfig) {
         if parsed.isEmpty {
-            importError = "未能从当前页面解析到课程，请确保已打开「个人课表查询」的课表页面。"
+            let pageName = config.academicAffairsType == .qiangZhi ? "学期理论课表" : "个人课表查询"
+            importError = "未能从当前页面解析到课程，请确保已打开「\(pageName)」的课表页面。"
             return
         }
         seedDefaultPresetsIfNeeded(modelContext: modelContext)
@@ -552,8 +623,8 @@ struct ScheduleImportView: View {
         for item in items {
             let course = Course(
                 name: item.name,
-                teacher: item.teacher.trimmingCharacters(in: .whitespaces).isEmpty ? nil : item.teacher,
-                location: item.location.trimmingCharacters(in: .whitespaces).isEmpty ? nil : item.location,
+                teacher: item.teacher.flatMap { $0.trimmingCharacters(in: .whitespaces).isEmpty ? nil : $0 },
+                location: item.location.flatMap { $0.trimmingCharacters(in: .whitespaces).isEmpty ? nil : $0 },
                 credits: item.credits,
                 weekRangesString: item.weekRangesString,
                 weekParity: item.weekParity,
