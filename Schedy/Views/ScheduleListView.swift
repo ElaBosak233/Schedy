@@ -11,7 +11,7 @@ import SwiftUI
 struct ScheduleListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Schedule.name) private var schedules: [Schedule]
-    @AppStorage("activeScheduleName") private var activeScheduleName: String = "我的课程表"
+    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = "我的课程表"
 
     @State private var showAddSchedule = false
     @State private var scheduleToEdit: Schedule?
@@ -122,7 +122,7 @@ struct ScheduleListView: View {
 struct ScheduleEditSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @AppStorage("activeScheduleName") private var activeScheduleName: String = "我的课程表"
+    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = "我的课程表"
     @AppStorage(ScheduleDisplayKeys.activeTimeSlotPresetName) private var activeTimeSlotPresetName: String = ""
     @Query(sort: \TimeSlotPreset.name) private var presets: [TimeSlotPreset]
     @Query private var allSchedules: [Schedule]
@@ -179,7 +179,7 @@ struct ScheduleEditSheet: View {
                     semesterStartDate = s.semesterStartDate
                 } else {
                     name = ""
-                    semesterStartDate = defaultSemesterStartForPicker()
+                    semesterStartDate = defaultSemesterStartDate()
                     selectedPresetName = activeTimeSlotPresetName.isEmpty ? (presets.first?.name ?? "") : activeTimeSlotPresetName
                 }
             }
@@ -213,14 +213,6 @@ struct ScheduleEditSheet: View {
             )
         }
         return $selectedPresetName
-    }
-
-    private func defaultSemesterStartForPicker() -> Date {
-        let cal = Calendar.current
-        let today = cal.startOfDay(for: Date())
-        let weekday = cal.component(.weekday, from: today)
-        let daysUntilMonday = weekday == 1 ? 1 : (weekday == 2 ? 0 : (9 - weekday))
-        return cal.date(byAdding: .day, value: daysUntilMonday, to: today) ?? today
     }
 
     private func save() {

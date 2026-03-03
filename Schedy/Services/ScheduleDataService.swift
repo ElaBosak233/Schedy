@@ -82,7 +82,7 @@ func extendPresetToCoverPeriodIfNeeded(preset: TimeSlotPreset?, requiredPeriodCo
 }
 
 /// 默认学期第一天：取「下一个周一」或「今天若已是周一」
-private func defaultSemesterStartDate() -> Date {
+func defaultSemesterStartDate() -> Date {
     let cal = Calendar.current
     let today = cal.startOfDay(for: Date())
     let weekday = cal.component(.weekday, from: today) // 1 = Sun, 2 = Mon, ...
@@ -90,7 +90,7 @@ private func defaultSemesterStartDate() -> Date {
     return cal.date(byAdding: .day, value: daysUntilMonday, to: today) ?? today
 }
 
-/// 去重：合并同名 TimeSlotPreset（保留最早创建的，迁移 slots/schedules），合并同名 Schedule（保留第一个，迁移 courses/reschedules）
+/// 去重：合并同名 TimeSlotPreset（保留最早创建的，删除重复 slots，迁移 schedules 引用），合并同名 Schedule（保留第一个，迁移 courses/reschedules）
 @MainActor
 func deduplicateIfNeeded(modelContext: ModelContext) {
     // 去重 TimeSlotPreset
@@ -98,8 +98,8 @@ func deduplicateIfNeeded(modelContext: ModelContext) {
     var seenPresets: [String: TimeSlotPreset] = [:]
     for preset in allPresets.sorted(by: { $0.createdAt < $1.createdAt }) {
         if let existing = seenPresets[preset.name] {
-            // 把 slots 和 schedules 迁移到 existing，删除重复
-            for slot in preset.slots ?? [] { slot.preset = existing }
+            // slots 内容重复，直接删除；schedules 引用迁移到 existing
+            for slot in preset.slots ?? [] { modelContext.delete(slot) }
             for schedule in preset.schedules ?? [] { schedule.timeSlotPreset = existing }
             modelContext.delete(preset)
         } else {
@@ -139,7 +139,7 @@ func seedDefaultScheduleIfNeeded(modelContext: ModelContext) {
         schedule.timeSlotPreset = presets.first
         modelContext.insert(schedule)
         try? modelContext.save()
-        UserDefaults.standard.set(defaultName, forKey: "activeScheduleName")
+        UserDefaults.standard.set(defaultName, forKey: ScheduleDisplayKeys.activeScheduleName)
         if UserDefaults.standard.string(forKey: ScheduleDisplayKeys.activeTimeSlotPresetName)?.isEmpty != false,
            let firstPresetName = presets.first?.name {
             UserDefaults.standard.set(firstPresetName, forKey: ScheduleDisplayKeys.activeTimeSlotPresetName)

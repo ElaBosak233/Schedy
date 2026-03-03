@@ -17,6 +17,8 @@ enum ScheduleDisplayKeys {
     static let firstWeekday = "scheduleFirstWeekday"
     /// 当前使用的时间段名称（所有课程表共用）
     static let activeTimeSlotPresetName = "activeTimeSlotPresetName"
+    /// 当前选中的课程表名称
+    static let activeScheduleName = "activeScheduleName"
 }
 
 // MARK: - 外观与 iCloud

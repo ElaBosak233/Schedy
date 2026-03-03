@@ -18,7 +18,7 @@ private struct EditableWeekRange: Identifiable {
 struct CourseEditSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @AppStorage("activeScheduleName") private var activeScheduleName: String = "我的课程表"
+    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = "我的课程表"
 
     let course: Course?
     let schedule: Schedule?

@@ -118,7 +118,7 @@ struct ScheduleGridView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Query(sort: \Schedule.name) private var schedules: [Schedule]
     @Query(sort: \TimeSlotPreset.name) private var presets: [TimeSlotPreset]
-    @AppStorage("activeScheduleName") private var activeScheduleName: String = "我的课程表"
+    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = "我的课程表"
     @AppStorage(ScheduleDisplayKeys.activeTimeSlotPresetName) private var activeTimeSlotPresetName: String = ""
     @AppStorage(ScheduleDisplayKeys.showHorizontalLines) private var showHorizontalLines: Bool = true
     @AppStorage(ScheduleDisplayKeys.showVerticalLines) private var showVerticalLines: Bool = true

@@ -52,7 +52,7 @@ struct SettingsRootView: View {
                 NavigationLink {
                     ICloudSettingsView()
                 } label: {
-                    Label("iCloud", systemImage: "icloud")
+                    Label("数据同步", systemImage: "arrow.triangle.2.circlepath.icloud")
                 }
             } header: {
                 Text("课程表")

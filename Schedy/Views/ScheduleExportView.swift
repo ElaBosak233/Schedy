@@ -12,7 +12,7 @@ struct ScheduleExportView: View {
     @Environment(\.dismiss) private var dismiss
 
     @Query(sort: \Schedule.name) private var schedules: [Schedule]
-    @AppStorage("activeScheduleName") private var activeScheduleName: String = "我的课程表"
+    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = "我的课程表"
 
     /// 用户选择「导出为 CSV」时由外部生成文件并设置 shareExportURL，然后关闭本界面
     var onExportCSV: () -> Void

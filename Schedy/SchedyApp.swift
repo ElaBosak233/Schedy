@@ -31,53 +31,50 @@ enum AppearanceMode: String, CaseIterable {
     }
 }
 
+func makeModelContainer(useICloud: Bool) -> ModelContainer {
+    let schema = Schema([
+        Schedule.self,
+        Course.self,
+        CourseReschedule.self,
+        TimeSlotPreset.self,
+        TimeSlotItem.self,
+    ])
+    let iCloudAvailable = FileManager.default.ubiquityIdentityToken != nil
+    let config = ModelConfiguration(
+        schema: schema,
+        isStoredInMemoryOnly: false,
+        cloudKitDatabase: (useICloud && iCloudAvailable) ? .automatic : .none
+    )
+    do {
+        return try ModelContainer(for: schema, configurations: [config])
+    } catch {
+        if useICloud && iCloudAvailable {
+            UserDefaults.standard.set(false, forKey: kICloudSyncEnabledKey)
+            let fallbackConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false, cloudKitDatabase: .none)
+            if let fallback = try? ModelContainer(for: schema, configurations: [fallbackConfig]) {
+                return fallback
+            }
+        }
+        fatalError("无法创建 ModelContainer: \(error)")
+    }
+}
+
 @main
 struct SchedyApp: App {
     @AppStorage(kAppearanceModeKey) private var appearanceModeRaw: String = AppearanceMode.system.rawValue
+    @AppStorage(kICloudSyncEnabledKey) private var iCloudSyncEnabled: Bool = false
 
-    /// SwiftData 容器：本地或 iCloud 同步；首次启动根据 iCloud 可用性设置默认同步开关
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Schedule.self,
-            Course.self,
-            CourseReschedule.self,
-            TimeSlotPreset.self,
-            TimeSlotItem.self,
-        ])
+    @State private var containerID: UUID = UUID()
+    @State private var modelContainer: ModelContainer
 
-        // iCloud 可用性：模拟器或未登录 Apple ID 时不可用
-        let iCloudAvailable = FileManager.default.ubiquityIdentityToken != nil
-
-        // 首次启动：根据 iCloud 是否可用设置默认；iCloud 不可用时默认关闭
+    init() {
+        // 首次启动：默认关闭 iCloud
         if UserDefaults.standard.object(forKey: kICloudSyncEnabledKey) == nil {
-            UserDefaults.standard.set(iCloudAvailable, forKey: kICloudSyncEnabledKey)
+            UserDefaults.standard.set(false, forKey: kICloudSyncEnabledKey)
         }
-
-        let useICloud = UserDefaults.standard.bool(forKey: kICloudSyncEnabledKey) && iCloudAvailable
-
-        let config = ModelConfiguration(
-            schema: schema,
-            isStoredInMemoryOnly: false,
-            cloudKitDatabase: useICloud ? .automatic : .none
-        )
-        do {
-            return try ModelContainer(for: schema, configurations: [config])
-        } catch {
-            // CloudKit 初始化失败时回退到仅本地存储
-            if useICloud {
-                UserDefaults.standard.set(false, forKey: kICloudSyncEnabledKey)
-                let fallbackConfig = ModelConfiguration(
-                    schema: schema,
-                    isStoredInMemoryOnly: false,
-                    cloudKitDatabase: .none
-                )
-                if let fallback = try? ModelContainer(for: schema, configurations: [fallbackConfig]) {
-                    return fallback
-                }
-            }
-            fatalError("无法创建 ModelContainer: \(error)")
-        }
-    }()
+        let useICloud = UserDefaults.standard.bool(forKey: kICloudSyncEnabledKey)
+        _modelContainer = State(initialValue: makeModelContainer(useICloud: useICloud))
+    }
 
     private var appearanceMode: AppearanceMode {
         AppearanceMode(rawValue: appearanceModeRaw) ?? .system
@@ -86,13 +83,18 @@ struct SchedyApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .id(containerID)
+                .modelContainer(modelContainer)
                 .preferredColorScheme(appearanceMode.colorScheme)
                 .onAppear {
                     requestCourseNotificationPermission()
                     registerNotificationRefreshTask()
                     scheduleNextNotificationRefresh()
                 }
+                .onChange(of: iCloudSyncEnabled) { _, newValue in
+                    modelContainer = makeModelContainer(useICloud: newValue)
+                    containerID = UUID()
+                }
         }
-        .modelContainer(sharedModelContainer)
     }
 }

@@ -348,7 +348,7 @@ struct PresetRenameSheet: View {
 // MARK: - 单节时间段编辑
 struct TimeSlotEditView: View {
     @Environment(\.modelContext) private var modelContext
-    @AppStorage("activeScheduleName") private var activeScheduleName: String = "我的课程表"
+    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = "我的课程表"
     @Bindable var slot: TimeSlotItem
 
     private func dateFrom(hour: Int, minute: Int) -> Date {
