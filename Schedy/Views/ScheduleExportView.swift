@@ -2,7 +2,7 @@
 //  ScheduleExportView.swift
 //  Schedy
 //
-//  导出课表流程：进入子界面 → 选择导出为 CSV 等 → 执行导出并弹分享
+//  导出流程：选择当前课表后点击「导出为 CSV」，由调用方生成文件并弹出系统分享面板。
 //
 
 import SwiftData

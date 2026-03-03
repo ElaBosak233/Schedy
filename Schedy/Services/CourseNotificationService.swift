@@ -1,8 +1,8 @@
 //
 //  CourseNotificationService.swift
-//  schedy
+//  Schedy
 //
-//  在课程开始前 15 分钟发送本地通知。支持多张课表同时提醒（按「是否通知」），且考虑调课后的有效课次。
+//  课程提醒：开课前 15 分钟发送本地通知；支持多张课表分别开关、考虑调课后的有效课次；先清空再重排，上限 64 条。
 //
 
 import Foundation
@@ -13,15 +13,6 @@ private let kNotificationPrefix = "schedy-"
 private let kReminderMinutes: Int = 15
 /// 最多预排的周数（iOS 本地通知总数上限 64）
 private let kMaxWeeksAhead = 6
-
-/// 根据学期第一天和当前日期计算当前周（1-based）
-private func currentWeek(semesterStart: Date, calendar: Calendar) -> Int {
-    let today = calendar.startOfDay(for: Date())
-    let start = calendar.startOfDay(for: semesterStart)
-    guard today >= start else { return 1 }
-    let days = calendar.dateComponents([.day], from: start, to: today).day ?? 0
-    return min(max(1, days / 7 + 1), 25)
-}
 
 /// 请求通知权限（可在任意处调用）
 func requestCourseNotificationPermission() {
@@ -101,7 +92,7 @@ private func scheduleCourseRemindersAfterClear(modelContext: ModelContext) {
             let scheduleSlots = slots(for: preset)
 
             let semesterStart = cal.startOfDay(for: schedule.semesterStartDate)
-            let currentW = currentWeek(semesterStart: schedule.semesterStartDate, calendar: cal)
+            let currentW = Calendar.currentWeek(semesterStart: schedule.semesterStartDate, calendar: cal)
 
             for week in currentW ..< (currentW + kMaxWeeksAhead) {
                 guard scheduledCount < maxTotal else { break }

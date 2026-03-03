@@ -129,10 +129,9 @@ final class Course {
     /// 跨几节（至少为 1）
     var periodSpan: Int { max(1, effectivePeriodEnd - periodIndex + 1) }
 
+    /// 周几的中文显示名（如「周一」）
     var dayOfWeekName: String {
-        let names = ["", "周一", "周二", "周三", "周四", "周五", "周六", "周日"]
-        guard dayOfWeek >= 1, dayOfWeek <= 7 else { return "?" }
-        return names[dayOfWeek]
+        WeekdayLabels.name(forDayOfWeek: dayOfWeek)
     }
 
     /// 周次展示文案，如 "第1、5-8周"、"第1、5-8周 单周"

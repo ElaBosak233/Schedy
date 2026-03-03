@@ -1,14 +1,14 @@
 //
-//  schedyApp.swift
-//  schedy
+//  SchedyApp.swift
+//  Schedy
 //
-//  Created by ela on 2026/2/25.
+//  App 入口：SwiftData 容器（含 iCloud 可选）、外观模式、启动时注册通知与小组件刷新。
 //
 
 import SwiftData
 import SwiftUI
 
-/// 外观模式：跟随系统 / 浅色 / 深色
+/// 外观模式：跟随系统 / 浅色 / 深色，对应 preferredColorScheme
 enum AppearanceMode: String, CaseIterable {
     case system = "system"
     case light = "light"
@@ -31,13 +31,11 @@ enum AppearanceMode: String, CaseIterable {
     }
 }
 
-let kAppearanceModeKey = "appearanceMode"
-let kICloudSyncEnabledKey = "iCloudSyncEnabled"
-
 @main
 struct SchedyApp: App {
     @AppStorage(kAppearanceModeKey) private var appearanceModeRaw: String = AppearanceMode.system.rawValue
 
+    /// SwiftData 容器：本地或 iCloud 同步；首次启动根据 iCloud 可用性设置默认同步开关
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Schedule.self,

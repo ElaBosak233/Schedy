@@ -9,9 +9,7 @@ import SwiftData
 import SwiftUI
 
 private func dayName(_ day: Int) -> String {
-    let names = ["", "周一", "周二", "周三", "周四", "周五", "周六", "周日"]
-    guard day >= 1, day <= 7 else { return "?" }
-    return names[day]
+    WeekdayLabels.name(forDayOfWeek: day)
 }
 
 struct RescheduleSheet: View {

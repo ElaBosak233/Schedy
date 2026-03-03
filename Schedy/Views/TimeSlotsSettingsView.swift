@@ -1,8 +1,8 @@
 //
 //  TimeSlotsSettingsView.swift
-//  schedy
+//  Schedy
 //
-//  时间段设置：切换冬令时/夏令时、自定义每节课的起止时间
+//  时间段设置：预设列表（冬令时/夏令时等）、当前使用的预设、每预设内各节起止时间的增删改。
 //
 
 import SwiftData

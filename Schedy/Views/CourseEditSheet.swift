@@ -1,8 +1,8 @@
 //
 //  CourseEditSheet.swift
-//  schedy
+//  Schedy
 //
-//  添加/编辑课程：课程名、时间（周次范围/单双周/星期/节次）、老师、地点
+//  添加/编辑课程 Sheet：课程名、周次范围与单双周、星期与节次、教师、地点、学分。
 //
 
 import SwiftData
@@ -237,8 +237,7 @@ struct CourseEditSheet: View {
     }
 
     private func dayName(_ d: Int) -> String {
-        let names = ["", "周一", "周二", "周三", "周四", "周五", "周六", "周日"]
-        return names.indices.contains(d) ? names[d] : "?"
+        WeekdayLabels.name(forDayOfWeek: d)
     }
 
     private func save() {

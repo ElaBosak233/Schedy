@@ -1,13 +1,14 @@
 //
 //  ContentView.swift
-//  schedy
+//  Schedy
 //
-//  主界面：课程表 + 设置（课程表列表、时间段）
+//  主界面：Tab（今天 / 课程表 / 设置）、全屏背景；onAppear/进入前台时刷新通知与小组件数据。
 //
 
 import SwiftData
 import SwiftUI
 
+/// 根视图：三 Tab（今天、课程表、设置），背景渐变；生命周期中触发课程提醒与小组件刷新
 struct ContentView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.modelContext) private var modelContext
@@ -92,99 +93,6 @@ struct ContentView: View {
                 }
             }
         }
-    }
-}
-
-// MARK: - 设置根视图：外观 / 课程表 / 时间段 / 权限 / 关于
-struct SettingsRootView: View {
-    @AppStorage(kAppearanceModeKey) private var appearanceModeRaw: String = AppearanceMode.system.rawValue
-    @AppStorage(kICloudSyncEnabledKey) private var iCloudSyncEnabled: Bool = true
-
-    private var iCloudAvailable: Bool {
-        FileManager.default.ubiquityIdentityToken != nil
-    }
-
-    private var iCloudSyncBinding: Binding<Bool> {
-        Binding(
-            get: { iCloudAvailable ? iCloudSyncEnabled : false },
-            set: { if iCloudAvailable { iCloudSyncEnabled = $0 } }
-        )
-    }
-
-    private var appearanceBinding: Binding<AppearanceMode> {
-        Binding(
-            get: { AppearanceMode(rawValue: appearanceModeRaw) ?? .system },
-            set: { appearanceModeRaw = $0.rawValue }
-        )
-    }
-
-    var body: some View {
-        List {
-            Section {
-                Picker(selection: appearanceBinding) {
-                    ForEach(AppearanceMode.allCases, id: \.rawValue) { mode in
-                        Text(mode.displayName).tag(mode)
-                    }
-                } label: {
-                    Label("外观", systemImage: "circle.lefthalf.filled")
-                }
-                .pickerStyle(.menu)
-                NavigationLink {
-                    ScheduleDisplaySettingsView()
-                } label: {
-                    Label("课表显示", systemImage: "tablecells")
-                }
-            } header: {
-                Text("外观")
-            }
-
-            Section {
-                NavigationLink {
-                    ScheduleListView()
-                } label: {
-                    Label("课程表", systemImage: "rectangle.grid.2x2")
-                }
-                NavigationLink {
-                    TimeSlotsSettingsView()
-                } label: {
-                    Label("时间段", systemImage: "clock")
-                }
-                Toggle(isOn: iCloudSyncBinding) {
-                    Label("iCloud 同步", systemImage: "icloud")
-                }
-                .disabled(!iCloudAvailable)
-            } header: {
-                Text("课程表")
-            } footer: {
-                if iCloudAvailable {
-                    Text("课程表、调课、时间段等数据通过 iCloud 自动在多设备间同步。请确保已登录同一 Apple ID。修改后需重启 app 生效。")
-                } else {
-                    Text("当前设备未登录 iCloud（如模拟器），无法使用同步功能。请在真机登录 Apple ID 后使用。")
-                }
-            }
-
-            Section {
-                NavigationLink {
-                    PermissionsView()
-                } label: {
-                    Label("权限", systemImage: "hand.raised")
-                }
-            } header: {
-                Text("权限")
-            }
-
-            Section {
-                NavigationLink {
-                    AboutView()
-                } label: {
-                    Label("关于", systemImage: "info.circle")
-                }
-            } header: {
-                Text("关于")
-            }
-        }
-        .navigationTitle("设置")
-        .navigationBarTitleDisplayMode(.large)
     }
 }
 

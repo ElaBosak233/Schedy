@@ -1,8 +1,8 @@
 //
 //  TodayView.swift
-//  schedy
+//  Schedy
 //
-//  「今天」视图：按卡片列表显示今天的课程
+//  「今天」Tab：根据当前选中的课表与时间段，用 EffectiveCourseService 取当日有效课次并以卡片列表展示。
 //
 
 import SwiftData

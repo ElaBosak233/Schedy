@@ -2,11 +2,13 @@
 //  WidgetDataKeys.swift
 //  SchedyWidget
 //
-//  与主 App WidgetDataService 中写入的 key 保持一致
+//  从 App Group 读取数据时使用的键名，必须与主 App 中 WidgetDataService.swift 的
+//  WidgetDataKeys 及 kWidgetAppGroupSuiteName 完全一致；修改时需同步主 App 与 Widget 两处。
 //
 
 import Foundation
 
+/// App Group 标识，须与主 App 中 kWidgetAppGroupSuiteName 一致
 let kWidgetAppGroupSuiteName = "group.dev.e23.schedy"
 
 /// 跟随 App 当前选中的课表（设置里显示的选项值；若用户某张课表恰好同名则选该选项时仍视为「跟随」）

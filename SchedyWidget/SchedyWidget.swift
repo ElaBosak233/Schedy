@@ -2,7 +2,7 @@
 //  SchedyWidget.swift
 //  SchedyWidget
 //
-//  课程表小组件：1x1（小方）与 2x1（长条），可设置显示哪张课表，显示日期与接下来两节课。
+//  今日课程小组件：小/中尺寸，从 App Group 读取当前课表今日数据，显示日期、星期与最多两节课信息。
 //
 
 import WidgetKit

@@ -1,8 +1,8 @@
 //
 //  PermissionsView.swift
-//  schedy
+//  Schedy
 //
-//  权限设置：展示当前权限状态，并提供跳转系统设置的入口
+//  权限页：显示通知权限状态（已开启/已关闭等），并提供跳转系统「设置」的按钮。
 //
 
 import SwiftUI

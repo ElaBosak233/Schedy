@@ -1,8 +1,8 @@
 //
 //  ScheduleGridView.swift
-//  schedy
+//  Schedy
 //
-//  主课程表网格：按周几 + 节次展示，左右滑动切换周次，表头显示当日日期
+//  主课程表网格：周×星期×节次，左右滑动切换周、考虑调课；表头日期、导入/导出/添加课程入口。
 //
 
 import SwiftData
@@ -136,7 +136,7 @@ struct ScheduleGridView: View {
     @State private var coursePreviewContext: CoursePreviewContext?
     @State private var courseToEdit: Course?
 
-    private let dayLabels = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
+    private let dayLabels = WeekdayLabels.columnLabels
 
     /// 根据「每周第一天」和「是否显示周末」得到要显示的星期列顺序（1=周一 … 7=周日）
     private var displayDayIndices: [Int] {

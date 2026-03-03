@@ -2,7 +2,7 @@
 //  SchedyWidgetIntent.swift
 //  SchedyWidget
 //
-//  小组件配置：选择显示哪张课表，默认「跟随 App 当前选中」。
+//  小组件配置 Intent：用户可选择要显示的课表（或「跟随 App 当前选中」），选项来自 App Group 的课表列表。
 //
 
 import AppIntents

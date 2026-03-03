@@ -2,11 +2,12 @@
 //  CSVParser.swift
 //  Schedy
 //
-//  从 CSV 文件解析课程列表
+//  从 CSV 字符串解析为 [ParsedCourseItem]；列定义与错误类型见 CSVImportConstants。
 //
 
 import Foundation
 
+/// CSV 解析过程中的错误类型，用于导入失败时提示用户
 enum CSVParserError: Error, LocalizedError {
     case emptyFile
     case invalidHeader

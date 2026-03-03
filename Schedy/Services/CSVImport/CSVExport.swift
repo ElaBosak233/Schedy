@@ -2,11 +2,12 @@
 //  CSVExport.swift
 //  Schedy
 //
-//  将当前课表导出为 CSV（与导入格式一致，便于备份或二次编辑）
+//  将指定课程表导出为 CSV 字符串（表头与列顺序与导入模板一致，便于备份或二次编辑后重新导入）。
 //
 
 import Foundation
 
+/// 课程表导出为 CSV：列与 CSVImportConstants 模板一致
 enum CSVExport {
     /// 与 CSV 导入一致的表头
     private static let header = "课程名,教师,地点,学分,周次,单双周,星期,起始节,结束节"

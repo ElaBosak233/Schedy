@@ -1,8 +1,8 @@
 //
 //  AboutView.swift
-//  schedy
+//  Schedy
 //
-//  关于页面：应用信息、开源地址与协议
+//  关于页：应用名称、副标题、开源仓库与许可证链接。
 //
 
 import SwiftUI

@@ -1,8 +1,12 @@
 //
 //  WidgetDataService.swift
-//  schedy
+//  Schedy
 //
 //  将「每张课程表的今日数据」写入 App Group，供小组件读取；支持小组件选择显示哪张课表。
+//
+//  注意：App Group 标识（kWidgetAppGroupSuiteName）与 WidgetDataKeys 的键名必须与
+//  SchedyWidget 扩展中的 WidgetDataKeys.swift 完全一致，否则小组件无法正确读取数据。
+//  修改任一 key 或 suite 时需同时更新主 App 与 Widget 两处。
 //
 
 import Foundation
@@ -12,6 +16,7 @@ import WidgetKit
 /// App Group 标识，需与主 App 和 Widget 的 entitlements 一致
 let kWidgetAppGroupSuiteName = "group.dev.e23.schedy"
 
+/// 写入 App Group 时使用的键名，须与 SchedyWidget/WidgetDataKeys.swift 中定义保持一致
 enum WidgetDataKeys {
     static let scheduleName = "widgetScheduleName"
     static let date = "widgetDate"
@@ -39,15 +44,6 @@ enum WidgetDataKeys {
     static let schedulePresetPrefix = "schedulePreset_"
 }
 
-/// 根据学期第一天和当前日期计算当前周（1-based）
-private func currentWeek(semesterStart: Date, calendar: Calendar) -> Int {
-    let today = calendar.startOfDay(for: Date())
-    let start = calendar.startOfDay(for: semesterStart)
-    guard today >= start else { return 1 }
-    let days = calendar.dateComponents([.day], from: start, to: today).day ?? 0
-    return min(max(1, days / 7 + 1), 25)
-}
-
 /// 系统 Calendar 的 weekday：1=周日, 2=周一, … 7=周六 → 模型 dayOfWeek：1=周一, …, 7=周日
 private func toDayOfWeek(_ calendarWeekday: Int) -> Int {
     return calendarWeekday == 1 ? 7 : (calendarWeekday - 1)
@@ -62,13 +58,12 @@ func refreshWidgetData(modelContext: ModelContext, activeScheduleName: String) {
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = "M月d日"
     dateFormatter.locale = Locale(identifier: "zh_CN")
-    let weekdayNames = ["", "周一", "周二", "周三", "周四", "周五", "周六", "周日"]
 
     let today = Date()
     let dateString = dateFormatter.string(from: today)
     let calendarWeekday = cal.component(.weekday, from: today)
     let dayOfWeek = toDayOfWeek(calendarWeekday)
-    let weekdayString = dayOfWeek >= 1 && dayOfWeek <= 7 ? weekdayNames[dayOfWeek] : ""
+    let weekdayString = WeekdayLabels.name(forDayOfWeek: dayOfWeek)
 
     var scheduleDescriptor = FetchDescriptor<Schedule>()
     scheduleDescriptor.relationshipKeyPathsForPrefetching = [\Schedule.courses, \Schedule.timeSlotPreset]
@@ -91,7 +86,7 @@ func refreshWidgetData(modelContext: ModelContext, activeScheduleName: String) {
     for schedule in allSchedules {
         let scheduleName = schedule.name
         let scheduleID = schedule.persistentModelID
-        let week = currentWeek(semesterStart: schedule.semesterStartDate, calendar: cal)
+        let week = Calendar.currentWeek(semesterStart: schedule.semesterStartDate, calendar: cal)
         let preset = schedule.timeSlotPreset ?? defaultPreset
         let presetName = preset?.name ?? ""
         suite.set(presetName, forKey: WidgetDataKeys.schedulePresetPrefix + scheduleName)

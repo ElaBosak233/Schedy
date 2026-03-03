@@ -1,13 +1,14 @@
 //
 //  ScheduleDataService.swift
-//  schedy
+//  Schedy
 //
-//  初始化默认时间段、默认课程表及迁移
+//  数据初始化与迁移：首次启动时写入冬令时/夏令时预设、创建默认课程表；迁移无归属课程到第一张课表。
 //
 
 import Foundation
 import SwiftData
 
+/// 若尚无任何时间段预设，则创建「冬令时」「夏令时」并保存
 @MainActor
 func seedDefaultPresetsIfNeeded(modelContext: ModelContext) {
     let descriptor = FetchDescriptor<TimeSlotPreset>()
@@ -79,6 +80,8 @@ func extendPresetToCoverPeriodIfNeeded(preset: TimeSlotPreset?, requiredPeriodCo
     }
     try? modelContext.save()
 }
+
+/// 默认学期第一天：取「下一个周一」或「今天若已是周一」
 private func defaultSemesterStartDate() -> Date {
     let cal = Calendar.current
     let today = cal.startOfDay(for: Date())
@@ -87,6 +90,7 @@ private func defaultSemesterStartDate() -> Date {
     return cal.date(byAdding: .day, value: daysUntilMonday, to: today) ?? today
 }
 
+/// 若尚无任何课程表，则先创建预设再创建默认课程表并写入 activeScheduleName；并迁移无 schedule 的课程到第一张课表
 @MainActor
 func seedDefaultScheduleIfNeeded(modelContext: ModelContext) {
     let scheduleDescriptor = FetchDescriptor<Schedule>()

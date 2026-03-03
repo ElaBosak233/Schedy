@@ -1,9 +1,9 @@
 //
 //  ZhengFangHTMLParser.swift
-//  schedy
+//  Schedy
 //
-//  正方教务个人课表 HTML 解析（表格 id=kbgrid_table_0，td.td_wrap id="星期-节次"）
-//  支持解析课程名、教师、地点、周次、单双周、学分
+//  正方教务「个人课表查询」页面 HTML 解析：优先网格表（id=kbgrid_table_0），否则列表表（id=kblist_table）；
+//  输出 ParsedCourseItem，与 CSV 导入共用同一写入流程。
 //
 
 import Foundation

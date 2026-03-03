@@ -1,8 +1,8 @@
 //
 //  AcademicAffairsWebView.swift
-//  schedy
+//  Schedy
 //
-//  内嵌浏览器：打开教务（Academic Affairs）系统，支持地址栏修改网址、「导入当前页」获取 HTML
+//  导入流程中的内嵌浏览器：打开教务系统、地址栏、进度条、「导入当前页」抓取 HTML 交给解析器。
 //
 
 import SwiftUI

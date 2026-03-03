@@ -2,11 +2,12 @@
 //  CSVImportConstants.swift
 //  Schedy
 //
-//  CSV 模板与 LLM 生成 Prompt
+//  CSV 导入相关常量：表头与列含义、示例模板、供用户复制给 LLM 的格式说明 Prompt。
 //
 
 import Foundation
 
+/// CSV 导入使用的模板与说明文案
 enum CSVImportConstants {
     /// CSV 模板内容（UTF-8，可用 Excel 打开）
     static let templateContent: String = """

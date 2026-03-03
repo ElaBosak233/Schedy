@@ -2,13 +2,13 @@
 //  TimeSlotPreset.swift
 //  Schedy
 //
-//  时间段预设
+//  时间段预设：一套节次起止时间（如冬令时/夏令时），可被多张课表绑定。
 //
 
 import Foundation
 import SwiftData
 
-/// 一套时间段，如「冬令时」「夏令时」，包含多节课的起止时间
+/// 一套时间段，如「冬令时」「夏令时」，包含多节 TimeSlotItem；课表可绑定其一，未绑定时用 App 默认预设
 @Model
 final class TimeSlotPreset {
     var name: String = ""
@@ -21,8 +21,11 @@ final class TimeSlotPreset {
         self.slots = slots.isEmpty ? nil : slots
     }
 
-    // MARK: - 默认时间段
+    // MARK: - 默认时间段（首次启动时由 ScheduleDataService 写入）
+
+    /// 内置冬令时 / 夏令时数据，供创建默认预设使用
     enum Default {
+        /// 冬令时：15 节，节次 1…15 的起止时间
         static func winter() -> [(period: Int, start: (h: Int, m: Int), end: (h: Int, m: Int))] {
             [
                 (1, (8, 00), (8, 40)),
@@ -43,6 +46,7 @@ final class TimeSlotPreset {
             ]
         }
 
+        /// 夏令时：15 节，下午/晚上比冬令时略晚
         static func summer() -> [(period: Int, start: (h: Int, m: Int), end: (h: Int, m: Int))] {
             [
                 (1, (8, 00), (8, 40)),

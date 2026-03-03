@@ -1,21 +1,11 @@
 //
 //  ScheduleDisplaySettingsView.swift
-//  schedy
+//  Schedy
 //
-//  课表显示设置：网格线、周末、每周第一天
+//  课表显示设置：网格线、周末、每周第一天。AppStorage 键见 AppStorageKeys.swift。
 //
 
 import SwiftUI
-
-/// AppStorage 键：课表网格与显示、全局当前时间段
-enum ScheduleDisplayKeys {
-    static let showHorizontalLines = "scheduleGridShowHorizontalLines"
-    static let showVerticalLines = "scheduleGridShowVerticalLines"
-    static let showWeekends = "scheduleShowWeekends"
-    static let firstWeekday = "scheduleFirstWeekday"
-    /// 当前使用的时间段名称（全局可切换，所有课程表共用）
-    static let activeTimeSlotPresetName = "activeTimeSlotPresetName"
-}
 
 /// 每周第一天：1 = 周日，2 = 周一（与 Calendar.Weekday 一致）
 enum FirstWeekdayOption: Int, CaseIterable {
