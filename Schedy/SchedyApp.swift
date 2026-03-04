@@ -31,6 +31,22 @@ enum AppearanceMode: String, CaseIterable {
     }
 }
 
+/// 返回 SwiftData 默认 SQLite 文件的 URL（ApplicationSupport/<BundleID>/default.store）
+private func defaultStoreURL() -> URL? {
+    guard let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first,
+          let bundleID = Bundle.main.bundleIdentifier else { return nil }
+    return appSupport.appendingPathComponent(bundleID).appendingPathComponent("default.store")
+}
+
+/// 删除本地 SQLite 文件（.store / .store-shm / .store-wal），用于"云端覆盖本地"场景
+private func deleteLocalStore() {
+    guard let base = defaultStoreURL() else { return }
+    let fm = FileManager.default
+    for url in [base, URL(fileURLWithPath: base.path + "-shm"), URL(fileURLWithPath: base.path + "-wal")] {
+        _ = try? fm.removeItem(at: url)
+    }
+}
+
 func makeModelContainer(useICloud: Bool) -> ModelContainer {
     let schema = Schema([
         Schedule.self,
@@ -73,6 +89,11 @@ struct SchedyApp: App {
             UserDefaults.standard.set(false, forKey: kICloudSyncEnabledKey)
         }
         let useICloud = UserDefaults.standard.bool(forKey: kICloudSyncEnabledKey)
+        // 云端覆盖本地：删除本地 SQLite 文件，让 CloudKit 重新同步云端数据
+        if UserDefaults.standard.bool(forKey: kClearLocalDataOnNextLaunchKey) {
+            UserDefaults.standard.removeObject(forKey: kClearLocalDataOnNextLaunchKey)
+            deleteLocalStore()
+        }
         _modelContainer = State(initialValue: makeModelContainer(useICloud: useICloud))
     }
 
@@ -93,7 +114,6 @@ struct SchedyApp: App {
                 }
                 .onChange(of: iCloudSyncEnabled) { _, newValue in
                     modelContainer = makeModelContainer(useICloud: newValue)
-                    containerID = UUID()
                 }
         }
     }

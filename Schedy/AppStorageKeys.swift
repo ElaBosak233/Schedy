@@ -27,3 +27,5 @@ enum ScheduleDisplayKeys {
 let kAppearanceModeKey = "appearanceMode"
 /// iCloud 同步开关键
 let kICloudSyncEnabledKey = "iCloudSyncEnabled"
+/// 下次启动时清除本地数据（云端覆盖本地场景）
+let kClearLocalDataOnNextLaunchKey = "clearLocalDataOnNextLaunch"

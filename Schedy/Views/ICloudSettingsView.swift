@@ -19,10 +19,9 @@ struct ICloudSettingsView: View {
     @State private var syncError: String? = nil
     @State private var isSyncing: Bool = false
     @State private var pendingToggleValue: Bool? = nil
-    /// 选择"上传本地数据"时，记录本地已有的 Schedule persistentModelID，首次 import 后删除云端带来的多余数据
-    @State private var localOnlyScheduleIDs: Set<PersistentIdentifier>? = nil
 
     @State private var showClearConfirm = false
+    @State private var needsRestart = false
 
     private var iCloudAvailable: Bool {
         FileManager.default.ubiquityIdentityToken != nil
@@ -78,10 +77,18 @@ struct ICloudSettingsView: View {
                             Text("上次同步")
                                 .foregroundStyle(.secondary)
                             Spacer()
-                            Text(date, style: .relative) + Text("前")
+                            Text(date, format: .dateTime.year().month().day().hour().minute().second())
                         }
                         .font(.subheadline)
                     }
+                }
+            }
+
+            if needsRestart {
+                Section {
+                    Text("设置已更改，请重启 App 以生效。")
+                        .foregroundStyle(.orange)
+                        .font(.subheadline)
                 }
             }
 
@@ -107,6 +114,7 @@ struct ICloudSettingsView: View {
         ) {
             Button("关闭", role: .destructive) {
                 iCloudSyncEnabled = false
+                needsRestart = true
                 pendingToggleValue = nil
             }
             Button("取消", role: .cancel) { pendingToggleValue = nil }
@@ -121,24 +129,20 @@ struct ICloudSettingsView: View {
                 set: { if !$0 { pendingToggleValue = nil } }
             )
         ) {
-            Button("上传本地数据") {
-                let ids = Set((try? modelContext.fetch(FetchDescriptor<Schedule>()))?.map(\.persistentModelID) ?? [])
-                localOnlyScheduleIDs = ids
+            Button("合并本地与云端") {
                 iCloudSyncEnabled = true
+                needsRestart = true
                 pendingToggleValue = nil
             }
-            Button("使用云端数据", role: .destructive) {
-                let schedules = (try? modelContext.fetch(FetchDescriptor<Schedule>())) ?? []
-                let presets = (try? modelContext.fetch(FetchDescriptor<TimeSlotPreset>())) ?? []
-                schedules.forEach { modelContext.delete($0) }
-                presets.forEach { modelContext.delete($0) }
-                try? modelContext.save()
+            Button("云端覆盖本地", role: .destructive) {
+                UserDefaults.standard.set(true, forKey: kClearLocalDataOnNextLaunchKey)
                 iCloudSyncEnabled = true
+                needsRestart = true
                 pendingToggleValue = nil
             }
             Button("取消", role: .cancel) { pendingToggleValue = nil }
         } message: {
-            Text("本地有 \(localScheduleCount) 张课程表。开启后将与 iCloud 同步，请选择数据来源：")
+            Text("本地有 \(localScheduleCount) 张课程表。\n\n合并：保留本地数据，并与 iCloud 云端数据合并。\n云端覆盖：删除本地数据，完全使用 iCloud 云端数据。")
         }
         // 开启 iCloud：本地无数据时直接确认
         .alert(
@@ -150,6 +154,7 @@ struct ICloudSettingsView: View {
         ) {
             Button("开启") {
                 iCloudSyncEnabled = true
+                needsRestart = true
                 pendingToggleValue = nil
             }
             Button("取消", role: .cancel) { pendingToggleValue = nil }
@@ -175,13 +180,7 @@ struct ICloudSettingsView: View {
                     } else {
                         syncError = nil
                         lastSyncDate = event.endDate
-                        // 首次 import 完成后，删除云端带来的多余 Schedule（不在本地原有集合里的）
-                        if event.type == .import, let keepIDs = localOnlyScheduleIDs {
-                            localOnlyScheduleIDs = nil
-                            let all = (try? modelContext.fetch(FetchDescriptor<Schedule>())) ?? []
-                            all.filter { !keepIDs.contains($0.persistentModelID) }.forEach { modelContext.delete($0) }
-                            try? modelContext.save()
-                        }
+                        // 首次 import 完成后无需额外处理
                     }
                 }
             @unknown default:
