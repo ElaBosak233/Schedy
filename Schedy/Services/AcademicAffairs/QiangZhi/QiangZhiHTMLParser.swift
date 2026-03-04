@@ -5,12 +5,19 @@
 //  强智教务「学期理论课表」解析：
 //  - 表格 id=kbtable
 //  - 每一行首列为节次（0102节/0304节...）
-//  - 每天单元格内课程显示在 div.kbcontent1（简版）或 div.kbcontent（详情）
+//  - 每天单元格内课程显示在 div.kbcontent（详情）或 div.kbcontent1（简版）
+//  - 同一单元格可能包含多门课，用 --------------------- 分隔
+//
+//  关键修复：
+//  1) 周次不要从“班级/人数(114)”那行猜，直接从 block 中抓取周次行：
+//     形如 "3-6(全部)[01-02-03-04节]" / "10(全部)[01-02节]" 等
+//  2) kbcontent 优先，kbcontent1 兜底（简版更容易粘连误判）
 //
 
 import Foundation
 
 enum QiangZhiHTMLParser: AcademicAffairsHTMLParserProtocol {
+
     static func parse(html: String) -> [ParsedCourseItem] {
         guard let tableHTML = extractKBTable(from: html) else { return [] }
 
@@ -31,6 +38,8 @@ enum QiangZhiHTMLParser: AcademicAffairsHTMLParserProtocol {
 
         return mergeAdjacentPeriods(rawItems)
     }
+
+    // MARK: - Table extraction
 
     private static func extractKBTable(from html: String) -> String? {
         guard let start = html.range(of: "<table id=\"kbtable\"", options: .caseInsensitive) else {
@@ -94,26 +103,38 @@ enum QiangZhiHTMLParser: AcademicAffairsHTMLParserProtocol {
         return cells
     }
 
+    // MARK: - Cell parsing
+
     private static func parseCell(_ cellHTML: String, dayOfWeek: Int, periodStart: Int, periodEnd: Int) -> [ParsedCourseItem] {
-        let conciseBlocks = extractDivContents(from: cellHTML, className: "kbcontent1").filter { !isEmptyBlock($0) }
-        let detailBlocks = extractDivContents(from: cellHTML, className: "kbcontent").filter { !isEmptyBlock($0) }
-        let sourceBlocks = conciseBlocks.isEmpty ? detailBlocks : conciseBlocks
+
+        // ✅ 优先详情 kbcontent，缺失时回退 kbcontent1
+        var sourceDivs = extractDivContents(from: cellHTML, className: "kbcontent").filter { !isEmptyBlock($0) }
+        if sourceDivs.isEmpty {
+            sourceDivs = extractDivContents(from: cellHTML, className: "kbcontent1").filter { !isEmptyBlock($0) }
+        }
+        guard !sourceDivs.isEmpty else { return [] }
 
         var parsed: [ParsedCourseItem] = []
-        for block in sourceBlocks {
-            guard let meta = parseCourseMeta(from: block) else { continue }
-            parsed.append(ParsedCourseItem(
-                name: meta.name,
-                teacher: meta.teacher,
-                location: meta.location,
-                credits: nil,
-                weekRangesString: meta.weekRangesString,
-                weekParity: meta.weekParity,
-                dayOfWeek: dayOfWeek,
-                periodIndex: periodStart,
-                periodEnd: periodEnd
-            ))
+
+        // ✅ 同一 div 里可能用 --------------------- 分隔多门课
+        for div in sourceDivs {
+            let blocks = splitCourseBlocks(div).filter { !isEmptyBlock($0) }
+            for block in blocks {
+                guard let meta = parseCourseMeta(from: block) else { continue }
+                parsed.append(ParsedCourseItem(
+                    name: meta.name,
+                    teacher: meta.teacher,
+                    location: meta.location,
+                    credits: nil,
+                    weekRangesString: meta.weekRangesString,
+                    weekParity: meta.weekParity,
+                    dayOfWeek: dayOfWeek,
+                    periodIndex: periodStart,
+                    periodEnd: periodEnd
+                ))
+            }
         }
+
         return parsed
     }
 
@@ -136,13 +157,41 @@ enum QiangZhiHTMLParser: AcademicAffairsHTMLParserProtocol {
         return blocks
     }
 
+    private static func splitCourseBlocks(_ block: String) -> [String] {
+        // 强智通常用一串 '-' 分隔多门课
+        let pattern = #"-{5,}(?:<br\s*/?>)?"#
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) else { return [block] }
+
+        let ns = block as NSString
+        var result: [String] = []
+        var lastEnd = 0
+
+        regex.enumerateMatches(in: block, range: NSRange(location: 0, length: ns.length)) { match, _, _ in
+            guard let match else { return }
+            let sub = ns.substring(with: NSRange(location: lastEnd, length: match.range.location - lastEnd))
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            if !sub.isEmpty { result.append(sub) }
+            lastEnd = match.range.upperBound
+        }
+
+        let tail = ns.substring(from: lastEnd).trimmingCharacters(in: .whitespacesAndNewlines)
+        if !tail.isEmpty { result.append(tail) }
+
+        return result.isEmpty ? [block] : result
+    }
+
+    // MARK: - Meta parsing
+
     private static func parseCourseMeta(from block: String) -> (name: String, teacher: String, location: String, weekRangesString: String, weekParity: Course.WeekParity)? {
         let name = parseCourseName(from: block)
         guard !name.isEmpty else { return nil }
 
-        let weekSource = extractWeekSourceText(from: block)
-        let weekRangesString = parseWeekRanges(from: weekSource)
-        let weekParity = parseWeekParity(from: weekSource.isEmpty ? block : weekSource)
+        // ✅ 关键：直接抓“周次行”，避免把 “班级号 + (114)” 当周次
+        let weekLine = extractWeekLineText(from: block)
+
+        let weekRangesString = parseWeekRanges(from: weekLine.isEmpty ? block : weekLine)
+        let weekParity = parseWeekParity(from: weekLine.isEmpty ? block : weekLine)
+
         let location = parseLocation(from: block)
         let teacher = parseTeacher(from: block)
 
@@ -166,18 +215,28 @@ enum QiangZhiHTMLParser: AcademicAffairsHTMLParserProtocol {
         return cleanParsedText(stripHTML(prefix))
     }
 
-    private static func extractWeekSourceText(from block: String) -> String {
-        let patterns = [
-            #"<font[^>]*title\s*=\s*['"]周次\(节次\)['"][^>]*>(.*?)</font>"#,
-            #"<font[^>]*title\s*=\s*['"]班级['"][^>]*>[\s\S]*?<br/>\s*([^<]*(?:\(\s*全部\s*\)|\(\s*单周\s*\)|\(\s*双周\s*\))[^<]*)</font>"#
-        ]
-        for pattern in patterns {
-            if let extracted = firstCapturedGroup(from: block, pattern: pattern) {
-                let normalized = cleanParsedText(stripHTML(extracted))
-                if !normalized.isEmpty { return normalized }
-            }
+    /// ✅ 从整块文本中抓取周次行：
+    /// 例如： "3-6(全部)[01-02-03-04节]" / "10(全部)[01-02节]" / "4-6,8-16(单周)[...节]"
+    /// 说明：
+    /// - “班级号行”可能含 "(114)" 这类人数信息，不能当周次；
+    /// - 周次行几乎总是带 "(全部|单周|双周)" 且后面跟 "[..节]"，以此为锚点最稳。
+    private static func extractWeekLineText(from block: String) -> String {
+        let plain = cleanParsedText(stripHTML(block))
+        if plain.isEmpty { return "" }
+
+        let pattern = #"(\d{1,2}(?:\s*-\s*\d{1,2})?(?:\s*[，,]\s*\d{1,2}(?:\s*-\s*\d{1,2})?)*)\s*\((全部|单周|双周)\)\s*\[[^\]]*节\]"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return "" }
+
+        let ns = plain as NSString
+        let fullRange = NSRange(location: 0, length: ns.length)
+
+        var last: NSTextCheckingResult?
+        regex.enumerateMatches(in: plain, options: [], range: fullRange) { m, _, _ in
+            if let m { last = m }
         }
-        return ""
+        guard let m = last else { return "" }
+
+        return ns.substring(with: m.range(at: 0))
     }
 
     private static func parseWeekParity(from text: String) -> Course.WeekParity {
@@ -186,6 +245,7 @@ enum QiangZhiHTMLParser: AcademicAffairsHTMLParserProtocol {
         return .all
     }
 
+    /// 输出形如："3-6" / "10-10" / "4-6,8-16"
     private static func parseWeekRanges(from text: String) -> String {
         guard !text.isEmpty else { return "" }
         let source = extractWeekListCandidate(from: text)
@@ -221,97 +281,56 @@ enum QiangZhiHTMLParser: AcademicAffairsHTMLParserProtocol {
             }
         }
 
-        var deduped: [String] = []
+        // 去重保序
         var seen = Set<String>()
-        for part in parts where !seen.contains(part) {
-            seen.insert(part)
-            deduped.append(part)
+        var deduped: [String] = []
+        for p in parts where seen.insert(p).inserted {
+            deduped.append(p)
         }
         return deduped.joined(separator: ",")
     }
 
+    /// 抽取“周次列表候选串”
+    /// - 若 text 形如 "3-6(全部)[01-02节]"，会取出 "3-6"
+    /// - 若 text 里只有 "... 3-6(全部) ..."（没有节次），也会尽量取到 "3-6"
     private static func extractWeekListCandidate(from text: String) -> String {
-        let cleaned = cleanParsedText(text)
+        var cleaned = cleanParsedText(stripHTML(text))
         if cleaned.isEmpty { return "" }
 
-        let markerPattern = #"(.+?)\s*\((全部|单周|双周)\)\s*$"#
-        if
-            let markerRegex = try? NSRegularExpression(pattern: markerPattern),
-            let match = markerRegex.firstMatch(in: cleaned, options: [], range: NSRange(location: 0, length: (cleaned as NSString).length)),
-            match.numberOfRanges >= 2,
-            match.range(at: 1).location != NSNotFound,
-            let range = Range(match.range(at: 1), in: cleaned)
-        {
-            let beforeMarker = String(cleaned[range]).trimmingCharacters(in: .whitespaces)
-            let trailingPattern = #"\d{1,2}(?:\s*-\s*\d{1,2})?(?:\s*[，,]\s*\d{1,2}(?:\s*-\s*\d{1,2})?)*\s*$"#
-            if
-                let trailingRegex = try? NSRegularExpression(pattern: trailingPattern),
-                let trailingMatch = trailingRegex.firstMatch(in: beforeMarker, options: [], range: NSRange(location: 0, length: (beforeMarker as NSString).length)),
-                let trailingRange = Range(trailingMatch.range(at: 0), in: beforeMarker)
-            {
-                let candidate = String(beforeMarker[trailingRange]).trimmingCharacters(in: .whitespaces)
-                let prefix = String(beforeMarker[..<trailingRange.lowerBound]).trimmingCharacters(in: .whitespaces)
-                return normalizeStickyLeadingWeekToken(candidate: candidate, prefix: prefix)
-            }
+        // 去掉 [01-02-03节]，避免解析时把节次数字当周次
+        if let bracketRegex = try? NSRegularExpression(pattern: #"\[\d{2}(?:-\d{2})*节\]"#) {
+            cleaned = bracketRegex.stringByReplacingMatches(
+                in: cleaned,
+                range: NSRange(location: 0, length: (cleaned as NSString).length),
+                withTemplate: ""
+            ).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        if cleaned.isEmpty { return "" }
+
+        // 不要求 "(全部|单周|双周)" 在末尾：全局搜索，取最后一个
+        let pattern = #"(\d{1,2}(?:\s*-\s*\d{1,2})?(?:\s*[，,]\s*\d{1,2}(?:\s*-\s*\d{1,2})?)*)\s*\((全部|单周|双周)\)"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return cleaned }
+
+        let ns = cleaned as NSString
+        let range = NSRange(location: 0, length: ns.length)
+
+        var last: NSTextCheckingResult?
+        regex.enumerateMatches(in: cleaned, options: [], range: range) { m, _, _ in
+            if let m { last = m }
         }
 
-        return cleaned
-    }
-
-    /// 处理「班级号+周次」粘连导致的首 token 偏大问题：
-    /// 例如 "...2023011-16(全部)" 被提成 "11-16"，需要修正为 "1-16"。
-    private static func normalizeStickyLeadingWeekToken(candidate: String, prefix: String) -> String {
         guard
-            let lastPrefixChar = prefix.last,
-            lastPrefixChar.isNumber,
-            lastPrefixChar == "0"
-        else {
-            return candidate
-        }
-
-        var parts = candidate.split(whereSeparator: { $0 == "," || $0 == "，" }).map(String.init)
-        guard !parts.isEmpty else { return candidate }
-
-        let first = parts[0].trimmingCharacters(in: .whitespaces)
-        let rangePattern = #"^(\d{2})\s*-\s*(\d{1,2})$"#
-        if
-            let regex = try? NSRegularExpression(pattern: rangePattern),
-            let m = regex.firstMatch(in: first, options: [], range: NSRange(location: 0, length: (first as NSString).length)),
-            m.numberOfRanges >= 3,
-            m.range(at: 1).location != NSNotFound,
-            m.range(at: 2).location != NSNotFound
-        {
-            let ns = first as NSString
-            let left = ns.substring(with: m.range(at: 1))
-            let right = ns.substring(with: m.range(at: 2))
-            if
-                left.hasPrefix("1"),
-                let tailLeft = Int(String(left.suffix(1))),
-                let rightValue = Int(right),
-                tailLeft >= 1, tailLeft <= 9, rightValue >= 1, tailLeft <= rightValue
-            {
-                parts[0] = "\(tailLeft)-\(rightValue)"
-                return parts.joined(separator: ",")
-            }
-        }
-
-        let singlePattern = #"^(\d{2})$"#
-        if
-            let regex = try? NSRegularExpression(pattern: singlePattern),
-            let m = regex.firstMatch(in: first, options: [], range: NSRange(location: 0, length: (first as NSString).length)),
+            let m = last,
             m.numberOfRanges >= 2,
             m.range(at: 1).location != NSNotFound
-        {
-            let ns = first as NSString
-            let left = ns.substring(with: m.range(at: 1))
-            if left.hasPrefix("1"), let tailLeft = Int(String(left.suffix(1))), tailLeft >= 1, tailLeft <= 9 {
-                parts[0] = "\(tailLeft)"
-                return parts.joined(separator: ",")
-            }
+        else {
+            return cleaned
         }
 
-        return candidate
+        return ns.substring(with: m.range(at: 1)).trimmingCharacters(in: .whitespacesAndNewlines)
     }
+
+    // MARK: - Location / Teacher
 
     private static func parseLocation(from block: String) -> String {
         let patterns = [
@@ -329,6 +348,7 @@ enum QiangZhiHTMLParser: AcademicAffairsHTMLParserProtocol {
 
     private static func parseTeacher(from block: String) -> String {
         let patterns = [
+            #"<font[^>]*title\s*=\s*['"]老师['"][^>]*>(.*?)</font>"#,
             #"<font[^>]*title\s*=\s*['"]教师['"][^>]*>(.*?)</font>"#,
             #"教师[：:]\s*([^<\n\r]+)"#
         ]
@@ -340,6 +360,8 @@ enum QiangZhiHTMLParser: AcademicAffairsHTMLParserProtocol {
         }
         return ""
     }
+
+    // MARK: - Regex helpers / merge
 
     private static func firstCapturedGroup(from text: String, pattern: String) -> String? {
         guard let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive, .dotMatchesLineSeparators]) else {
@@ -396,6 +418,8 @@ enum QiangZhiHTMLParser: AcademicAffairsHTMLParserProtocol {
             return lhs.periodIndex < rhs.periodIndex
         }
     }
+
+    // MARK: - Text cleaning
 
     private static func stripHTML(_ s: String) -> String {
         var out = s
