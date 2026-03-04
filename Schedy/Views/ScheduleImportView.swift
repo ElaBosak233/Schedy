@@ -543,6 +543,7 @@ struct ScheduleImportView: View {
                 switch type {
                 case .zhengFang: parsed = ZhengFangHTMLParser.parse(html: html)
                 case .qiangZhi: parsed = QiangZhiHTMLParser.parse(html: html)
+                case .chaoXing: parsed = ChaoXingHTMLParser.parse(html: html)
                 }
                 DispatchQueue.main.async {
                     self.isImporting = false
@@ -567,6 +568,7 @@ struct ScheduleImportView: View {
                 switch type {
                 case .zhengFang: parsed = ZhengFangHTMLParser.parse(html: h)
                 case .qiangZhi: parsed = QiangZhiHTMLParser.parse(html: h)
+                case .chaoXing: parsed = ChaoXingHTMLParser.parse(html: h)
                 }
                 DispatchQueue.main.async {
                     self.isImporting = false
@@ -578,7 +580,12 @@ struct ScheduleImportView: View {
 
     private func finishImport(parsed: [ParsedCourseItem], config: ImportConfig) {
         if parsed.isEmpty {
-            let pageName = config.academicAffairsType == .qiangZhi ? "学期理论课表" : "个人课表查询"
+            let pageName: String
+            switch config.academicAffairsType {
+            case .qiangZhi: pageName = "学期理论课表"
+            case .chaoXing: pageName = "课程表"
+            default: pageName = "个人课表查询"
+            }
             importError = "未能从当前页面解析到课程，请确保已打开「\(pageName)」的课表页面。"
             return
         }

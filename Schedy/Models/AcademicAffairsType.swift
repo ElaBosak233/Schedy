@@ -11,6 +11,7 @@ import Foundation
 enum AcademicAffairsType: String, CaseIterable {
     case zhengFang = "正方教务"
     case qiangZhi = "强智教务"
+    case chaoXing = "超星教务"
 
     var displayName: String { rawValue }
 }
