@@ -194,8 +194,8 @@ struct TimeSlotsSettingsView: View {
         }
 
         let newPreset = TimeSlotPreset(name: name, slots: [])
-        let defaultData = TimeSlotPreset.Default.winter()
-        for item in defaultData {
+        modelContext.insert(newPreset)
+        for item in TimeSlotPreset.Default.winter() {
             let slot = TimeSlotItem(
                 periodIndex: item.period,
                 startHour: item.start.h,
@@ -207,7 +207,6 @@ struct TimeSlotsSettingsView: View {
             newPreset.slots = (newPreset.slots ?? []) + [slot]
             modelContext.insert(slot)
         }
-        modelContext.insert(newPreset)
         try? modelContext.save()
         newPresetName = ""
         showAddPreset = false
@@ -231,14 +230,9 @@ struct TimeSlotsSettingsView: View {
 
         let (startH, startM, endH, endM): (Int, Int, Int, Int)
         if let lastSlot = existingSlots.sorted(by: { $0.periodIndex < $1.periodIndex }).last {
-            var endMinutes = lastSlot.endHour * 60 + lastSlot.endMinute + 45
-            if endMinutes >= 24 * 60 { endMinutes = 23 * 60 }
-            let endHour = endMinutes / 60
-            let endMin = endMinutes % 60
-            let startMinutes = endMinutes - 40
-            let startHour = max(0, startMinutes / 60)
-            let startMin = max(0, startMinutes % 60)
-            (startH, startM, endH, endM) = (startHour, startMin, endHour, endMin)
+            let startMinutes = min(lastSlot.endHour * 60 + lastSlot.endMinute + 10, 23 * 60)
+            let endMinutes = min(startMinutes + 40, 23 * 60 + 59)
+            (startH, startM, endH, endM) = (startMinutes / 60, startMinutes % 60, endMinutes / 60, endMinutes % 60)
         } else {
             (startH, startM, endH, endM) = (8, 0, 8, 40)
         }

@@ -30,20 +30,20 @@ func seedDefaultPresetsIfNeeded(modelContext: ModelContext) {
     }
 
     let winter = TimeSlotPreset(name: "冬令时", slots: [])
+    modelContext.insert(winter)
     for slot in makeSlots(TimeSlotPreset.Default.winter()) {
         slot.preset = winter
         winter.slots = (winter.slots ?? []) + [slot]
         modelContext.insert(slot)
     }
-    modelContext.insert(winter)
 
     let summer = TimeSlotPreset(name: "夏令时", slots: [])
+    modelContext.insert(summer)
     for slot in makeSlots(TimeSlotPreset.Default.summer()) {
         slot.preset = summer
         summer.slots = (summer.slots ?? []) + [slot]
         modelContext.insert(slot)
     }
-    modelContext.insert(summer)
 
     try? modelContext.save()
 }

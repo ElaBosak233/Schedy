@@ -343,39 +343,7 @@ struct ScheduleImportView: View {
     private func importFromParsedCourses(_ parsed: [ParsedCourseItem]) {
         seedDefaultPresetsIfNeeded(modelContext: modelContext)
         let presetsList = (try? modelContext.fetch(FetchDescriptor<TimeSlotPreset>())) ?? []
-        let preset = presetForImport(presetsList: presetsList)
-        let maxPeriodNeeded = parsed.map { $0.periodEnd }.max() ?? 0
-
-        switch importAction {
-        case .overwrite:
-            guard let schedule = activeSchedule else {
-                importError = "未找到当前课表。"
-                return
-            }
-            extendPresetToCoverPeriodIfNeeded(preset: preset, requiredPeriodCount: maxPeriodNeeded, modelContext: modelContext)
-            for c in schedule.courses ?? [] {
-                modelContext.delete(c)
-            }
-            schedule.courses = []
-            addParsedCourses(parsed, to: schedule, preset: preset)
-            try? modelContext.save()
-            refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
-            scheduleCourseReminders(modelContext: modelContext)
-            importSuccessCount = parsed.count
-        case .newSchedule:
-            extendPresetToCoverPeriodIfNeeded(preset: preset, requiredPeriodCount: maxPeriodNeeded, modelContext: modelContext)
-            let semesterStart = defaultSemesterStartDate()
-            let newName = newScheduleName()
-            let newSchedule = Schedule(name: newName, semesterStartDate: semesterStart)
-            newSchedule.timeSlotPreset = preset
-            modelContext.insert(newSchedule)
-            addParsedCourses(parsed, to: newSchedule, preset: preset)
-            try? modelContext.save()
-            activeScheduleName = newName
-            refreshWidgetData(modelContext: modelContext, activeScheduleName: newName)
-            scheduleCourseReminders(modelContext: modelContext)
-            importSuccessCount = parsed.count
-        }
+        applyParsedCourses(parsed, presetsList: presetsList)
     }
 
     /// 导入时使用的时间预设：覆盖当前课表时用该课表绑定的预设，新建时用全局默认
@@ -386,6 +354,37 @@ struct ScheduleImportView: View {
         case .newSchedule:
             return presetsList.first { $0.name == activeTimeSlotPresetName } ?? presetsList.first
         }
+    }
+
+    private func applyParsedCourses(_ parsed: [ParsedCourseItem], presetsList: [TimeSlotPreset]) {
+        let preset = presetForImport(presetsList: presetsList)
+        let maxPeriodNeeded = parsed.map { $0.periodEnd }.max() ?? 0
+        extendPresetToCoverPeriodIfNeeded(preset: preset, requiredPeriodCount: maxPeriodNeeded, modelContext: modelContext)
+
+        let targetSchedule: Schedule
+        switch importAction {
+        case .overwrite:
+            guard let schedule = activeSchedule else {
+                importError = "未找到当前课表。"
+                return
+            }
+            for c in schedule.courses ?? [] { modelContext.delete(c) }
+            schedule.courses = []
+            targetSchedule = schedule
+        case .newSchedule:
+            let newName = newScheduleName()
+            let newSchedule = Schedule(name: newName, semesterStartDate: defaultSemesterStartDate())
+            newSchedule.timeSlotPreset = preset
+            modelContext.insert(newSchedule)
+            activeScheduleName = newName
+            targetSchedule = newSchedule
+        }
+
+        addParsedCourses(parsed, to: targetSchedule, preset: preset)
+        try? modelContext.save()
+        refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
+        scheduleCourseReminders(modelContext: modelContext)
+        importSuccessCount = parsed.count
     }
 
     // MARK: - Step 3: 院校 / 教务系统（Tab）
@@ -524,30 +523,31 @@ struct ScheduleImportView: View {
                 importError = "无法访问所选文件"
                 return
             }
-            isImporting = true
+            let html: String
             do {
                 let data = try Data(contentsOf: url)
-                let html = String(data: data, encoding: .utf8)
+                url.stopAccessingSecurityScopedResource()
+                html = String(data: data, encoding: .utf8)
                     ?? String(data: data, encoding: .utf16)
                     ?? ""
-                url.stopAccessingSecurityScopedResource()
-                // 在后台解析，避免大 HTML 阻塞主线程导致卡死
-                let type = config.academicAffairsType
-                DispatchQueue.global(qos: .userInitiated).async { [html] in
-                    let parsed: [ParsedCourseItem]
-                    switch type {
-                    case .zhengFang: parsed = ZhengFangHTMLParser.parse(html: html)
-                    case .qiangZhi: parsed = QiangZhiHTMLParser.parse(html: html)
-                    }
-                    DispatchQueue.main.async {
-                        self.isImporting = false
-                        self.performImport(html: nil, config: config, preParsed: parsed)
-                    }
-                }
             } catch {
                 url.stopAccessingSecurityScopedResource()
-                isImporting = false
                 importError = "读取文件失败：\(error.localizedDescription)"
+                return
+            }
+            isImporting = true
+            // 在后台解析，避免大 HTML 阻塞主线程导致卡死
+            let type = config.academicAffairsType
+            DispatchQueue.global(qos: .userInitiated).async { [html] in
+                let parsed: [ParsedCourseItem]
+                switch type {
+                case .zhengFang: parsed = ZhengFangHTMLParser.parse(html: html)
+                case .qiangZhi: parsed = QiangZhiHTMLParser.parse(html: html)
+                }
+                DispatchQueue.main.async {
+                    self.isImporting = false
+                    self.performImport(html: nil, config: config, preParsed: parsed)
+                }
             }
         case .failure(let error):
             importError = error.localizedDescription
@@ -584,39 +584,7 @@ struct ScheduleImportView: View {
         }
         seedDefaultPresetsIfNeeded(modelContext: modelContext)
         let presetsList = (try? modelContext.fetch(FetchDescriptor<TimeSlotPreset>())) ?? []
-        let preset = presetForImport(presetsList: presetsList)
-        let maxPeriodNeeded = parsed.map { $0.periodEnd }.max() ?? 0
-
-        switch importAction {
-        case .overwrite:
-            guard let schedule = activeSchedule else {
-                importError = "未找到当前课表。"
-                return
-            }
-            extendPresetToCoverPeriodIfNeeded(preset: preset, requiredPeriodCount: maxPeriodNeeded, modelContext: modelContext)
-            for c in schedule.courses ?? [] {
-                modelContext.delete(c)
-            }
-            schedule.courses = []
-            addParsedCourses(parsed, to: schedule, preset: preset)
-            try? modelContext.save()
-            refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
-            scheduleCourseReminders(modelContext: modelContext)
-            importSuccessCount = parsed.count
-        case .newSchedule:
-            extendPresetToCoverPeriodIfNeeded(preset: preset, requiredPeriodCount: maxPeriodNeeded, modelContext: modelContext)
-            let semesterStart = defaultSemesterStartDate()
-            let newName = newScheduleName()
-            let newSchedule = Schedule(name: newName, semesterStartDate: semesterStart)
-            newSchedule.timeSlotPreset = preset
-            modelContext.insert(newSchedule)
-            addParsedCourses(parsed, to: newSchedule, preset: preset)
-            try? modelContext.save()
-            activeScheduleName = newName
-            refreshWidgetData(modelContext: modelContext, activeScheduleName: newName)
-            scheduleCourseReminders(modelContext: modelContext)
-            importSuccessCount = parsed.count
-        }
+        applyParsedCourses(parsed, presetsList: presetsList)
     }
 
     private func addParsedCourses(_ items: [ParsedCourseItem], to schedule: Schedule, preset: TimeSlotPreset?) {
@@ -635,16 +603,7 @@ struct ScheduleImportView: View {
                 schedule: schedule
             )
             modelContext.insert(course)
-            schedule.courses = (schedule.courses ?? []) + [course]
         }
-    }
-
-    private func defaultSemesterStartDate() -> Date {
-        let cal = Calendar.current
-        let today = cal.startOfDay(for: Date())
-        let weekday = cal.component(.weekday, from: today)
-        let daysUntilMonday = weekday == 1 ? 1 : (weekday == 2 ? 0 : (9 - weekday))
-        return cal.date(byAdding: .day, value: daysUntilMonday, to: today) ?? today
     }
 
     private func newScheduleName() -> String {
