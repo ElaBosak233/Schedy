@@ -53,16 +53,40 @@ struct SchedyWidgetProvider: AppIntentTimelineProvider {
         let scheduleChoice = configuration.scheduleName.flatMap { $0.isEmpty ? nil : $0 } ?? kWidgetScheduleOptionFollowApp
         let resolvedSchedule = WidgetEntry.resolveScheduleNameToShow(suite: suite, configuredName: scheduleChoice)
         let resolvedPreset = WidgetEntry.resolvePresetName(forScheduleName: resolvedSchedule, suite: suite)
-        var widgetEntry = WidgetEntry.load(from: suite, scheduleName: resolvedSchedule, presetName: resolvedPreset)
-        if widgetEntry.dateString.isEmpty, let legacy = WidgetEntry.loadLegacy(from: suite) {
-            widgetEntry = legacy
-        }
-        let entry = SchedyWidgetEntry(date: Date(), entry: widgetEntry)
+
         let now = Date()
-        let nextFifteen = Calendar.current.date(byAdding: .minute, value: 15, to: now) ?? now
+        let timelineData = WidgetEntry.loadTimeline(from: suite, scheduleName: resolvedSchedule, presetName: resolvedPreset)
+
+        var entries: [SchedyWidgetEntry] = []
+        if !timelineData.isEmpty {
+            // 过滤出今天的时间线（触发时间在今天范围内）
+            let todayStart = Calendar.current.startOfDay(for: now)
+            let tomorrowStart = Calendar.current.date(byAdding: .day, value: 1, to: todayStart) ?? todayStart
+            let todayEntries = timelineData.filter { $0.trigger >= todayStart && $0.trigger < tomorrowStart }
+            // 找到当前应显示的 entry（最后一个触发时间 <= now 的）
+            let pastEntries = todayEntries.filter { $0.trigger <= now }
+            let futureEntries = todayEntries.filter { $0.trigger > now }
+            let currentEntry = pastEntries.last ?? todayEntries.first
+            if let current = currentEntry {
+                entries.append(SchedyWidgetEntry(date: now, entry: current.entry))
+            }
+            // 添加未来的切换点
+            for item in futureEntries {
+                entries.append(SchedyWidgetEntry(date: item.trigger, entry: item.entry))
+            }
+        }
+
+        if entries.isEmpty {
+            var widgetEntry = WidgetEntry.load(from: suite, scheduleName: resolvedSchedule, presetName: resolvedPreset)
+            if widgetEntry.dateString.isEmpty, let legacy = WidgetEntry.loadLegacy(from: suite) {
+                widgetEntry = legacy
+            }
+            entries.append(SchedyWidgetEntry(date: now, entry: widgetEntry))
+        }
+
+        // 次日午夜刷新（重新从 App Group 读取新一天的数据）
         let nextMidnight = Calendar.current.startOfDay(for: Calendar.current.date(byAdding: .day, value: 1, to: now) ?? now)
-        let nextUpdate = min(nextFifteen, nextMidnight)
-        return Timeline(entries: [entry], policy: .after(nextUpdate))
+        return Timeline(entries: entries, policy: .after(nextMidnight))
     }
 }
 

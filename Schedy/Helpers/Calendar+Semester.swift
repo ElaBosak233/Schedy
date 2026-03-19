@@ -17,8 +17,12 @@ extension Calendar {
     static func currentWeek(semesterStart: Date, calendar: Calendar = .current) -> Int {
         let today = calendar.startOfDay(for: Date())
         let start = calendar.startOfDay(for: semesterStart)
-        guard today >= start else { return 1 }
-        let days = calendar.dateComponents([.day], from: start, to: today).day ?? 0
+        // 对齐到学期第一天所在周的周一
+        let weekday = calendar.component(.weekday, from: start)  // 1=周日,2=周一,...,7=周六
+        let daysToMonday = weekday == 1 ? -6 : -(weekday - 2)
+        let weekOneMonday = calendar.date(byAdding: .day, value: daysToMonday, to: start) ?? start
+        guard today >= weekOneMonday else { return 1 }
+        let days = calendar.dateComponents([.day], from: weekOneMonday, to: today).day ?? 0
         return min(max(1, days / 7 + 1), 25)
     }
 }

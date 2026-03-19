@@ -32,6 +32,8 @@ enum WidgetDataKeys {
     static let entryPrefix = "widgetEntry"
     static let entrySeparator = "__SEP__"
     static let schedulePresetPrefix = "schedulePreset_"
+    static let timelinePrefix = "widgetTimeline"
+    static let timelineTrigger = "trigger"
 }
 
 struct WidgetEntry {
@@ -74,6 +76,23 @@ struct WidgetEntry {
         return WidgetEntry(scheduleName: scheduleName, dateString: dateString, weekdayString: weekdayString, status: status, course1: course1, course2: course2)
     }
 
+    /// 从 suite 读取今日时间线（按触发时间排序的 entry 列表），用于生成多个 timeline entries
+    static func loadTimeline(from suite: UserDefaults?, scheduleName name: String, presetName preset: String) -> [(trigger: Date, entry: WidgetEntry)] {
+        guard let suite = suite else { return [] }
+        let key = "\(WidgetDataKeys.timelinePrefix)_\(name)\(WidgetDataKeys.entrySeparator)\(preset)"
+        guard let json = suite.string(forKey: key),
+              let data = json.data(using: .utf8),
+              let arr = try? JSONSerialization.jsonObject(with: data) as? [[String: String]] else { return [] }
+        return arr.compactMap { dict in
+            guard let triggerStr = dict[WidgetDataKeys.timelineTrigger],
+                  let triggerTs = Double(triggerStr) else { return nil }
+            let trigger = Date(timeIntervalSince1970: triggerTs)
+            return (trigger: trigger, entry: parseEntryDict(dict: dict, fallbackScheduleName: name))
+        }.sorted { $0.trigger < $1.trigger }
+    }
+}
+
+extension WidgetEntry {
     /// 解析「小组件要显示的课表名」：若为跟随 App 或该课表已不存在，则回退到默认/第一张
     static func resolveScheduleNameToShow(suite: UserDefaults?, configuredName: String) -> String {
         let list = suite?.stringArray(forKey: WidgetDataKeys.scheduleNamesList) ?? []

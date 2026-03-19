@@ -42,6 +42,10 @@ enum WidgetDataKeys {
     static let entrySeparator = "__SEP__"
     /// 课表名 → 绑定预设名，供小组件根据选中的课表解析预设：schedulePreset_ + 课表名
     static let schedulePresetPrefix = "schedulePreset_"
+    /// 今日时间线（JSON 数组），key：timelinePrefix + "_" + scheduleName + "__SEP__" + presetName
+    static let timelinePrefix = "widgetTimeline"
+    /// 时间线中每个 entry 的触发时间戳 key
+    static let timelineTrigger = "trigger"
 }
 
 /// 系统 Calendar 的 weekday：1=周日, 2=周一, … 7=周六 → 模型 dayOfWeek：1=周一, …, 7=周日
@@ -175,6 +179,69 @@ func refreshWidgetData(modelContext: ModelContext, activeScheduleName: String) {
             WidgetDataKeys.course2Location: c2Location,
         ]
         suite.set(dict, forKey: entryKey)
+
+        // 写入今日时间线：每节课结束时对应一个 entry，供小组件生成多个 timeline entries
+        var timelineEntries: [[String: String]] = []
+        // 第一个 entry：今天开始（或当前时刻）
+        func makeEntry(trigger: Date, notEndedItems: [(name: String, location: String, periodStart: Int, periodEnd: Int)]) -> [String: String] {
+            var e: [String: String] = [
+                WidgetDataKeys.scheduleName: scheduleName,
+                WidgetDataKeys.date: dateString,
+                WidgetDataKeys.weekday: weekdayString,
+                WidgetDataKeys.timelineTrigger: String(trigger.timeIntervalSince1970),
+            ]
+            if notEndedItems.isEmpty {
+                e[WidgetDataKeys.status] = courseItems.isEmpty ? "noClass" : "allDone"
+                if !courseItems.isEmpty {
+                    let lastTwo = Array(courseItems.suffix(2))
+                    e[WidgetDataKeys.course1Name] = lastTwo.first?.name ?? ""
+                    e[WidgetDataKeys.course1Time] = lastTwo.first.flatMap { startTime(period: $0.periodStart) }.map { String(format: "%02d:%02d", $0.hour, $0.minute) } ?? ""
+                    e[WidgetDataKeys.course1Location] = lastTwo.first?.location ?? ""
+                    if lastTwo.count > 1 {
+                        e[WidgetDataKeys.course2Name] = lastTwo[1].name
+                        e[WidgetDataKeys.course2Time] = startTime(period: lastTwo[1].periodStart).map { String(format: "%02d:%02d", $0.hour, $0.minute) } ?? ""
+                        e[WidgetDataKeys.course2Location] = lastTwo[1].location
+                    }
+                }
+            } else {
+                e[WidgetDataKeys.status] = "next"
+                let display = Array(notEndedItems.prefix(2))
+                e[WidgetDataKeys.course1Name] = display.first?.name ?? ""
+                e[WidgetDataKeys.course1Time] = display.first.flatMap { startTime(period: $0.periodStart) }.map { String(format: "%02d:%02d", $0.hour, $0.minute) } ?? ""
+                e[WidgetDataKeys.course1Location] = display.first?.location ?? ""
+                if display.count > 1 {
+                    e[WidgetDataKeys.course2Name] = display[1].name
+                    e[WidgetDataKeys.course2Time] = startTime(period: display[1].periodStart).map { String(format: "%02d:%02d", $0.hour, $0.minute) } ?? ""
+                    e[WidgetDataKeys.course2Location] = display[1].location
+                }
+            }
+            return e
+        }
+        // 按课程结束时间生成切换点
+        let todayStart = cal.startOfDay(for: today)
+        var remaining = courseItems
+        timelineEntries.append(makeEntry(trigger: todayStart, notEndedItems: remaining.filter { item in
+            guard let end = endTime(period: item.periodEnd) else { return true }
+            return end.hour * 60 + end.minute > 0
+        }))
+        for item in courseItems {
+            guard let end = endTime(period: item.periodEnd) else { continue }
+            var comps = cal.dateComponents([.year, .month, .day], from: today)
+            comps.hour = end.hour
+            comps.minute = end.minute
+            comps.second = 0
+            guard let triggerDate = cal.date(from: comps) else { continue }
+            remaining = courseItems.filter { i in
+                guard let e2 = endTime(period: i.periodEnd) else { return true }
+                return e2.hour * 60 + e2.minute > end.hour * 60 + end.minute
+            }
+            timelineEntries.append(makeEntry(trigger: triggerDate, notEndedItems: remaining))
+        }
+        if let data = try? JSONSerialization.data(withJSONObject: timelineEntries),
+           let json = String(data: data, encoding: .utf8) {
+            let timelineKey = "\(WidgetDataKeys.timelinePrefix)_\(scheduleName)\(WidgetDataKeys.entrySeparator)\(presetName)"
+            suite.set(json, forKey: timelineKey)
+        }
     }
 
     let presetNames = allPresets.map(\.name)
@@ -186,8 +253,10 @@ func refreshWidgetData(modelContext: ModelContext, activeScheduleName: String) {
         validSchedulePresets[s.name] = p
     }
     let existingKeys = suite.dictionaryRepresentation().keys
-    for key in existingKeys where key.hasPrefix(validEntryPrefix) {
-        let rest = String(key.dropFirst(validEntryPrefix.count))
+    for key in existingKeys where key.hasPrefix(validEntryPrefix) || key.hasPrefix(WidgetDataKeys.timelinePrefix + "_") {
+        let isTimeline = key.hasPrefix(WidgetDataKeys.timelinePrefix + "_")
+        let prefixLen = isTimeline ? (WidgetDataKeys.timelinePrefix + "_").count : validEntryPrefix.count
+        let rest = String(key.dropFirst(prefixLen))
         guard let sepRange = rest.range(of: sep) else {
             suite.removeObject(forKey: key)
             continue

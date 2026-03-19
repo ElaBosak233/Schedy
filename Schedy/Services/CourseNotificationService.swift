@@ -92,6 +92,10 @@ private func scheduleCourseRemindersAfterClear(modelContext: ModelContext) {
             let scheduleSlots = slots(for: preset)
 
             let semesterStart = cal.startOfDay(for: schedule.semesterStartDate)
+            // 对齐到学期第一天所在周的周一（dayOfWeek: 2=周一，iOS Calendar）
+            let semesterWeekday = cal.component(.weekday, from: semesterStart)  // 1=周日,2=周一,...,7=周六
+            let daysToMonday = semesterWeekday == 1 ? -6 : -(semesterWeekday - 2)
+            let weekOneMonday = cal.date(byAdding: .day, value: daysToMonday, to: semesterStart)!
             let currentW = Calendar.currentWeek(semesterStart: schedule.semesterStartDate, calendar: cal)
 
             for week in currentW ..< (currentW + kMaxWeeksAhead) {
@@ -103,7 +107,7 @@ private func scheduleCourseRemindersAfterClear(modelContext: ModelContext) {
                         week: week,
                         dayOfWeek: dayOfWeek
                     )
-                    guard let dayDate = cal.date(byAdding: .day, value: (week - 1) * 7 + (dayOfWeek - 1), to: semesterStart) else { continue }
+                    guard let dayDate = cal.date(byAdding: .day, value: (week - 1) * 7 + (dayOfWeek - 1), to: weekOneMonday) else { continue }
                     for occ in occurrences {
                         guard let start = startTime(slots: scheduleSlots, forPeriod: occ.periodStart) else { continue }
                         let comps = DateComponents(
