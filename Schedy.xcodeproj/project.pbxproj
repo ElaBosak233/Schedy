@@ -55,12 +55,24 @@
 		65B690382F50104A001C550A /* Schedy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Schedy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		65B6906C2F501200001C550A /* SchedyWidgetIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedyWidgetIntent.swift; sourceTree = "<group>"; };
 		65B6906E2F501200001C550A /* AppIntents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppIntents.framework; path = System/Library/Frameworks/AppIntents.framework; sourceTree = SDKROOT; };
-		65B690702F501400001C550A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		65662ED22F6C2C7E00891713 /* Exceptions for "Schedy" folder in "Schedy" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 65B690372F50104A001C550A /* Schedy */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		65283EED2F4F4D44006BE09E /* Schedy */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				65662ED22F6C2C7E00891713 /* Exceptions for "Schedy" folder in "Schedy" target */,
+			);
 			path = Schedy;
 			sourceTree = "<group>";
 		};
@@ -91,7 +103,6 @@
 			children = (
 				65283EED2F4F4D44006BE09E /* Schedy */,
 				65283F0D2F4F4D45006BE09E /* SchedyWidget */,
-				65B690702F501400001C550A /* Info.plist */,
 				65283EEC2F4F4D44006BE09E /* Products */,
 				65B68F4B2F500DB7001C550A /* Recovered References */,
 				65B690642F50106D001C550A /* Frameworks */,
@@ -449,7 +460,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_FILE = Schedy/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Schedy 课程表";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -485,7 +496,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_FILE = Schedy/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Schedy 课程表";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
