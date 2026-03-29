@@ -59,18 +59,13 @@ struct SchedyWidgetProvider: AppIntentTimelineProvider {
 
         var entries: [SchedyWidgetEntry] = []
         if !timelineData.isEmpty {
-            // 过滤出今天的时间线（触发时间在今天范围内）
-            let todayStart = Calendar.current.startOfDay(for: now)
-            let tomorrowStart = Calendar.current.date(byAdding: .day, value: 1, to: todayStart) ?? todayStart
-            let todayEntries = timelineData.filter { $0.trigger >= todayStart && $0.trigger < tomorrowStart }
-            // 找到当前应显示的 entry（最后一个触发时间 <= now 的）
-            let pastEntries = todayEntries.filter { $0.trigger <= now }
-            let futureEntries = todayEntries.filter { $0.trigger > now }
-            let currentEntry = pastEntries.last ?? todayEntries.first
+            // 多日时间线：先选当前时刻对应状态，再附上未来所有切换点
+            let pastEntries = timelineData.filter { $0.trigger <= now }
+            let futureEntries = timelineData.filter { $0.trigger > now }
+            let currentEntry = pastEntries.last ?? timelineData.first
             if let current = currentEntry {
                 entries.append(SchedyWidgetEntry(date: now, entry: current.entry))
             }
-            // 添加未来的切换点
             for item in futureEntries {
                 entries.append(SchedyWidgetEntry(date: item.trigger, entry: item.entry))
             }
@@ -84,9 +79,8 @@ struct SchedyWidgetProvider: AppIntentTimelineProvider {
             entries.append(SchedyWidgetEntry(date: now, entry: widgetEntry))
         }
 
-        // 次日午夜刷新（重新从 App Group 读取新一天的数据）
-        let nextMidnight = Calendar.current.startOfDay(for: Calendar.current.date(byAdding: .day, value: 1, to: now) ?? now)
-        return Timeline(entries: entries, policy: .after(nextMidnight))
+        // 用 .atEnd 让系统在最后一个切换点后请求下一段时间线
+        return Timeline(entries: entries, policy: .atEnd)
     }
 }
 

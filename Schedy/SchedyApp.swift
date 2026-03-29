@@ -109,8 +109,8 @@ struct SchedyApp: App {
                 .preferredColorScheme(appearanceMode.colorScheme)
                 .onAppear {
                     requestCourseNotificationPermission()
-                    registerNotificationRefreshTask()
-                    scheduleNextNotificationRefresh()
+                    registerBackgroundRefreshTasks()
+                    scheduleNextBackgroundRefresh()
                 }
                 .onChange(of: iCloudSyncEnabled) { _, newValue in
                     modelContainer = makeModelContainer(useICloud: newValue)

@@ -51,7 +51,6 @@
 		65283F0B2F4F4D45006BE09E /* WidgetDataKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetDataKeys.swift; sourceTree = "<group>"; };
 		65283F0C2F4F4D45006BE09E /* SchedyWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SchedyWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		65283F1B2F4F4D45006BE09E /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
-		65283F1D2F4F4D45006BE09E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		65B690382F50104A001C550A /* Schedy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Schedy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		65B6906C2F501200001C550A /* SchedyWidgetIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedyWidgetIntent.swift; sourceTree = "<group>"; };
 		65B6906E2F501200001C550A /* AppIntents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppIntents.framework; path = System/Library/Frameworks/AppIntents.framework; sourceTree = SDKROOT; };
@@ -124,7 +123,6 @@
 				65283F0A2F4F4D45006BE09E /* SchedyWidget.swift */,
 				65283F0B2F4F4D45006BE09E /* WidgetDataKeys.swift */,
 				65B6906C2F501200001C550A /* SchedyWidgetIntent.swift */,
-				65283F1D2F4F4D45006BE09E /* Info.plist */,
 			);
 			path = SchedyWidget;
 			sourceTree = "<group>";

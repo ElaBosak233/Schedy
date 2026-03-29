@@ -15,7 +15,7 @@
 	</array>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>dev.e23.schedy.refreshNotifications</string>
+		<string>dev.e23.schedy.backgroundRefresh</string>
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>

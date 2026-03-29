@@ -89,7 +89,6 @@ struct ContentView: View {
                 if phase == .active {
                     scheduleCourseReminders(modelContext: modelContext)
                     refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
-                    scheduleNextNotificationRefresh()
                 }
             }
         }
