@@ -52,9 +52,75 @@ struct ScheduleImportView: View {
     @State private var showHTMLFileImporter = false
     @State private var showTemplateCopied = false
     @State private var showPromptCopied = false
+    @State private var schoolSearchText = ""
 
     private var activeSchedule: Schedule? {
         schedules.first { $0.name == activeScheduleName } ?? schedules.first
+    }
+
+    private struct SchoolSearchEntry: Identifiable {
+        let school: SchoolInfo
+        let sectionKey: String
+        let sortKey: String
+        let searchKey: String
+
+        var id: String { school.id }
+    }
+
+    private struct SchoolSection: Identifiable {
+        let id: String
+        let title: String
+        let schools: [SchoolSearchEntry]
+    }
+
+    private static let allSchoolEntries: [SchoolSearchEntry] = SchoolInfo.all.map { school in
+        let pinyin = latinString(from: school.name)
+        let initials = pinyin
+            .split(separator: " ")
+            .compactMap { $0.first }
+            .map { String($0).uppercased() }
+            .joined()
+        let compactPinyin = pinyin.replacingOccurrences(of: " ", with: "")
+        let section = pinyinSectionKey(for: school.name)
+        let searchKey = [school.name.lowercased(), compactPinyin.lowercased(), initials.lowercased()]
+            .joined(separator: " ")
+        return SchoolSearchEntry(
+            school: school,
+            sectionKey: section,
+            sortKey: "\(section)-\(compactPinyin)-\(school.name)",
+            searchKey: searchKey
+        )
+    }
+
+    private var filteredSchoolEntries: [SchoolSearchEntry] {
+        let query = schoolSearchText
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+        guard !query.isEmpty else {
+            return Self.allSchoolEntries
+        }
+        return Self.allSchoolEntries.filter { $0.searchKey.contains(query) }
+    }
+
+    private var schoolSections: [SchoolSection] {
+        let grouped = Dictionary(grouping: filteredSchoolEntries, by: \.sectionKey)
+        return grouped
+            .map { key, value in
+                SchoolSection(
+                    id: key,
+                    title: key,
+                    schools: value.sorted { $0.sortKey < $1.sortKey }
+                )
+            }
+            .sorted { lhs, rhs in
+                if lhs.title == "#" { return false }
+                if rhs.title == "#" { return true }
+                return lhs.title < rhs.title
+            }
+    }
+
+    private var schoolIndexTitles: [String] {
+        schoolSections.map(\.title)
     }
 
     enum Step {
@@ -401,36 +467,98 @@ struct ScheduleImportView: View {
 
             if sourceTab == .school {
                 // 院校 Tab：预配置的学校列表
-                List {
-                    Section {
-                        ForEach(SchoolInfo.all) { school in
-                            Button {
-                                selectedSchool = school
-                                importConfig = ImportConfig(academicAffairsType: school.academicAffairsType, entryURL: school.entryURL)
-                                step = .browser
-                            } label: {
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(school.name)
-                                            .font(.headline)
-                                            .foregroundStyle(.primary)
-                                        Text(school.academicAffairsType.displayName)
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
+                ScrollViewReader { proxy in
+                    ZStack(alignment: .trailing) {
+                        List {
+                            Section {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "magnifyingglass")
+                                        .foregroundStyle(.secondary)
+                                    TextField("搜索学校名或拼音首字母", text: $schoolSearchText)
+                                        .textInputAutocapitalization(.never)
+                                        .autocorrectionDisabled(true)
+                                    if !schoolSearchText.isEmpty {
+                                        Button {
+                                            schoolSearchText = ""
+                                        } label: {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .foregroundStyle(.tertiary)
+                                        }
+                                        .buttonStyle(.plain)
                                     }
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                        .foregroundStyle(.tertiary)
                                 }
+                                .padding(.vertical, 6)
+                            }
+
+                            ForEach(schoolSections) { section in
+                                Section(section.title) {
+                                    ForEach(section.schools) { entry in
+                                        let school = entry.school
+                                        Button {
+                                            guard school.isEnabled,
+                                                  let academicAffairsType = school.academicAffairsType,
+                                                  let entryURL = school.entryURL else {
+                                                return
+                                            }
+                                            selectedSchool = school
+                                            importConfig = ImportConfig(academicAffairsType: academicAffairsType, entryURL: entryURL)
+                                            step = .browser
+                                        } label: {
+                                            HStack {
+                                                VStack(alignment: .leading, spacing: 2) {
+                                                    Text(school.name)
+                                                        .font(.headline)
+                                                        .foregroundStyle(.primary)
+                                                    Text(school.typeDisplayName)
+                                                        .font(.caption)
+                                                        .foregroundStyle(.secondary)
+                                                }
+                                                Spacer()
+                                                if school.isEnabled {
+                                                    Image(systemName: "chevron.right")
+                                                        .foregroundStyle(.tertiary)
+                                                } else {
+                                                    Text("暂未支持")
+                                                        .font(.caption)
+                                                        .foregroundStyle(.secondary)
+                                                }
+                                            }
+                                        }
+                                        .disabled(!school.isEnabled)
+                                    }
+                                }
+                                .id(section.id)
+                            }
+                            Section {
+                                EmptyView()
+                            } footer: {
+                                Text("将使用该学校对应的教务系统解析规则。支持按学校名或拼音首字母搜索。打开教务系统后，请进入「个人课表查询」页面，再点击右上角下载按钮导入。")
                             }
                         }
-                    } header: {
-                        Text("选择院校")
-                    } footer: {
-                        Text("将使用该学校对应的教务系统解析规则。打开教务系统后，请进入「个人课表查询」页面，再点击右上角下载按钮导入。")
+                        .listStyle(.insetGrouped)
+
+                        if schoolIndexTitles.count > 1 {
+                            VStack(spacing: 2) {
+                                ForEach(schoolIndexTitles, id: \.self) { title in
+                                    Button {
+                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                            proxy.scrollTo(title, anchor: .top)
+                                        }
+                                    } label: {
+                                        Text(title)
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                            .frame(width: 16)
+                                    }
+                                }
+                            }
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 4)
+                            .background(.ultraThinMaterial, in: Capsule())
+                            .padding(.trailing, 4)
+                        }
                     }
                 }
-                .listStyle(.insetGrouped)
             } else {
                 // 教务系统 Tab：按系统类型选择，需用户自行输入教务网址
                 List {
@@ -462,6 +590,25 @@ struct ScheduleImportView: View {
                 .listStyle(.insetGrouped)
             }
         }
+    }
+
+    private static func latinString(from text: String) -> String {
+        let mutable = NSMutableString(string: text) as CFMutableString
+        CFStringTransform(mutable, nil, kCFStringTransformToLatin, false)
+        CFStringTransform(mutable, nil, kCFStringTransformStripCombiningMarks, false)
+        return (mutable as String)
+            .replacingOccurrences(of: "'", with: "")
+            .replacingOccurrences(of: "  ", with: " ")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .uppercased()
+    }
+
+    private static func pinyinSectionKey(for name: String) -> String {
+        let latin = latinString(from: name)
+        if let first = latin.first, first.isLetter {
+            return String(first)
+        }
+        return "#"
     }
 
     // MARK: - Step 4: 内嵌浏览器

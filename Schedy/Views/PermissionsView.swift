@@ -6,10 +6,10 @@
 //
 
 import SwiftUI
-import UIKit
 import UserNotifications
 
 struct PermissionsView: View {
+    @Environment(\.openURL) private var openURL
     @State private var notificationStatus: UNAuthorizationStatus?
     @State private var isLoading = true
 
@@ -88,8 +88,8 @@ struct PermissionsView: View {
     }
 
     private func openSystemSettings() {
-        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
-        UIApplication.shared.open(url)
+        guard let url = URL(string: "app-settings:") else { return }
+        openURL(url)
     }
 }
 

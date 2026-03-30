@@ -7,7 +7,6 @@
 
 import SwiftData
 import SwiftUI
-import UIKit
 
 /// 课程预览的上下文：课程 + 来源周 + 是否非本周（半透明），用于 sheet(item:) 保证周次一致
 private struct CoursePreviewContext: Identifiable {
@@ -127,8 +126,6 @@ struct ScheduleGridView: View {
 
     /// 当前查看的周次（1-based），左右滑动切换
     @State private var viewingWeek: Int = 1
-    /// 用于翻页触觉反馈：仅在实际切换周时触发，避免首次进入时震动
-    @State private var lastHapticWeek: Int? = nil
     @State private var showAddCourse = false
     @State private var showScheduleImport = false
     @State private var showScheduleExport = false
@@ -245,13 +242,7 @@ struct ScheduleGridView: View {
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             .animation(.easeInOut(duration: 0.15), value: viewingWeek)
-            .onChange(of: viewingWeek) { _, newWeek in
-                if lastHapticWeek != nil {
-                    let generator = UIImpactFeedbackGenerator(style: .light)
-                    generator.impactOccurred()
-                }
-                lastHapticWeek = newWeek
-            }
+            .sensoryFeedback(.impact(weight: .light), trigger: viewingWeek)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .safeAreaInset(edge: .top, spacing: 0) {
                 floatingHeader
@@ -306,7 +297,7 @@ struct ScheduleGridView: View {
                 )
             }
             .sheet(item: $shareExportURL) { item in
-                ShareSheet(activityItems: [item.url]) {
+                ShareExportSheet(fileURL: item.url) {
                     shareExportURL = nil
                 }
             }
@@ -707,43 +698,45 @@ private struct ShareableExportItem: Identifiable {
     let url: URL
 }
 
-/// 系统分享面板（保存到文件、发送等），关闭后回调
-private struct ShareSheet: UIViewControllerRepresentable {
-    let activityItems: [Any]
-    var onComplete: () -> Void = {}
-
-    func makeUIViewController(context: Context) -> UIActivityViewControllerWrapper {
-        UIActivityViewControllerWrapper(activityItems: activityItems, onComplete: onComplete)
-    }
-
-    func updateUIViewController(_ uiViewController: UIActivityViewControllerWrapper, context: Context) {}
-}
-
-private final class UIActivityViewControllerWrapper: UIViewController {
-    let activityItems: [Any]
+/// SwiftUI 分享面板容器
+private struct ShareExportSheet: View {
+    let fileURL: URL
     let onComplete: () -> Void
+    @Environment(\.dismiss) private var dismiss
 
-    init(activityItems: [Any], onComplete: @escaping () -> Void) {
-        self.activityItems = activityItems
-        self.onComplete = onComplete
-        super.init(nibName: nil, bundle: nil)
-    }
-
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-
-    override func loadView() {
-        view = UIView()
-        view.backgroundColor = .clear
-    }
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        guard presentedViewController == nil else { return }
-        let vc = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
-        vc.completionWithItemsHandler = { [weak self] _, _, _, _ in
-            self?.onComplete()
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 16) {
+                Text("导出文件已生成")
+                    .font(.headline)
+                Text(fileURL.lastPathComponent)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                ShareLink(item: fileURL) {
+                    Label("分享或保存 CSV", systemImage: "square.and.arrow.up")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                Button("关闭") {
+                    onComplete()
+                    dismiss()
+                }
+                .buttonStyle(.bordered)
+            }
+            .padding()
+            .navigationTitle("导出课表")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("关闭") {
+                        onComplete()
+                        dismiss()
+                    }
+                }
+            }
         }
-        present(vc, animated: true)
     }
 }
 
