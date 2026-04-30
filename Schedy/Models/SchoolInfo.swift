@@ -46,7 +46,13 @@ enum SchoolAcademicAffairsType: String {
             return .qiangZhi
         case .chaoXing:
             return .chaoXing
-        case .unknown, .kingo, .urp, .south:
+        case .kingo:
+            return .kingo
+        case .urp:
+            return .urp
+        case .south:
+            return .south
+        case .unknown:
             return nil
         }
     }
@@ -60,11 +66,11 @@ enum SchoolAcademicAffairsType: String {
         case .chaoXing:
             return AcademicAffairsType.chaoXing.displayName
         case .kingo:
-            return "Kingo（暂未支持）"
+            return AcademicAffairsType.kingo.displayName
         case .urp:
-            return "URP（暂未支持）"
+            return AcademicAffairsType.urp.displayName
         case .south:
-            return "South（暂未支持）"
+            return AcademicAffairsType.south.displayName
         case .unknown:
             return "未知教务"
         }

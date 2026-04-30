@@ -2,7 +2,7 @@
 //  AcademicAffairsWebView.swift
 //  Schedy
 //
-//  导入流程中的内嵌浏览器：打开教务系统、地址栏、进度条、「导入当前页」抓取 HTML 交给解析器。
+//  导入流程中的内嵌浏览器：打开教务系统、地址栏、进度条、「导入当前页」注入 JS 抓取课程数据。
 //
 
 import SwiftUI
@@ -10,22 +10,24 @@ import WebKit
 
 struct AcademicAffairsWebView: View {
     let initialURL: URL
+    let academicAffairsType: AcademicAffairsType
     @Binding var urlBarText: String
     @Binding var pendingLoadURL: URL?
     @Binding var requestHTML: Bool
     @State private var loadProgress: Double = 1
-    let onHTMLReceived: (URL?, String) -> Void
+    let onCourseDataReceived: (URL?, Result<String, Error>) -> Void
 
     var body: some View {
         VStack(spacing: 0) {
             urlBar
             AcademicAffairsWebViewRepresentable(
                 initialURL: initialURL,
+                academicAffairsType: academicAffairsType,
                 urlBarText: $urlBarText,
                 pendingLoadURL: $pendingLoadURL,
                 requestHTML: $requestHTML,
                 loadProgress: $loadProgress,
-                onHTMLReceived: onHTMLReceived
+                onCourseDataReceived: onCourseDataReceived
             )
             .overlay(alignment: .top) {
                 if loadProgress < 0.99 {
@@ -73,15 +75,16 @@ struct AcademicAffairsWebView: View {
 
 private struct AcademicAffairsWebViewRepresentable: UIViewControllerRepresentable {
     let initialURL: URL
+    let academicAffairsType: AcademicAffairsType
     @Binding var urlBarText: String
     @Binding var pendingLoadURL: URL?
     @Binding var requestHTML: Bool
     @Binding var loadProgress: Double
-    let onHTMLReceived: (URL?, String) -> Void
+    let onCourseDataReceived: (URL?, Result<String, Error>) -> Void
 
     func makeUIViewController(context: Context) -> AcademicAffairsWebViewController {
-        let vc = AcademicAffairsWebViewController(initialURL: initialURL)
-        vc.onHTMLReceived = onHTMLReceived
+        let vc = AcademicAffairsWebViewController(initialURL: initialURL, academicAffairsType: academicAffairsType)
+        vc.onCourseDataReceived = onCourseDataReceived
         vc.onHTMLRequestConsumed = { DispatchQueue.main.async { requestHTML = false } }
         vc.onURLChange = { url in
             DispatchQueue.main.async {
@@ -110,15 +113,20 @@ private struct AcademicAffairsWebViewRepresentable: UIViewControllerRepresentabl
 private final class AcademicAffairsWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
     private var webView: WKWebView!
     private let initialURL: URL
+    private let academicAffairsType: AcademicAffairsType
     private var progressObservation: NSKeyValueObservation?
+    private var titleObservation: NSKeyValueObservation?
     private var pendingHTMLRequest = false
-    var onHTMLReceived: ((URL?, String) -> Void)?
+    private var waitingForInjectedResult = false
+    private var originalTitle: String?
+    var onCourseDataReceived: ((URL?, Result<String, Error>) -> Void)?
     var onHTMLRequestConsumed: (() -> Void)?
     var onURLChange: ((URL?) -> Void)?
     var onProgressChange: ((Double) -> Void)?
 
-    init(initialURL: URL) {
+    init(initialURL: URL, academicAffairsType: AcademicAffairsType) {
         self.initialURL = initialURL
+        self.academicAffairsType = academicAffairsType
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -135,11 +143,15 @@ private final class AcademicAffairsWebViewController: UIViewController, WKNaviga
         progressObservation = webView.observe(\.estimatedProgress, options: [.new]) { [weak self] webView, _ in
             self?.onProgressChange?(webView.estimatedProgress)
         }
+        titleObservation = webView.observe(\.title, options: [.new]) { [weak self] webView, _ in
+            self?.handleTitleChange(webView.title)
+        }
         webView.load(URLRequest(url: initialURL))
     }
 
     deinit {
         progressObservation?.invalidate()
+        titleObservation?.invalidate()
     }
 
     func loadURL(_ url: URL) {
@@ -163,7 +175,7 @@ private final class AcademicAffairsWebViewController: UIViewController, WKNaviga
         onURLChange?(webView.url)
         if pendingHTMLRequest {
             pendingHTMLRequest = false
-            captureHTMLNow()
+            injectCourseCaptureNow()
         }
     }
 
@@ -204,40 +216,83 @@ private final class AcademicAffairsWebViewController: UIViewController, WKNaviga
         present(alert, animated: true)
     }
 
-    // MARK: - HTML capture
+    // MARK: - Course data capture
     func requestHTMLCapture() {
         onHTMLRequestConsumed?()
         if webView.isLoading {
             pendingHTMLRequest = true
             return
         }
-        captureHTMLNow()
+        injectCourseCaptureNow()
     }
 
-    private func captureHTMLNow() {
-        captureHTML { [weak self] url, html in
-            self?.onHTMLReceived?(url, html)
+    private func injectCourseCaptureNow() {
+        guard !waitingForInjectedResult else { return }
+        waitingForInjectedResult = true
+        originalTitle = webView.title
+
+        let js = AcademicAffairsInjectedCourseParser.providerScript(for: academicAffairsType)
+        webView.evaluateJavaScript(js) { [weak self] _, error in
+            guard let self else { return }
+            if let error {
+                self.finishInjectedCapture(.failure(error))
+                return
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 15) { [weak self] in
+                guard let self, self.waitingForInjectedResult else { return }
+                self.finishInjectedCapture(.failure(AcademicAffairsWebViewError.timeout))
+            }
         }
     }
 
-    func captureHTML(completion: @escaping (URL?, String) -> Void) {
-        let js = """
-        (function() {
-          var html = document.documentElement ? document.documentElement.outerHTML : "";
-          if (html && html.length > 100) return html;
-          var body = document.body ? document.body.innerText : "";
-          return body ? "<pre>" + body + "</pre>" : html;
-        })();
-        """
-        webView.evaluateJavaScript(js) { [weak self] result, _ in
-            let html = (result as? String) ?? ""
-            completion(self?.webView.url, html)
+    private func handleTitleChange(_ title: String?) {
+        guard waitingForInjectedResult, let title else { return }
+        if title.hasPrefix("KEBIAO_OK:") {
+            let payload = String(title.dropFirst("KEBIAO_OK:".count))
+            finishInjectedCapture(.success(payload))
+        } else if title.hasPrefix("KEBIAO_ERR:") {
+            let message = String(title.dropFirst("KEBIAO_ERR:".count))
+            finishInjectedCapture(.failure(AcademicAffairsWebViewError.provider(message)))
         }
+    }
+
+    private func finishInjectedCapture(_ result: Result<String, Error>) {
+        guard waitingForInjectedResult else { return }
+        waitingForInjectedResult = false
+        let callback = onCourseDataReceived
+        let url = webView.url
+        if let originalTitle {
+            webView.evaluateJavaScript("document.title = \(Self.javascriptStringLiteral(originalTitle));", completionHandler: nil)
+        }
+        callback?(url, result)
+    }
+
+    private static func javascriptStringLiteral(_ value: String) -> String {
+        guard let data = try? JSONSerialization.data(withJSONObject: [value]),
+              let json = String(data: data, encoding: .utf8),
+              json.count >= 2 else {
+            return "''"
+        }
+        return String(json.dropFirst().dropLast())
     }
 
     func captureWebArchive(completion: @escaping (Data?) -> Void) {
         webView.createWebArchiveData { result in
             completion(try? result.get())
+        }
+    }
+}
+
+private enum AcademicAffairsWebViewError: LocalizedError {
+    case provider(String)
+    case timeout
+
+    var errorDescription: String? {
+        switch self {
+        case .provider(let message):
+            return message
+        case .timeout:
+            return "注入脚本执行超时，请确认已进入课表页面后重试。"
         }
     }
 }
