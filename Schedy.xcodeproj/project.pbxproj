@@ -54,6 +54,7 @@
 		65B690382F50104A001C550A /* Schedy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Schedy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		65B6906C2F501200001C550A /* SchedyWidgetIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedyWidgetIntent.swift; sourceTree = "<group>"; };
 		65B6906E2F501200001C550A /* AppIntents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppIntents.framework; path = System/Library/Frameworks/AppIntents.framework; sourceTree = SDKROOT; };
+		65B690702F501300001C550A /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -100,6 +101,7 @@
 		65283EE22F4F4D44006BE09E = {
 			isa = PBXGroup;
 			children = (
+				65B690702F501300001C550A /* Version.xcconfig */,
 				65283EED2F4F4D44006BE09E /* Schedy */,
 				65283F0D2F4F4D45006BE09E /* SchedyWidget */,
 				65283EEC2F4F4D44006BE09E /* Products */,
@@ -402,10 +404,10 @@
 		};
 		65283F162F4F4D45006BE09E /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 65B690702F501300001C550A /* Version.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = SchedyWidget/SchedyWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SchedyWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -414,7 +416,6 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.e23.schedy.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -426,10 +427,10 @@
 		};
 		65283F172F4F4D45006BE09E /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 65B690702F501300001C550A /* Version.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = SchedyWidget/SchedyWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SchedyWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -438,7 +439,6 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.e23.schedy.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -450,12 +450,12 @@
 		};
 		65B690412F50104B001C550A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 65B690702F501300001C550A /* Version.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Schedy/Schedy.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Schedy/Info.plist;
@@ -471,7 +471,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.e23.schedy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -486,12 +485,12 @@
 		};
 		65B690422F50104B001C550A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 65B690702F501300001C550A /* Version.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Schedy/Schedy.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Schedy/Info.plist;
@@ -507,7 +506,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.e23.schedy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
