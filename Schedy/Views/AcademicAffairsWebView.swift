@@ -2,7 +2,7 @@
 //  AcademicAffairsWebView.swift
 //  Schedy
 //
-//  导入流程中的内嵌浏览器：打开教务系统、地址栏、进度条、「导入当前页」注入 JS 抓取课程数据。
+//  导入流程中的内嵌浏览器：打开教务系统、地址栏、进度条、「导入当前页」抓取课程数据。
 //
 
 import SwiftUI
@@ -175,7 +175,7 @@ private final class AcademicAffairsWebViewController: UIViewController, WKNaviga
         onURLChange?(webView.url)
         if pendingHTMLRequest {
             pendingHTMLRequest = false
-            injectCourseCaptureNow()
+            captureCourseDataNow()
         }
     }
 
@@ -223,7 +223,36 @@ private final class AcademicAffairsWebViewController: UIViewController, WKNaviga
             pendingHTMLRequest = true
             return
         }
-        injectCourseCaptureNow()
+        captureCourseDataNow()
+    }
+
+    private func captureCourseDataNow() {
+        if academicAffairsType.usesRegexHTMLParser {
+            captureHTMLNow()
+        } else {
+            injectCourseCaptureNow()
+        }
+    }
+
+    private func captureHTMLNow() {
+        captureHTML { [weak self] url, html in
+            self?.onCourseDataReceived?(url, .success("HTML_PAGE|" + html))
+        }
+    }
+
+    private func captureHTML(completion: @escaping (URL?, String) -> Void) {
+        let js = """
+        (function() {
+          var html = document.documentElement ? document.documentElement.outerHTML : "";
+          if (html && html.length > 100) return html;
+          var body = document.body ? document.body.innerText : "";
+          return body ? "<pre>" + body + "</pre>" : html;
+        })();
+        """
+        webView.evaluateJavaScript(js) { [weak self] result, _ in
+            let html = (result as? String) ?? ""
+            completion(self?.webView.url, html)
+        }
     }
 
     private func injectCourseCaptureNow() {
@@ -279,6 +308,17 @@ private final class AcademicAffairsWebViewController: UIViewController, WKNaviga
     func captureWebArchive(completion: @escaping (Data?) -> Void) {
         webView.createWebArchiveData { result in
             completion(try? result.get())
+        }
+    }
+}
+
+private extension AcademicAffairsType {
+    var usesRegexHTMLParser: Bool {
+        switch self {
+        case .qiangZhi, .chaoXing:
+            return true
+        default:
+            return false
         }
     }
 }

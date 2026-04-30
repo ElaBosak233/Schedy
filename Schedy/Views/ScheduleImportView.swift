@@ -649,10 +649,10 @@ struct ScheduleImportView: View {
 
     private func handleInjectedCourseData(_ result: Result<String, Error>, config: ImportConfig) {
         switch result {
-        case .success(let compactData):
+        case .success(let payload):
             let type = config.academicAffairsType
             DispatchQueue.global(qos: .userInitiated).async {
-                let parsed = AcademicAffairsInjectedCourseParser.parseCompact(compactData, type: type)
+                let parsed = Self.parseAcademicAffairsPayload(payload, type: type)
                 DispatchQueue.main.async {
                     self.isImporting = false
                     self.finishImport(parsed: parsed, config: config)
@@ -662,6 +662,21 @@ struct ScheduleImportView: View {
             isImporting = false
             importError = error.localizedDescription
         }
+    }
+
+    private static func parseAcademicAffairsPayload(_ payload: String, type: AcademicAffairsType) -> [ParsedCourseItem] {
+        if payload.hasPrefix("HTML_PAGE|") {
+            let html = String(payload.dropFirst("HTML_PAGE|".count))
+            switch type {
+            case .qiangZhi:
+                return QiangZhiHTMLParser.parse(html: html)
+            case .chaoXing:
+                return ChaoXingHTMLParser.parse(html: html)
+            default:
+                return AcademicAffairsInjectedCourseParser.parseCompact("HTML|" + html, type: type)
+            }
+        }
+        return AcademicAffairsInjectedCourseParser.parseCompact(payload, type: type)
     }
 
     private func finishImport(parsed: [ParsedCourseItem], config: ImportConfig) {
