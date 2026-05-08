@@ -42,12 +42,6 @@
     "url": "http://jwgl.ahmu.edu.cn/eams/loginExt.action"
   },
   {
-    "id": "pyxx",
-    "name": "安徽医科大学 - 研究生",
-    "type": "unknown",
-    "url": "http://210.45.96.114/pyxx/login.aspx"
-  },
-  {
     "id": "xtgl",
     "name": "安徽医科大学临床医学院",
     "type": "zhengFang",
@@ -166,12 +160,6 @@
     "name": "阿坝师范学院",
     "type": "unknown",
     "url": "http://jwcs.abtu.edu.cn/"
-  },
-  {
-    "id": "yjsxt",
-    "name": "安庆师范大学 - 研究生",
-    "type": "unknown",
-    "url": "https://yjsxt.aqnu.edu.cn/"
   },
   {
     "id": "sso",
@@ -798,12 +786,6 @@
     "url": "https://webvpn.bupt.edu.cn"
   },
   {
-    "id": "jxzxehall",
-    "name": "北京理工大学 - 研究生",
-    "type": "unknown",
-    "url": "http://jxzxehall.bit.edu.cn/new/index.html"
-  },
-  {
     "id": "authserver8",
     "name": "北京工业职业技术学院",
     "type": "zhengFang",
@@ -850,12 +832,6 @@
     "name": "北京电影学院",
     "type": "unknown",
     "url": "http://jwstu.bfa.edu.cn/?#!/home/common/scheduleQuery"
-  },
-  {
-    "id": "school4",
-    "name": "北京中医药大学 - 研究生",
-    "type": "unknown",
-    "url": "http://202.204.35.224"
   },
   {
     "id": "jtxy",
@@ -922,18 +898,6 @@
     "name": "北京大学医学部",
     "type": "unknown",
     "url": "http://elective.pku.edu.cn"
-  },
-  {
-    "id": "graduate",
-    "name": "北京林业大学 - 研究生",
-    "type": "south",
-    "url": "https://graduate.bjfu.edu.cn"
-  },
-  {
-    "id": "school5",
-    "name": "北京电影学院 - 研究生",
-    "type": "unknown",
-    "url": "http://202.205.127.146:8881/#/login"
   },
   {
     "id": "bzpt",
@@ -1734,12 +1698,6 @@
     "url": "http://xk.csust.edu.cn/"
   },
   {
-    "id": "yjsgl",
-    "name": "长沙理工大学 - 研究生",
-    "type": "unknown",
-    "url": "https://yjsgl.csust.edu.cn/gmis/(S(wpznwioaoceynjh5xkvjrgrv))/home/stulogin"
-  },
-  {
     "id": "xk2",
     "name": "长沙理工大学城南学院",
     "type": "qiangZhi",
@@ -1768,18 +1726,6 @@
     "name": "长江大学",
     "type": "unknown",
     "url": "https://cas.yangtzeu.edu.cn/authserver/login?service=https%3A%2F%2Fehall.yangtzeu.edu.cn%2Fywtb-portal%2Fofficial%2Findex.html%3Fbrowser%3Dno%23%2Fhome%2Fofficial_home"
-  },
-  {
-    "id": "yjsgl2",
-    "name": "长沙理工大学 - 研究生",
-    "type": "unknown",
-    "url": "https://yjsgl.csust.edu.cn/gmis/(S(wpznwioaoceynjh5xkvjrgrv))/home/stulogin"
-  },
-  {
-    "id": "uis2",
-    "name": "重庆理工大学 - 研究生",
-    "type": "south",
-    "url": "https://uis.cqut.edu.cn/unified_identity_logon/#/login?applicationCode=XZim715"
   },
   {
     "id": "jwzx",
@@ -1942,12 +1888,6 @@
     "name": "重庆幼儿师范高等专科学校",
     "type": "zhengFang",
     "url": "http://123.146.162.135:81/"
-  },
-  {
-    "id": "yjs",
-    "name": "长安大学 - 研究生",
-    "type": "unknown",
-    "url": "https://yjs.chd.edu.cn"
   },
   {
     "id": "ciit",
@@ -2532,12 +2472,6 @@
     "url": "https://jwgl.webvpn.nepu.edu.cn"
   },
   {
-    "id": "webvpn12",
-    "name": "东北石油大学 - 研究生",
-    "type": "unknown",
-    "url": "https://172-16-199-10.webvpn.nepu.edu.cn/yjsjwgl/qt/index.jsp"
-  },
-  {
     "id": "login3",
     "name": "东北财经大学",
     "type": "urp",
@@ -2560,12 +2494,6 @@
     "name": "东南大学",
     "type": "unknown",
     "url": "http://ehall.seu.edu.cn/appShow?appId=4770397878132218"
-  },
-  {
-    "id": "ehall8",
-    "name": "东南大学 - 研究生",
-    "type": "unknown",
-    "url": "http://ehall.seu.edu.cn/appShow?appId=4979568947762216"
   },
   {
     "id": "xk3",
@@ -2982,12 +2910,6 @@
     "url": "https://my.fudan.edu.cn/list/bks_xx_kcb"
   },
   {
-    "id": "my7",
-    "name": "复旦大学个人数据中心 - 研究生",
-    "type": "unknown",
-    "url": "https://my.fudan.edu.cn/list/yjs_xx_kcb"
-  },
-  {
     "id": "fzfu",
     "name": "福州外语外贸学院",
     "type": "zhengFang",
@@ -3184,12 +3106,6 @@
     "name": "佛山科学技术学院",
     "type": "unknown",
     "url": "http://100.fosu.edu.cn/"
-  },
-  {
-    "id": "my8",
-    "name": "复旦大学 - 研究生",
-    "type": "unknown",
-    "url": "https://my.fudan.edu.cn/list/yjs_xx_kcb"
   },
   {
     "id": "fynu",
@@ -3498,12 +3414,6 @@
     "url": "https://newcas.gzhu.edu.cn/"
   },
   {
-    "id": "yjsglxt",
-    "name": "广州大学 - 研究生",
-    "type": "unknown",
-    "url": "http://yjsglxt.gzhu.edu.cn/"
-  },
-  {
     "id": "gzgs",
     "name": "广州工商学院",
     "type": "unknown",
@@ -3682,12 +3592,6 @@
     "name": "桂林理工大学",
     "type": "unknown",
     "url": "http://jw.glut.edu.cn/"
-  },
-  {
-    "id": "gsems",
-    "name": "桂林理工大学 - 研究生",
-    "type": "unknown",
-    "url": "http://gsems.glut.edu.cn/"
   },
   {
     "id": "glutnn",
@@ -5022,12 +4926,6 @@
     "url": "https://jwxt.seig.edu.cn/jwglxt/xtgl/login_slogin.html"
   },
   {
-    "id": "jwxt20182",
-    "name": "广西教职工大学分院 - 研究生",
-    "type": "zhengFang",
-    "url": "https://jwxt2018.gxu.edu.cn/jwglxt/xtgl/login_slogin.html"
-  },
-  {
     "id": "hfzy",
     "name": "合肥职业技术学院",
     "type": "zhengFang",
@@ -5622,18 +5520,6 @@
     "url": "https://cas.hbzyy.net/data/share/dev04/ssl/assets/cab/gaikuang.docx:/usr/share/nginx/html/assets/cab/jiaowu.docx"
   },
   {
-    "id": "yjsxt2",
-    "name": "湖南大学 - 研究生",
-    "type": "south",
-    "url": "http://yjsxt.hnu.edu.cn/gmis/home/stulogin"
-  },
-  {
-    "id": "yjss",
-    "name": "河海大学 - 研究生",
-    "type": "south",
-    "url": "http://yjss.hhu.edu.cn/home/stulogin#"
-  },
-  {
     "id": "urp",
     "name": "河北农业大学现代科技学院",
     "type": "unknown",
@@ -5826,18 +5712,6 @@
     "url": "http://jwgl.hist.edu.cn/cas/login.action"
   },
   {
-    "id": "gmis2",
-    "name": "湖南工商大学 - 研究生",
-    "type": "unknown",
-    "url": "https://gmis2.hutb.edu.cn/page/756770/show"
-  },
-  {
-    "id": "yjspy",
-    "name": "华中科技大学 - 研究生",
-    "type": "unknown",
-    "url": "http://yjspy.hust.edu.cn/"
-  },
-  {
     "id": "hycgy",
     "name": "湖南财经工业职业技术学院",
     "type": "unknown",
@@ -5874,18 +5748,6 @@
     "url": "http://jw.hnmeida.com.cn:6013"
   },
   {
-    "id": "home",
-    "name": "湖北中医药大学 - 研究生",
-    "type": "south",
-    "url": "http://218.197.176.171/home/stulogin"
-  },
-  {
-    "id": "gmis5",
-    "name": "河北医科大学 - 研究生",
-    "type": "south",
-    "url": "http://202.206.48.246/gmis5/(S(n01ufjze2atwrp0n0erhjt3p))/home/stulogin"
-  },
-  {
     "id": "cas74",
     "name": "杭州科技职业技术学院",
     "type": "kingo",
@@ -5904,34 +5766,16 @@
     "url": "http://jwcmis.hnie.edu.cn"
   },
   {
-    "id": "hrbcmyjs",
-    "name": "哈尔滨音乐学院 - 研究生",
-    "type": "chaoXing",
-    "url": "https://hrbcmyjs.mh.chaoxing.com/"
-  },
-  {
     "id": "a",
     "name": "淮北理工学院",
     "type": "qiangZhi",
     "url": "https://a.hblgxy.edu.cn:5111/jsxsd/"
   },
   {
-    "id": "yjsglxt2",
-    "name": "华南农业大学 - 研究生",
-    "type": "unknown",
-    "url": "https://yjsglxt.scau.edu.cn/"
-  },
-  {
     "id": "hnsoftedu",
     "name": "湖南软件职业技术大学",
     "type": "qiangZhi",
     "url": "http://jw.hnsoftedu.com/jsxsd/"
-  },
-  {
-    "id": "yjsgl3",
-    "name": "哈尔滨体育学院 - 研究生",
-    "type": "unknown",
-    "url": "http://yjsgl.hrbipe.edu.cn/EducationTS/Student/Index#"
   },
   {
     "id": "school42",
@@ -6612,34 +6456,16 @@
     "url": "http://gsxyjw.yinghuaonline.com/hrbgxxy/"
   },
   {
-    "id": "yjsjy",
-    "name": "哈尔滨师范大学 - 研究生",
-    "type": "unknown",
-    "url": "http://yjsjy.hrbnu.edu.cn/"
-  },
-  {
     "id": "jwpt",
     "name": "哈尔滨师范大学",
     "type": "unknown",
     "url": "http://jwpt.hrbnu.edu.cn/jsxsd/"
   },
   {
-    "id": "yjs2",
-    "name": "哈尔滨工程大学 - 研究生",
-    "type": "unknown",
-    "url": "http://yjs.hrbeu.edu.cn/"
-  },
-  {
     "id": "jwgl66",
     "name": "哈尔滨工程大学",
     "type": "unknown",
     "url": "https://jwgl.wvpn.hrbeu.edu.cn/jwapp/sys/wdkb/*default/index.do?EMAP_LANG=zh#/xskcb"
-  },
-  {
-    "id": "hitsz",
-    "name": "哈尔滨工业大学（深圳） - 研究生",
-    "type": "unknown",
-    "url": "http://jw.hitsz.edu.cn/"
   },
   {
     "id": "hitsz2",
@@ -7578,18 +7404,6 @@
     "url": "https://sdjwxt.syu.edu.cn/"
   },
   {
-    "id": "grd",
-    "name": "华中师范大学（研究生）",
-    "type": "unknown",
-    "url": "https://grd.ccnu.edu.cn/yjsxt/xtgl/index_initMenu.html"
-  },
-  {
-    "id": "yjs3",
-    "name": "湖南城市学院 - 研究生",
-    "type": "unknown",
-    "url": "https://yjs.hncu.edu.cn:1008/login"
-  },
-  {
     "id": "ylzyjs",
     "name": "伊犁职业技术学院",
     "type": "chaoXing",
@@ -7798,12 +7612,6 @@
     "name": "江苏大学",
     "type": "zhengFang",
     "url": "http://xuanke.ujs.edu.cn/"
-  },
-  {
-    "id": "yjsgll",
-    "name": "江苏大学 - 研究生",
-    "type": "unknown",
-    "url": "http://yjsgll.ujs.edu.cn/pyxx/Default.aspx"
   },
   {
     "id": "pass2",
@@ -8646,12 +8454,6 @@
     "url": "https://jwxt.jxfu.edu.cn/"
   },
   {
-    "id": "yjsjy2",
-    "name": "吉林农业大学 - 研究生",
-    "type": "unknown",
-    "url": "https://yjsjy.jlau.edu.cn"
-  },
-  {
     "id": "jwgl78",
     "name": "济源职业技术学院",
     "type": "kingo",
@@ -8736,18 +8538,6 @@
     "url": "https://jw.jhzyedu.cn/xtgl/login_slogin.html?"
   },
   {
-    "id": "vpn19",
-    "name": "吉林大学新研究生管理系统2022 - 研究生",
-    "type": "unknown",
-    "url": "https://vpn.jlu.edu.cn/login"
-  },
-  {
-    "id": "vpn20",
-    "name": "吉林大学(新)教务管理系统 - 研究生",
-    "type": "unknown",
-    "url": "https://vpn.jlu.edu.cn/login"
-  },
-  {
     "id": "cas116",
     "name": "江苏旅游职业学院",
     "type": "unknown",
@@ -8806,12 +8596,6 @@
     "name": "吉安幼儿师范高等专科学校",
     "type": "zhengFang",
     "url": "https://jw.japec.edu.cn//sso/lyiotlogin"
-  },
-  {
-    "id": "yjsxt3",
-    "name": "暨南大学-研究生",
-    "type": "unknown",
-    "url": "https://yjsxt.jnu.edu.cn/gsapp/sys/yjsemaphome/portal/index.do"
   },
   {
     "id": "cas117",
@@ -9336,12 +9120,6 @@
     "url": "https://authserver.lntu.edu.cn/authserver/login?service=https%3A%2F%2Fehall.lntu.edu.cn%2Flogin"
   },
   {
-    "id": "yjsgl4",
-    "name": "辽宁师范大学 - 研究生",
-    "type": "unknown",
-    "url": "https://yjsgl.lnnu.edu.cn/"
-  },
-  {
     "id": "jwgl85",
     "name": "辽宁机电职业技术学院",
     "type": "zhengFang",
@@ -9652,12 +9430,6 @@
     "name": "涟源钢铁总厂职工大学",
     "type": "unknown",
     "url": "https://lygt.web2.superchutou.com/#/login"
-  },
-  {
-    "id": "yjszs",
-    "name": "辽宁中医药大学 - 研究生",
-    "type": "south",
-    "url": "https://yjszs.lnutcm.edu.cn:7777/Gmis/home/stulogin"
   },
   {
     "id": "bowenedu",
@@ -10086,18 +9858,6 @@
     "url": "https://vpn.nynu.edu.cn/https/77726476706e69737468656265737421f1e2559434357a467b1ac7a2815b367bc2c79eb4f6aa/authserver/login?service=https%3A%2F%2Fvpn.nynu.edu.cn%2Flogin%3Fcas_login%3Dtrue"
   },
   {
-    "id": "gsmis",
-    "name": "南京理工大学 - 研究生",
-    "type": "unknown",
-    "url": "http://gsmis.njust.edu.cn/"
-  },
-  {
-    "id": "yjsxt4",
-    "name": "南方医科大学 - 研究生",
-    "type": "unknown",
-    "url": "https://yjsxt.smu.edu.cn"
-  },
-  {
     "id": "jwzx6",
     "name": "南京艺术学院",
     "type": "unknown",
@@ -10470,12 +10230,6 @@
     "url": "http://jw3.njau.edu.cn/"
   },
   {
-    "id": "myportal",
-    "name": "南京农业大学 - 研究生",
-    "type": "unknown",
-    "url": "http://myportal.njau.edu.cn/new/index.html"
-  },
-  {
     "id": "i10",
     "name": "南京医科大学",
     "type": "unknown",
@@ -10492,12 +10246,6 @@
     "name": "南京城市职业学院",
     "type": "zhengFang",
     "url": "http://jw.ncc.edu.cn/jwglxt/xtgl/"
-  },
-  {
-    "id": "ehall18",
-    "name": "南京大学 - 研究生",
-    "type": "unknown",
-    "url": "https://ehall.nju.edu.cn/ywtb-portal/official/index.html#/hall"
   },
   {
     "id": "nau",
@@ -10612,12 +10360,6 @@
     "name": "南华大学",
     "type": "qiangZhi",
     "url": "http://jwzx.usc.edu.cn:8924/"
-  },
-  {
-    "id": "home3",
-    "name": "南华大学 - 研究生",
-    "type": "unknown",
-    "url": "http://210.43.114.81:8099/home/stulogin"
   },
   {
     "id": "cas130",
@@ -10786,12 +10528,6 @@
     "name": "宁波职业技术大学",
     "type": "zhengFang",
     "url": "https://jwc.webs.nbpt.edu.cn/"
-  },
-  {
-    "id": "ehall20",
-    "name": "宁波大学 - 研究生",
-    "type": "unknown",
-    "url": "https://ehall.nbu.edu.cn/new/index.html"
   },
   {
     "id": "nbut",
@@ -11166,12 +10902,6 @@
     "url": "https://zhjwxk.cic.tsinghua.edu.cn/xklogin.do"
   },
   {
-    "id": "zhjwxk3",
-    "name": "清华大学（反馈群：807321351） - 研究生",
-    "type": "unknown",
-    "url": "https://zhjwxk.cic.tsinghua.edu.cn/xklogin.do"
-  },
-  {
     "id": "qtnu",
     "name": "琼台师范学院",
     "type": "unknown",
@@ -11364,12 +11094,6 @@
     "url": "http://jwxt.qypt.edu.cn/#/jwxt/js/student"
   },
   {
-    "id": "yjsxt5",
-    "name": "青岛理工大学 - 研究生",
-    "type": "unknown",
-    "url": "https://yjsxt.qut.edu.cn"
-  },
-  {
     "id": "ehall21",
     "name": "黔南民族师范学院",
     "type": "qiangZhi",
@@ -11404,12 +11128,6 @@
     "name": "秦皇岛职业技术学院",
     "type": "kingo",
     "url": "http://111.227.176.122:8080/cas/login.action"
-  },
-  {
-    "id": "yjsxt6",
-    "name": "青岛大学 - 研究生",
-    "type": "unknown",
-    "url": "https://yjsxt.qdu.edu.cn/dashboard"
   },
   {
     "id": "jwgl107",
@@ -11662,12 +11380,6 @@
     "name": "山东司法警官职业学院",
     "type": "zhengFang",
     "url": "http://223.99.25.206:7071/"
-  },
-  {
-    "id": "graduate2",
-    "name": "上海科技大学 - 研究生",
-    "type": "unknown",
-    "url": "https://graduate.shanghaitech.edu.cn/gsapp/sys/wdkbappshtech/*default/index.do"
   },
   {
     "id": "jwglxt50",
@@ -12732,12 +12444,6 @@
     "url": "https://jw.sandau.edu.cn/eams-shuju/login.action"
   },
   {
-    "id": "yjssys",
-    "name": "陕西师范大学 - 研究生",
-    "type": "unknown",
-    "url": "http://yjssys.snnu.edu.cn/"
-  },
-  {
     "id": "tgcep",
     "name": "三峡电力职业学院",
     "type": "unknown",
@@ -12754,18 +12460,6 @@
     "name": "绥化学院",
     "type": "unknown",
     "url": "http://jwgl.shxy.edu.cn"
-  },
-  {
-    "id": "ids20",
-    "name": "上海科技大学（旧） - 研究生",
-    "type": "unknown",
-    "url": "https://ids.shanghaitech.edu.cn/authserver/login?service=https://grad.shanghaitech.edu.cn/sso/"
-  },
-  {
-    "id": "graduate3",
-    "name": "上海科技大学（新） - 研究生",
-    "type": "unknown",
-    "url": "https://graduate.shanghaitech.edu.cn/gsapp/sys/wdkbappshtech/*default/index.do"
   },
   {
     "id": "jiaowu2023",
@@ -12790,12 +12484,6 @@
     "name": "上海工程技术大学（自动导入时间）",
     "type": "unknown",
     "url": "https://webvpn.sues.edu.cn/https/77726476706e69737468656265737421f3f652d234256d43300d8db9d6562d/cas/login?service=https%3A%2F%2Fwebvpn.sues.edu.cn%2Flogin%3Fcas_login%3Dtrue"
-  },
-  {
-    "id": "ehall23",
-    "name": "四川大学 - 研究生",
-    "type": "unknown",
-    "url": "https://ehall.scu.edu.cn/gsapp/sys/wdkbapp/*default/index.do?THEME=cherry&amp;EMAP_LANG=zh#/xskcb"
   },
   {
     "id": "jwglxt57",
@@ -12994,12 +12682,6 @@
     "name": "山东航空学院",
     "type": "urp",
     "url": "http://service.sdua.edu.cn/EIP/nonlogin/onewebsitehande/toPersonalCenterPage.htm?activePersonalHomeTab=false"
-  },
-  {
-    "id": "yjsgl5",
-    "name": "三峡大学 - 研究生",
-    "type": "south",
-    "url": "http://yjsgl.ctgu.edu.cn/gmis5/home/stulogin"
   },
   {
     "id": "school111",
@@ -13302,12 +12984,6 @@
     "url": "https://jws.syuct.edu.cn/(szhjdw554ecffbntgcq515nj)/default2.aspx"
   },
   {
-    "id": "geims",
-    "name": "沈阳化工大学 - 研究生",
-    "type": "unknown",
-    "url": "https://geims.syuct.edu.cn/"
-  },
-  {
     "id": "school113",
     "name": "沈阳医学院",
     "type": "unknown",
@@ -13338,12 +13014,6 @@
     "url": "https://jwxt.sut.edu.cn/jsxsd/"
   },
   {
-    "id": "yjsglpt",
-    "name": "沈阳工业大学 - 研究生",
-    "type": "unknown",
-    "url": "http://yjsglpt.sut.edu.cn/"
-  },
-  {
     "id": "tpass2",
     "name": "沈阳工学院",
     "type": "zhengFang",
@@ -13366,12 +13036,6 @@
     "name": "沈阳建筑大学",
     "type": "unknown",
     "url": "http://111.117.146.166/eams/loginExt.action"
-  },
-  {
-    "id": "yjsglxt3",
-    "name": "沈阳建筑大学 - 研究生",
-    "type": "unknown",
-    "url": "http://yjsglxt.sjzu.edu.cn/gsapp/sys/yjsemaphome/portal/index.do"
   },
   {
     "id": "jxw",
@@ -13542,22 +13206,10 @@
     "url": "https://jwxt.shu.edu.cn"
   },
   {
-    "id": "xk7",
-    "name": "上海大学 - 研究生",
-    "type": "unknown",
-    "url": "http://www.xk.shu.edu.cn/"
-  },
-  {
     "id": "jwxk",
     "name": "上海大学（2024新版）",
     "type": "unknown",
     "url": "https://jwxk.shu.edu.cn/"
-  },
-  {
-    "id": "yjs4",
-    "name": "上海大学（2024新版） - 研究生",
-    "type": "unknown",
-    "url": "https://yjs.shu.edu.cn/gsapp/sys/yjsemaphome/portal/index.do"
   },
   {
     "id": "nbkjw",
@@ -13680,12 +13332,6 @@
     "url": "https://his.jxjy.chaoxing.com/login"
   },
   {
-    "id": "gs",
-    "name": "石河子大学 - 研究生",
-    "type": "south",
-    "url": "http://gs.shzu.edu.cn/gmis5/student/default/index"
-  },
-  {
     "id": "rz7",
     "name": "汕头职业技术学院",
     "type": "unknown",
@@ -13767,7 +13413,7 @@
     "id": "kdcnujw",
     "name": "首都师范大学科德学院",
     "type": "qiangZhi",
-    "url": "http://kdcnujw.yinghuaonline.com/sdsfdxkdxy/"
+    "url": "http://jw.kdcnu.com/sdsfdxkdxy_jsxsd/"
   },
   {
     "id": "v3",
@@ -13914,12 +13560,6 @@
     "url": "https://sso.tec.suda.edu.cn/login?service=http%3A%2F%2Flb.tec.suda.edu.cn%2Flogin"
   },
   {
-    "id": "yjs5",
-    "name": "苏州大学 - 研究生",
-    "type": "south",
-    "url": "http://yjs.suda.edu.cn"
-  },
-  {
     "id": "xk8",
     "name": "苏州大学",
     "type": "zhengFang",
@@ -14050,12 +13690,6 @@
     "name": "天津天狮学院",
     "type": "zhengFang",
     "url": "http://jw.tianshi.edu.cn:888/jwglxt/xtgl/login_slogin.html"
-  },
-  {
-    "id": "yjsxt7",
-    "name": "天津理工大学 - 研究生",
-    "type": "unknown",
-    "url": "https://yjsxt.tjut.edu.cn/gsapp/sys/yjsemaphome/portal/index.do"
   },
   {
     "id": "schk777",
@@ -14340,12 +13974,6 @@
     "url": "http://eas.wzbc.edu.cn/jwglxt/kbcx/xskbcx_cxXskbcxIndex.html"
   },
   {
-    "id": "tongji",
-    "name": "同济大学 - 研究生",
-    "type": "unknown",
-    "url": "http://1.tongji.edu.cn/"
-  },
-  {
     "id": "tongji2",
     "name": "同济大学",
     "type": "unknown",
@@ -14590,12 +14218,6 @@
     "name": "天府新区通用航空职业学院",
     "type": "unknown",
     "url": "http://jw.tficedu.com/"
-  },
-  {
-    "id": "yjsglxt4",
-    "name": "武汉轻工大学 - 研究生",
-    "type": "unknown",
-    "url": "http://yjsglxt.whpu.edu.cn"
   },
   {
     "id": "jwglxt68",
@@ -14940,12 +14562,6 @@
     "url": "https://bkxk.whu.edu.cn/xtgl/login_slogin.html"
   },
   {
-    "id": "cas175",
-    "name": "武汉大学 - 研究生",
-    "type": "unknown",
-    "url": "https://cas.whu.edu.cn/authserver/login?service=http://yjs.whu.edu.cn/ssfw/j_spring_ids_security_check"
-  },
-  {
     "id": "whxyjwxt",
     "name": "武汉学院",
     "type": "unknown",
@@ -14992,12 +14608,6 @@
     "name": "武汉理工大学",
     "type": "unknown",
     "url": "https://jwxt.whut.edu.cn"
-  },
-  {
-    "id": "yjsgl6",
-    "name": "武汉理工大学 - 研究生",
-    "type": "unknown",
-    "url": "https://yjsgl.whut.edu.cn"
   },
   {
     "id": "whsw",
@@ -15210,12 +14820,6 @@
     "url": "http://jw.whcibe.com/"
   },
   {
-    "id": "yjsjy3",
-    "name": "温州医科大学 - 研究生",
-    "type": "unknown",
-    "url": "https://yjsjy.wmu.edu.cn/"
-  },
-  {
     "id": "xxmzyjwc",
     "name": "湘西民族职业技术学院",
     "type": "unknown",
@@ -15290,12 +14894,6 @@
   {
     "id": "xmu2",
     "name": "厦门大学（教务）",
-    "type": "unknown",
-    "url": "https://jw.xmu.edu.cn/new/index.html"
-  },
-  {
-    "id": "xmu3",
-    "name": "厦门大学 - 研究生",
     "type": "unknown",
     "url": "https://jw.xmu.edu.cn/new/index.html"
   },
@@ -16128,12 +15726,6 @@
     "url": "http://ehall.xidian.edu.cn/new/index.html"
   },
   {
-    "id": "yjspt",
-    "name": "西安电子科技大学 - 研究生",
-    "type": "unknown",
-    "url": "http://yjspt.xidian.edu.cn/"
-  },
-  {
     "id": "ids26",
     "name": "西安石油大学",
     "type": "unknown",
@@ -16266,18 +15858,6 @@
     "url": "http://59.75.8.190:8081/xafyjw/cas/login.action"
   },
   {
-    "id": "yjsxt8",
-    "name": "中国矿业大学 - 研究生",
-    "type": "unknown",
-    "url": "http://yjsxt.cumt.edu.cn"
-  },
-  {
-    "id": "yjspy2",
-    "name": "新疆大学 - 研究生",
-    "type": "unknown",
-    "url": "http://yjspy.xju.edu.cn"
-  },
-  {
     "id": "dean2",
     "name": "西南科技大学",
     "type": "unknown",
@@ -16300,12 +15880,6 @@
     "name": "信阳农林学院",
     "type": "kingo",
     "url": "https://sso.xyafu.edu.cn/sso/login?service=https%3A%2F%2Fjwgl.xyafu.edu.cn%2Fcaslogin"
-  },
-  {
-    "id": "gmis",
-    "name": "西安交通大学 - 研究生",
-    "type": "unknown",
-    "url": "http://gmis.xjtu.edu.cn/pyxx/pygl/xskbcx"
   },
   {
     "id": "manager",
@@ -16356,18 +15930,6 @@
     "url": "http://210.43.24.144/jwglxt/xtgl/login_slogin.html?time=1759055198719"
   },
   {
-    "id": "yjsxt9",
-    "name": "西北大学 - 研究生",
-    "type": "unknown",
-    "url": "http://yjsxt.nwu.edu.cn"
-  },
-  {
-    "id": "yjsinfo",
-    "name": "西南大学 - 研究生",
-    "type": "unknown",
-    "url": "http://yjsinfo.swu.edu.cn"
-  },
-  {
     "id": "xmcu",
     "name": "厦门城市职业学院",
     "type": "kingo",
@@ -16378,18 +15940,6 @@
     "name": "新乡职业技术学院",
     "type": "kingo",
     "url": "https://authserver.xxvtc.edu.cn/authserver/login?service=https%3A%2F%2Fehall.xxvtc.edu.cn%3A443%2Flogin%3Fservice%3Dhttps%3A%2F%2Fehall.xxvtc.edu.cn%2Fywtb-portal%2FLite%2Findex.html%23%2Fhome%2FLite_home"
-  },
-  {
-    "id": "gmis3",
-    "name": "西安建筑科技大学 - 研究生",
-    "type": "unknown",
-    "url": "https://gmis.xauat.edu.cn/pyxx"
-  },
-  {
-    "id": "ecampus",
-    "name": "西北工业大学 - 研究生",
-    "type": "unknown",
-    "url": "https://ecampus.nwpu.edu.cn/main.html#/Index"
   },
   {
     "id": "cas192",
@@ -16480,12 +16030,6 @@
     "name": "云南国防工业职业技术学院",
     "type": "chaoXing",
     "url": "https://ynou.jw.chaoxing.com/admin/"
-  },
-  {
-    "id": "authserver107",
-    "name": "延边大学 - 研究生",
-    "type": "south",
-    "url": "https://authserver.ybu.edu.cn/authserver/login?service=https%3A%2F%2Fportal.ybu.edu.cn%2Flogin%3Fservice%3Dhttps%3A%2F%2Fportal.ybu.edu.cn%2Fywtb-portal%2Fofficial%2Findex.html"
   },
   {
     "id": "emis",
@@ -16692,12 +16236,6 @@
     "url": "http://ynnubsjw.minghuaetc.com/ynsfdxsxy/"
   },
   {
-    "id": "yjsms",
-    "name": "云南师范大学 - 研究生",
-    "type": "south",
-    "url": "https://yjsms.ynnu.edu.cn/home/login"
-  },
-  {
     "id": "jwmis10",
     "name": "云南师范大学",
     "type": "unknown",
@@ -16768,12 +16306,6 @@
     "name": "烟台南山学院",
     "type": "kingo",
     "url": "https://jw.nanshan.edu.cn/cas/login.action"
-  },
-  {
-    "id": "gsglxt",
-    "name": "燕山大学 - 研究生",
-    "type": "unknown",
-    "url": "http://gsglxt.ysu.edu.cn/pyxx/login.aspx"
   },
   {
     "id": "sso63",
@@ -17496,12 +17028,6 @@
     "url": "https://jw.v.zzu.edu.cn/eams/login.action"
   },
   {
-    "id": "gs2",
-    "name": "郑州大学 - 研究生",
-    "type": "unknown",
-    "url": "http://gs2.zzu.edu.cn/"
-  },
-  {
     "id": "portal21",
     "name": "郑州工业应用技术学院",
     "type": "zhengFang",
@@ -17622,12 +17148,6 @@
     "url": "https://jw.ustc.edu.cn/login"
   },
   {
-    "id": "ygl",
-    "name": "中国药科大学 - 研究生",
-    "type": "south",
-    "url": "http://ygl.cpu.edu.cn/gmis5/oauthLogin/zgyk"
-  },
-  {
     "id": "school142",
     "name": "湛江幼儿师范专科学校",
     "type": "urp",
@@ -17706,50 +17226,14 @@
     "url": "https://sep.ucas.ac.cn"
   },
   {
-    "id": "sep2",
-    "name": "中国科学院大学 - 研究生",
-    "type": "unknown",
-    "url": "https://sep.ucas.ac.cn"
-  },
-  {
-    "id": "degrees",
-    "name": "中国石油大学（华东） - 研究生",
-    "type": "unknown",
-    "url": "https://degrees.upc.edu.cn"
-  },
-  {
-    "id": "yjsglxt5",
-    "name": "中国矿业大学（北京） - 研究生",
-    "type": "unknown",
-    "url": "http://yjsglxt.cumtb.edu.cn"
-  },
-  {
-    "id": "epo",
-    "name": "中国地质大学（武汉） - 研究生",
-    "type": "unknown",
-    "url": "http://epo.cug.edu.cn/"
-  },
-  {
     "id": "cppu",
     "name": "中国人民警察大学",
     "type": "unknown",
     "url": "https://jw.cppu.edu.cn/index.html"
   },
   {
-    "id": "ca10",
-    "name": "中国政法大学 - 研究生",
-    "type": "unknown",
-    "url": "http://ca.cupl.edu.cn/tpass/login?service=http%3A%2F%2Fv.cupl.edu.cn%2Ftp_up%2Fview%3Fm%3Dup#act=portal/viewhome"
-  },
-  {
     "id": "v5",
     "name": "中国人民大学",
-    "type": "unknown",
-    "url": "https://v.ruc.edu.cn/"
-  },
-  {
-    "id": "v6",
-    "name": "中国人民大学（微人大） - 研究生",
     "type": "unknown",
     "url": "https://v.ruc.edu.cn/"
   },
@@ -17794,18 +17278,6 @@
     "name": "郑州铁路职业技术学院",
     "type": "kingo",
     "url": "https://sec.zzrvtc.edu.cn/webvpn/LjIwNC4yMTUuMjE4LjE2My4xNjg=/LjE5OS4xOTYuMjE3Ljk3LjE3NS4xNzcuMjE2LjIxNS4xNjkuMTQ4LjE0OC4xNTUuMTQ4LjE3Mi4xMDIuMTk5LjE2Ng==/login?service=https%3A%2F%2Fsec.zzrvtc.edu.cn%2Frump_frontend%2FloginFromCas%2F"
-  },
-  {
-    "id": "gmsstu",
-    "name": "中国农业大学 - 研究生",
-    "type": "south",
-    "url": "https://gmsstu.cau.edu.cn/logon"
-  },
-  {
-    "id": "yjs1",
-    "name": "中国科学技术大学 - 研究生",
-    "type": "unknown",
-    "url": "https://yjs1.ustc.edu.cn"
   },
   {
     "id": "cas217",
@@ -17952,12 +17424,6 @@
     "url": "http://jwxt.sysu.edu.cn/jwxt/"
   },
   {
-    "id": "yjsjy4",
-    "name": "中央财经大学 - 研究生",
-    "type": "zhengFang",
-    "url": "https://yjsjy.webvpn.cufe.edu.cn/yjsxt/xtgl/login_slogin.html"
-  },
-  {
     "id": "xuanke4",
     "name": "中央财经大学",
     "type": "zhengFang",
@@ -18100,18 +17566,6 @@
     "name": "中国传媒大学",
     "type": "unknown",
     "url": "https://bkjw.cuc.edu.cn/"
-  },
-  {
-    "id": "v7",
-    "name": "中国人民大学 - 研究生",
-    "type": "unknown",
-    "url": "https://v.ruc.edu.cn/"
-  },
-  {
-    "id": "i15",
-    "name": "中原工学院 - 研究生",
-    "type": "unknown",
-    "url": "http://i.zut.edu.cn/new/index.html"
   },
   {
     "id": "xsxk2",
