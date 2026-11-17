@@ -151,6 +151,7 @@ struct ScheduleImportView: View {
                     csvImportView
                 }
             }
+            .schedyPageStyle()
             .navigationTitle("导入课表")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -621,7 +622,7 @@ struct ScheduleImportView: View {
                         .foregroundStyle(.secondary)
                         .padding(8)
                         .frame(maxWidth: .infinity)
-                        .background(.ultraThinMaterial)
+                        .background(SchedyAppearance.background)
                     AcademicAffairsWebView(
                         initialURL: config.entryURL,
                         academicAffairsType: config.academicAffairsType,

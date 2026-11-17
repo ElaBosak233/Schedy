@@ -72,6 +72,7 @@ struct PermissionsView: View {
                 Text("通知权限用于在课程开始前 15 分钟提醒你；网络用于加载教务系统、开源链接等，随系统网络状态使用。若需修改通知权限，可点击「在系统设置中修改」跳转。")
             }
         }
+        .schedyPageStyle()
         .navigationTitle("权限")
         .navigationBarTitleDisplayMode(.inline)
         .task {

@@ -78,6 +78,7 @@ struct SettingsRootView: View {
                 Text("关于")
             }
         }
+        .schedyPageStyle(navigationBackground: .automatic)
         .navigationTitle("设置")
         .navigationBarTitleDisplayMode(.large)
     }

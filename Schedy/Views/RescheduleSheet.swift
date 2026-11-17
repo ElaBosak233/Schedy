@@ -117,6 +117,7 @@ struct RescheduleSheet: View {
                     }
                 }
             }
+            .schedyPageStyle()
             .navigationTitle("调课")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

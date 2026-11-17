@@ -49,36 +49,43 @@ private struct TodayCourseCard: View {
                         .clipShape(Capsule())
                 }
 
-                HStack(spacing: 16) {
-                    if let t = course.teacher, !t.isEmpty {
-                        Label(t, systemImage: "person.fill")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    if let loc = course.location, !loc.isEmpty {
-                        Label(loc, systemImage: "mappin.circle.fill")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    if let credits = course.credits {
-                        Label(String(format: "%g", credits) + " 学分", systemImage: "number.circle.fill")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+                ViewThatFits(in: .horizontal) {
+                    courseDetails(axis: .horizontal)
+                    courseDetails(axis: .vertical)
                 }
             }
             .padding(16)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(.secondarySystemGroupedBackground))
+            .background(SchedyAppearance.surface)
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         }
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
     }
+
+    private func courseDetails(axis: Axis) -> some View {
+        let layout = axis == .horizontal
+            ? AnyLayout(HStackLayout(spacing: 16))
+            : AnyLayout(VStackLayout(alignment: .leading, spacing: 6))
+        return layout {
+            if let teacher = course.teacher, !teacher.isEmpty {
+                Label(teacher, systemImage: "person.fill")
+            }
+            if let location = course.location, !location.isEmpty {
+                Label(location, systemImage: "mappin.circle.fill")
+            }
+            if let credits = course.credits {
+                Label(String(format: "%g", credits) + " 学分", systemImage: "number.circle.fill")
+            }
+        }
+        .font(.caption)
+        .foregroundStyle(.secondary)
+    }
 }
 
 struct TodayView: View {
     @Environment(\.modelContext) private var modelContext
+    @ScaledMetric(relativeTo: .body) private var minimumCardWidth: CGFloat = 320
     @Query(sort: \Schedule.name) private var schedules: [Schedule]
     @Query(sort: \TimeSlotPreset.name) private var presets: [TimeSlotPreset]
     @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = "我的课程表"
@@ -148,32 +155,45 @@ struct TodayView: View {
                 if effectiveOccurrences.isEmpty {
                     emptyState
                 } else {
-                    ScrollView {
-                        LazyVStack(spacing: 12) {
-                            Text(todayDateString)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.bottom, 4)
+                    GeometryReader { geometry in
+                        ScrollView {
+                            VStack(spacing: 12) {
+                                Text(todayDateString)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.bottom, 4)
 
-                            ForEach(effectiveOccurrences) { occurrence in
-                                TodayCourseCard(
-                                    course: occurrence.course,
-                                    periodStart: occurrence.periodStart,
-                                    periodEnd: occurrence.periodEnd,
-                                    timeRangeString: timeRangeString(periodStart: occurrence.periodStart, periodEnd: occurrence.periodEnd)
-                                )
+                                LazyVGrid(
+                                    columns: [GridItem(
+                                        .adaptive(minimum: min(minimumCardWidth, max(1, geometry.size.width - 32))),
+                                        spacing: 16,
+                                        alignment: .top
+                                    )],
+                                    alignment: .leading,
+                                    spacing: 16
+                                ) {
+                                    ForEach(effectiveOccurrences) { occurrence in
+                                        TodayCourseCard(
+                                            course: occurrence.course,
+                                            periodStart: occurrence.periodStart,
+                                            periodEnd: occurrence.periodEnd,
+                                            timeRangeString: timeRangeString(periodStart: occurrence.periodStart, periodEnd: occurrence.periodEnd)
+                                        )
+                                    }
+                                }
                             }
+                            .frame(maxWidth: 960)
+                            .padding(.horizontal, 16)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .padding(.bottom, 24)
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 12)
-                        .padding(.bottom, 24)
                     }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .scrollContentBackground(.hidden)
-            .background(Color.clear)
+            .schedyPageStyle()
             .navigationTitle("今天")
             .navigationBarTitleDisplayMode(.large)
             .onAppear {

@@ -73,6 +73,7 @@ struct ScheduleDisplaySettingsView: View {
                 Text("选择周日或周一作为课表最左侧的列。")
             }
         }
+        .schedyPageStyle()
         .navigationTitle("课表显示")
         .navigationBarTitleDisplayMode(.inline)
     }

@@ -211,6 +211,7 @@ struct CourseEditSheet: View {
                     .disabled(sortedPeriods.isEmpty)
                 }
             }
+            .schedyPageStyle()
             .navigationTitle(isEditing ? "编辑课程" : "添加课程")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -57,7 +57,7 @@ struct AcademicAffairsWebView: View {
             .disabled(urlBarText.trimmingCharacters(in: .whitespaces).isEmpty)
         }
         .padding(8)
-        .background(.ultraThinMaterial)
+        .background(SchedyAppearance.background)
     }
 
     private func tryLoadURL() {

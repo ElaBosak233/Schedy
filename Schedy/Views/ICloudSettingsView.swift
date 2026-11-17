@@ -102,6 +102,7 @@ struct ICloudSettingsView: View {
                 Text("清除本设备上的所有课程表与时间段数据，并重新创建默认课程表。iCloud 中的数据不受影响。")
             }
         }
+        .schedyPageStyle(navigationBackground: .automatic)
         .navigationTitle("数据同步")
         .navigationBarTitleDisplayMode(.large)
         // 关闭 iCloud 确认

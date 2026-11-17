@@ -35,6 +35,7 @@ struct ScheduleListView: View {
                 Text("点击选择当前使用的课程表。每张课程表可单独设置名称、学期第一天与绑定的时间段；小组件选哪张课表即使用该课表的时间段。")
             }
         }
+        .schedyPageStyle(navigationBackground: .automatic)
         .navigationTitle("课程表")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
@@ -171,6 +172,7 @@ struct ScheduleEditSheet: View {
                     }
                 }
             }
+            .schedyPageStyle()
             .navigationTitle(isEditing ? "编辑课程表" : "新建课程表")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {

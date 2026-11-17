@@ -115,6 +115,7 @@ struct ScheduleGridView: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
+    @ScaledMetric(relativeTo: .caption) private var minimumDayWidth: CGFloat = 44
     @Query(sort: \Schedule.name) private var schedules: [Schedule]
     @Query(sort: \TimeSlotPreset.name) private var presets: [TimeSlotPreset]
     @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = "我的课程表"
@@ -126,10 +127,10 @@ struct ScheduleGridView: View {
 
     /// 当前查看的周次（1-based），左右滑动切换
     @State private var viewingWeek: Int = 1
+    @State private var hasSelectedInitialWeek = false
     @State private var showAddCourse = false
     @State private var showScheduleImport = false
     @State private var showScheduleExport = false
-    @State private var showHeaderMenu = false
     /// 导出：生成 CSV 后要分享的临时文件 URL，非 nil 时弹出系统分享面板
     @State private var shareExportURL: ShareableExportItem?
     /// 点击课程块时带来源周与是否「非本周」，保证调课周次与点击一致；半透明课程仅展示卡片
@@ -166,9 +167,10 @@ struct ScheduleGridView: View {
     /// 课表显示周数：1 到 effectiveMaxWeeks（有课的最大周 + 1，空课表为 1 周）
     private var effectiveMaxWeeks: Int { activeSchedule?.effectiveMaxWeeks ?? 1 }
 
-    private let rowHeight: CGFloat = 64
+    @ScaledMetric(relativeTo: .caption) private var rowHeight: CGFloat = 64
     /// 时间列宽度，表头/表格行/课程块 overlay 共用，保证对齐
-    private let timeColumnWidth: CGFloat = 48
+    @ScaledMetric(relativeTo: .caption2) private var timeColumnWidth: CGFloat = 48
+    @ScaledMetric(relativeTo: .caption) private var dayHeaderHeight: CGFloat = 56
 
     /// 根据学期第一天计算「第 week 周、周 day」对应的日期（周一=1）
     private func date(forWeek week: Int, day: Int) -> Date? {
@@ -234,22 +236,51 @@ struct ScheduleGridView: View {
 
     var body: some View {
         NavigationStack {
-            TabView(selection: $viewingWeek) {
-                ForEach(1...effectiveMaxWeeks, id: \.self) { week in
-                    scheduleTable(week: week, viewingWeek: viewingWeek)
-                        .tag(week)
+            GeometryReader { geometry in
+                let minimumWidth = timeColumnWidth + minimumDayWidth * CGFloat(displayDayIndices.count)
+                let needsHorizontalScroll = geometry.size.width < minimumWidth
+                if needsHorizontalScroll {
+                    ScrollView(.horizontal) {
+                        scheduleTable(week: viewingWeek)
+                            .frame(width: minimumWidth, height: geometry.size.height)
+                    }
+                } else {
+                    ScrollViewReader { proxy in
+                        ScrollView(.horizontal) {
+                            LazyHStack(spacing: 0) {
+                                ForEach(1...effectiveMaxWeeks, id: \.self) { week in
+                                    scheduleTable(week: week)
+                                        .containerRelativeFrame(.horizontal)
+                                        .frame(height: geometry.size.height)
+                                        .id(week)
+                                }
+                            }
+                            .scrollTargetLayout()
+                        }
+                        .scrollTargetBehavior(.paging)
+                        .scrollPosition(id: weekScrollPosition, anchor: .leading)
+                        .scrollIndicators(.hidden)
+                        .task(id: geometry.size.width) {
+                            // 等待新页宽完成布局，再按当前周对齐，避免沿用旧像素偏移。
+                            await Task.yield()
+                            guard !Task.isCancelled else { return }
+                            proxy.scrollTo(viewingWeek, anchor: .leading)
+                        }
+                    }
                 }
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            .animation(.easeInOut(duration: 0.15), value: viewingWeek)
+            .background(SchedyAppearance.scheduleBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .padding(.horizontal, 8)
+            .padding(.bottom, 8)
             .sensoryFeedback(.impact(weight: .light), trigger: viewingWeek)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .safeAreaInset(edge: .top, spacing: 0) {
-                floatingHeader
+                weekIndicator
             }
-            .scrollContentBackground(.hidden)
-            .background(Color.clear)
-            .navigationBarHidden(true)
+            .schedyPageStyle()
+            .navigationTitle(activeSchedule?.name ?? "课程表")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { scheduleToolbar }
             .sheet(isPresented: $showScheduleImport) {
                 ScheduleImportView()
             }
@@ -285,17 +316,6 @@ struct ScheduleGridView: View {
             .sheet(item: $courseToEdit) { c in
                 CourseEditSheet(course: c, schedule: activeSchedule, preset: activePreset)
             }
-            .sheet(isPresented: $showHeaderMenu) {
-                HeaderMenuSheet(
-                    schedules: schedules,
-                    activeScheduleName: activeScheduleName,
-                    onSelectSchedule: { activeScheduleName = $0; showHeaderMenu = false },
-                    onAddCourse: { showHeaderMenu = false; showAddCourse = true },
-                    onImport: { showHeaderMenu = false; showScheduleImport = true },
-                    onExport: { showHeaderMenu = false; showScheduleExport = true },
-                    onDismiss: { showHeaderMenu = false }
-                )
-            }
             .sheet(item: $shareExportURL) { item in
                 ShareExportSheet(fileURL: item.url) {
                     shareExportURL = nil
@@ -306,7 +326,10 @@ struct ScheduleGridView: View {
                 if activeScheduleName.isEmpty {
                     activeScheduleName = schedules.first?.name ?? "我的课程表"
                 }
-                viewingWeek = defaultViewingWeek
+                if !hasSelectedInitialWeek {
+                    viewingWeek = defaultViewingWeek
+                    hasSelectedInitialWeek = true
+                }
                 refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
                 scheduleCourseReminders(modelContext: modelContext)
                 // 延迟再刷一次，确保 @Query 已就绪、数据已写入 App Group，小组件能读到
@@ -320,6 +343,9 @@ struct ScheduleGridView: View {
                 refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
                 scheduleCourseReminders(modelContext: modelContext)
             }
+            .onChange(of: effectiveMaxWeeks) { _, maxWeeks in
+                viewingWeek = min(viewingWeek, maxWeeks)
+            }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active {
                     refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
@@ -329,57 +355,123 @@ struct ScheduleGridView: View {
         }
     }
 
-    /// 悬浮于内容之上的顶部栏：标题 + 菜单、今日/周次、左右滑动提示（毛玻璃，提高信息密度）
-    private var floatingHeader: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                Text(activeSchedule?.name ?? "课程表")
-                    .font(.headline)
-                    .lineLimit(1)
-                    .frame(maxWidth: .infinity)
-                HStack {
-                    if onDismiss != nil {
-                        Button("关闭") {
-                            onDismiss?()
+    // 交给系统摆放按钮，Duo 的侧边工具栏也能自动避开相机和折叠区域。
+    @ToolbarContentBuilder
+    private var scheduleToolbar: some ToolbarContent {
+        if let onDismiss {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("关闭", action: onDismiss)
+            }
+        }
+        ToolbarItem(placement: .primaryAction) {
+            Button { showAddCourse = true } label: {
+                Label("添加课程", systemImage: "plus")
+            }
+        }
+        ToolbarItem(placement: .primaryAction) {
+            Menu {
+                Button { showScheduleImport = true } label: {
+                    Label("导入课表", systemImage: "square.and.arrow.down")
+                }
+                Button { showScheduleExport = true } label: {
+                    Label("导出课表", systemImage: "square.and.arrow.up")
+                }
+                .disabled(activeSchedule == nil)
+                Section("切换课程表") {
+                    ForEach(schedules, id: \.name) { schedule in
+                        Button {
+                            activeScheduleName = schedule.name
+                        } label: {
+                            if schedule.name == activeSchedule?.name {
+                                Label(schedule.name, systemImage: "checkmark")
+                            } else {
+                                Text(schedule.name)
+                            }
                         }
                     }
-                    Spacer(minLength: 0)
-                    Button {
-                        showHeaderMenu = true
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                            .font(.title3)
-                    }
+                }
+            } label: {
+                Label("课表管理", systemImage: "slider.horizontal.3")
+            }
+        }
+    }
+
+    /// 以周次标识保持分页位置，宽窄布局切换时不让新分页容器重置为第一页。
+    private var weekScrollPosition: Binding<Int?> {
+        Binding(
+            get: { viewingWeek },
+            set: { week in
+                if let week {
+                    viewingWeek = min(max(1, week), effectiveMaxWeeks)
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            weekIndicator
-        }
-        .background(.ultraThinMaterial)
+        )
     }
 
-    /// 当前周次指示 + 左右滑动提示
+    private func changeWeek(by offset: Int) {
+        viewingWeek = min(max(1, viewingWeek + offset), effectiveMaxWeeks)
+    }
+
+    /// 周次属于内容上下文；按钮由系统工具栏负责摆放。
     private var weekIndicator: some View {
-        HStack {
-            Text("第 \(viewingWeek) 周")
-                .font(.subheadline)
-                .fontWeight(.semibold)
-                .foregroundStyle(.secondary)
-            Spacer()
-            Text(todayDateString)
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .foregroundStyle(.primary)
-            Text(semesterWeekStatusString)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
+        ViewThatFits(in: .horizontal) {
+            HStack {
+                weekPicker
+                Spacer(minLength: 8)
+                Text(todayDateString)
+                Text(semesterWeekStatusString)
+                    .foregroundStyle(.secondary)
+            }
+            VStack(alignment: .leading, spacing: 4) {
+                weekPicker
+                Text("\(todayDateString) · \(semesterWeekStatusString)")
+                    .foregroundStyle(.secondary)
+            }
         }
+        .font(.subheadline)
         .padding(.horizontal, 16)
-        .padding(.vertical, 10)
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(SchedyAppearance.background)
     }
 
-    private func scheduleTable(week: Int, viewingWeek: Int) -> some View {
+    private var weekPicker: some View {
+        Menu {
+            Section {
+                Button { changeWeek(by: -1) } label: {
+                    Label("上一周", systemImage: "chevron.left")
+                }
+                .disabled(viewingWeek <= 1)
+                Button { changeWeek(by: 1) } label: {
+                    Label("下一周", systemImage: "chevron.right")
+                }
+                .disabled(viewingWeek >= effectiveMaxWeeks)
+                Button { viewingWeek = defaultViewingWeek } label: {
+                    Label("回到本周", systemImage: "calendar.badge.clock")
+                }
+            }
+            Section("跳转周次") {
+                Picker("查看周次", selection: $viewingWeek) {
+                    ForEach(1...effectiveMaxWeeks, id: \.self) { week in
+                        Text("第 \(week) 周").tag(week)
+                    }
+                }
+                .pickerStyle(.inline)
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Text("第 \(viewingWeek) 周")
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.caption2)
+            }
+            .frame(minHeight: 28)
+        }
+        .fixedSize()
+        .accessibilityLabel("查看周次")
+        .accessibilityValue("第 \(viewingWeek) 周")
+    }
+
+    private func scheduleTable(week: Int) -> some View {
         let grid = WeekCourseGrid(week: week, schedule: activeSchedule, sortedSlots: sortedSlots, maxWeeks: effectiveMaxWeeks)
         return VStack(spacing: 0) {
             // 固定表头：不随滚动
@@ -389,7 +481,7 @@ struct ScheduleGridView: View {
                     dayHeader(day: day, week: week)
                 }
             }
-            .background(.ultraThinMaterial)
+            .background(SchedyAppearance.scheduleBackground)
 
             if showHorizontalLines {
                 Divider().opacity(0.6)
@@ -411,10 +503,8 @@ struct ScheduleGridView: View {
                     .padding(.bottom, 24)
                 }
                 .frame(maxHeight: .infinity)
-                .onAppear {
-                    if viewingWeek == week {
-                        proxy.scrollTo("top", anchor: .top)
-                    }
+                .onChange(of: week) { _, _ in
+                    proxy.scrollTo("top", anchor: .top)
                 }
             }
         }
@@ -498,7 +588,7 @@ struct ScheduleGridView: View {
                 .fontWeight(.semibold)
                 .foregroundStyle(.secondary)
         }
-        .frame(width: timeColumnWidth, height: 56)
+        .frame(width: timeColumnWidth, height: dayHeaderHeight)
     }
 
     private func dayHeader(day: Int, week: Int) -> some View {
@@ -512,7 +602,7 @@ struct ScheduleGridView: View {
                 .foregroundStyle(.tertiary)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 56)
+        .frame(height: dayHeaderHeight)
         .overlay(alignment: .leading) {
             if showVerticalLines { verticalDivider }
         }
@@ -644,7 +734,7 @@ private struct CoursePreviewSheet: View {
                         .padding(24)
                     }
                     .listRowInsets(EdgeInsets(top: 16, leading: 20, bottom: 8, trailing: 20))
-                    .listRowBackground(Color(.secondarySystemGroupedBackground))
+                    .listRowBackground(SchedyAppearance.surface)
                 }
                 if !isNotThisWeek {
                     Section {
@@ -656,8 +746,7 @@ private struct CoursePreviewSheet: View {
                     }
                 }
             }
-            .scrollContentBackground(.hidden)
-            .background(Color(.systemGroupedBackground))
+            .schedyPageStyle()
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -726,88 +815,14 @@ private struct ShareExportSheet: View {
                 .buttonStyle(.bordered)
             }
             .padding()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .schedyPageStyle()
             .navigationTitle("导出课表")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("关闭") {
                         onComplete()
-                        dismiss()
-                    }
-                }
-            }
-        }
-    }
-}
-
-// MARK: - 顶部栏菜单 Sheet（替代 Menu，避免 safeAreaInset 内 Menu 触发的 _UIReparentingView 警告）
-private struct HeaderMenuSheet: View {
-    let schedules: [Schedule]
-    let activeScheduleName: String
-    let onSelectSchedule: (String) -> Void
-    let onAddCourse: () -> Void
-    let onImport: () -> Void
-    let onExport: () -> Void
-    let onDismiss: () -> Void
-    @Environment(\.dismiss) private var dismiss
-
-    private var activeSchedule: Schedule? {
-        schedules.first { $0.name == activeScheduleName } ?? schedules.first
-    }
-
-    var body: some View {
-        NavigationStack {
-            List {
-                Section {
-                    Button {
-                        onAddCourse()
-                        dismiss()
-                    } label: {
-                        Label("添加课程", systemImage: "plus.circle.fill")
-                    }
-                    Button {
-                        onImport()
-                        dismiss()
-                    } label: {
-                        Label("导入课表", systemImage: "square.and.arrow.down")
-                    }
-                }
-                Section {
-                    Button {
-                        onExport()
-                        dismiss()
-                    } label: {
-                        Label("导出课表", systemImage: "square.and.arrow.up")
-                    }
-                }
-                if !schedules.isEmpty {
-                    Section {
-                        ForEach(schedules, id: \Schedule.name) { (s: Schedule) in
-                            Button {
-                                onSelectSchedule(s.name)
-                                dismiss()
-                            } label: {
-                                HStack {
-                                    Text(s.name)
-                                    Spacer()
-                                    if s.name == activeScheduleName {
-                                        Image(systemName: "checkmark.circle.fill")
-                                            .foregroundStyle(.green)
-                                    }
-                                }
-                            }
-                        }
-                    } header: {
-                        Text("切换课程表")
-                    }
-                }
-            }
-            .navigationTitle("操作")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("取消") {
-                        onDismiss()
                         dismiss()
                     }
                 }

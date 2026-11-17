@@ -38,6 +38,7 @@ struct TimeSlotsSettingsView: View {
 
     var body: some View {
         listContent
+            .schedyPageStyle(navigationBackground: .automatic)
             .navigationTitle("时间段")
             .navigationBarTitleDisplayMode(.large)
             .toolbar { toolbarContent }
@@ -311,6 +312,7 @@ struct PresetRenameSheet: View {
             Form {
                 TextField("时间段名称", text: $name)
             }
+            .schedyPageStyle()
             .navigationTitle("编辑时间段")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear { name = preset.name }
@@ -378,6 +380,7 @@ struct TimeSlotEditView: View {
                 DatePicker("结束", selection: endDateBinding(), displayedComponents: .hourAndMinute)
             }
         }
+        .schedyPageStyle()
         .navigationTitle("编辑时间段")
         .navigationBarTitleDisplayMode(.inline)
         .onDisappear {

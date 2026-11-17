@@ -95,6 +95,7 @@ struct AboutView: View {
                 Text("本软件采用 Schedy 开源协议。可自由使用、修改与基于本代码开发衍生产品；须保留原作者署名，衍生产品须开源；以应用形式分发须通过 App Store。详见仓库 LICENSE。")
             }
         }
+        .schedyPageStyle()
         .navigationTitle("关于")
         .navigationBarTitleDisplayMode(.inline)
     }

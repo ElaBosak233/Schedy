@@ -53,6 +53,7 @@ struct ScheduleExportView: View {
                 }
             }
             .listStyle(.insetGrouped)
+            .schedyPageStyle()
             .navigationTitle("导出课表")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
