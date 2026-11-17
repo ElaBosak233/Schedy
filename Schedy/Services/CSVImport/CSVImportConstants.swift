@@ -10,42 +10,45 @@ import Foundation
 /// CSV 导入使用的模板与说明文案
 enum CSVImportConstants {
     /// CSV 模板内容（UTF-8，可用 Excel 打开）
-    static let templateContent: String = """
-课程名,教师,地点,学分,周次,单双周,星期,起始节,结束节
-高等数学,张老师,教学楼A101,4.0,1-16,全部,1,1,2
-大学英语,李老师,教学楼B201,2.0,1-16,全部,3,3,4
-程序设计,王老师,实验楼C301,3.0,1-8,单周,5,5,
-"""
+    static let templateContent: String = String(
+        localized: "import.csv.template.content",
+        defaultValue: """
+        课程名,教师,地点,学分,周次,单双周,星期,起始节,结束节
+        Calculus,Dr. Smith,A101,4.0,1-16,all,1,1,2
+        English,Dr. Lee,B201,2.0,1-16,all,3,3,4
+        Programming,Dr. Wang,C301,3.0,1-8,odd,5,5,
+        """
+    )
 
     /// 用于复制到剪贴板的 LLM Prompt，用户可粘贴到 ChatGPT/Claude 等，让 LLM 根据课表生成 CSV
-    static let llmPrompt: String = """
-    请根据我提供的课表信息，生成符合以下格式的 CSV 文件，用于导入 Schedy 课程表 App。
+    static let llmPrompt: String = String(
+        localized: "import.csv.prompt.content",
+        defaultValue: """
+        Generate a CSV file from the timetable information I provide, for import into Schedy: Timetable.
 
-    ## CSV 格式说明
+        CSV format:
+        - Keep this exact header (the Chinese column names are required by the import format):
+          课程名,教师,地点,学分,周次,单双周,星期,起始节,结束节
+        - Columns, in order:
+          1. Course name: required; preserve the original name.
+          2. Teacher: optional.
+          3. Location: optional.
+          4. Credits: optional number, e.g. 4.0. Use a decimal point.
+          5. Weeks: optional, e.g. 1-16. For multiple ranges, quote the cell: "1-1,5-8". Default: 1-1.
+          6. Week pattern: all, odd, or even. Default: all.
+          7. Weekday: required, 1=Monday through 7=Sunday.
+          8. Start period: required, starting from 1.
+          9. End period: optional; leave empty for a single period.
 
-    - **表头**（第一行，必须保留）：
-      课程名,教师,地点,学分,周次,单双周,星期,起始节,结束节
+        Examples:
+        Calculus,Dr. Smith,A101,4.0,1-16,all,1,1,2
+        English,Dr. Lee,,2.0,1-16,all,3,3,
 
-    - **列含义**：
-      - 课程名：必填
-      - 教师：选填
-      - 地点：选填
-      - 学分：选填，数字如 4.0
-      - 周次：选填，如 "1-16" 表示第1到16周，"1-1,5-8" 表示第1周 + 第5到8周。默认 "1-1"
-      - 单双周：选填，填「全部」/「单周」/「双周」之一，默认为「全部」
-      - 星期：必填，1=周一 … 7=周日，或填「周一」「周二」等
-      - 起始节：必填，第几节课开始，从 1 起算
-      - 结束节：选填，跨多节时填结束节；单节课可留空
+        Output only CSV, with the exact header above. Quote fields containing commas, quotes, or line breaks; double any quotes inside a quoted field.
 
-    - **示例**：
-      高等数学,张老师,教学楼A101,4.0,1-16,全部,1,1,2
-      大学英语,李老师,,2.0,1-16,全部,3,3,
+        My timetable information:
 
-    请只输出 CSV 内容，不要输出其他说明。表头必须与示例一致。
 
-    ---
-
-    以下是我的课表信息，请生成 CSV：
-
-    """
+        """
+    )
 }

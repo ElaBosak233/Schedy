@@ -32,7 +32,7 @@ struct ScheduleImportView: View {
 
     @Query(sort: \Schedule.name) private var schedules: [Schedule]
     @Query(sort: \TimeSlotPreset.name) private var presets: [TimeSlotPreset]
-    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = "我的课程表"
+    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = String(localized: "schedule.default.name", defaultValue: "My Timetable")
     @AppStorage(ScheduleDisplayKeys.activeTimeSlotPresetName) private var activeTimeSlotPresetName: String = ""
 
     @State private var step: Step = .chooseAction
@@ -133,6 +133,13 @@ struct ScheduleImportView: View {
     enum SourceTab: String, CaseIterable {
         case school = "院校"
         case system = "教务系统"
+
+        var displayName: String {
+            switch self {
+            case .school: return String(localized: "import.school.list.title", defaultValue: "School")
+            case .system: return String(localized: "import.school.system.title", defaultValue: "School System")
+            }
+        }
     }
 
     var body: some View {
@@ -152,19 +159,19 @@ struct ScheduleImportView: View {
                 }
             }
             .schedyPageStyle()
-            .navigationTitle("导入课表")
+            .navigationTitle(String(localized: "import.title", defaultValue: "Import Timetable"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     if step == .chooseImportMethod || step == .chooseSource || step == .browser || step == .csvImport {
-                        Button("上一步") {
+                        Button(String(localized: "common.action.back", defaultValue: "Back")) {
                             if step == .browser { step = .chooseSource }
                             else if step == .chooseSource { step = .chooseImportMethod }
                             else if step == .csvImport { step = .chooseImportMethod }
                             else { step = .chooseAction }
                         }
                     } else {
-                        Button("取消") { dismiss() }
+                        Button(String(localized: "common.action.cancel", defaultValue: "Cancel")) { dismiss() }
                     }
                 }
                 if step == .browser {
@@ -178,19 +185,19 @@ struct ScheduleImportView: View {
                     }
                 }
             }
-            .alert("导入失败", isPresented: .constant(importError != nil)) {
-                Button("确定") { importError = nil }
+            .alert(String(localized: "import.error.title", defaultValue: "Import Failed"), isPresented: .constant(importError != nil)) {
+                Button(String(localized: "common.action.ok", defaultValue: "OK")) { importError = nil }
             } message: {
                 if let msg = importError { Text(msg) }
             }
-            .alert("导入完成", isPresented: .constant(importSuccessCount != nil)) {
-                Button("确定") {
+            .alert(String(localized: "import.success.title", defaultValue: "Import Complete"), isPresented: .constant(importSuccessCount != nil)) {
+                Button(String(localized: "common.action.ok", defaultValue: "OK")) {
                     importSuccessCount = nil
                     dismiss()
                 }
             } message: {
                 if let n = importSuccessCount {
-                    Text("已导入 \(n) 门课程。")
+                    Text(String(localized: "import.success.course_count", defaultValue: "Imported \(n) courses."))
                 }
             }
         }
@@ -213,8 +220,8 @@ struct ScheduleImportView: View {
                 } label: {
                     Label {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("覆盖当前课表")
-                            Text("替换「\(activeSchedule?.name ?? "当前课表")」中的课程")
+                            Text(String(localized: "import.mode.overwrite_title", defaultValue: "Replace Current Timetable"))
+                            Text(String(localized: "import.mode.overwrite_description", defaultValue: "Replace courses in “\(activeSchedule?.name ?? String(localized: "schedule.selection.current", defaultValue: "Current Timetable"))”."))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -229,8 +236,8 @@ struct ScheduleImportView: View {
                 } label: {
                     Label {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("新建课表")
-                            Text("创建新课表并导入，保留现有课表不变")
+                            Text(String(localized: "import.mode.new_title", defaultValue: "New Timetable"))
+                            Text(String(localized: "import.mode.new_description", defaultValue: "Import into a new timetable and keep your existing timetables."))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -239,9 +246,9 @@ struct ScheduleImportView: View {
                     }
                 }
             } header: {
-                Text("导入方式")
+                Text(String(localized: "import.mode.title", defaultValue: "Import Mode"))
             } footer: {
-                Text("选择将课程导入到当前课表（覆盖）或新建一个课表。")
+                Text(String(localized: "import.mode.description", defaultValue: "Replace courses in the current timetable or import into a new one."))
             }
         }
         .listStyle(.insetGrouped)
@@ -258,8 +265,8 @@ struct ScheduleImportView: View {
                 } label: {
                     Label {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("从教务导入")
-                            Text("通过学校教务系统网页导入课表")
+                            Text(String(localized: "import.school.action", defaultValue: "Import from School System"))
+                            Text(String(localized: "import.school.action_description", defaultValue: "Import from your school's academic system website."))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -274,8 +281,8 @@ struct ScheduleImportView: View {
                 } label: {
                     Label {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("从 CSV 导入")
-                            Text("使用 CSV 文件或通过 AI 生成课表")
+                            Text(String(localized: "import.csv.action", defaultValue: "Import from CSV"))
+                            Text(String(localized: "import.csv.description", defaultValue: "Use a CSV file or generate one with AI."))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -284,9 +291,9 @@ struct ScheduleImportView: View {
                     }
                 }
             } header: {
-                Text("选择导入来源")
+                Text(String(localized: "import.source.choose_title", defaultValue: "Import Source"))
             } footer: {
-                Text("从教务导入会打开学校教务系统网页，进入课表页面后点击右上角下载按钮即可导入。也可使用 CSV 文件导入或让 AI 生成 CSV。")
+                Text(String(localized: "import.source.description", defaultValue: "Open your school's academic system, navigate to your timetable, then tap the download button in the top right to import. You can also import a CSV file or ask AI to generate one."))
             }
         }
         .listStyle(.insetGrouped)
@@ -303,8 +310,8 @@ struct ScheduleImportView: View {
                 } label: {
                     Label {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("复制 CSV 模板")
-                            Text("将模板复制到剪贴板，可粘贴到 Excel 或文本编辑器填写")
+                            Text(String(localized: "import.csv.template.copy_action", defaultValue: "Copy CSV Template"))
+                            Text(String(localized: "import.csv.template.description", defaultValue: "Copy the template, then paste it into Excel or a text editor to fill it in."))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -319,8 +326,8 @@ struct ScheduleImportView: View {
                 } label: {
                     Label {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("复制 Prompt")
-                            Text("复制后粘贴到 ChatGPT、Claude 等，让 AI 根据课表生成 CSV")
+                            Text(String(localized: "import.csv.prompt.copy_action", defaultValue: "Copy AI Prompt"))
+                            Text(String(localized: "import.csv.prompt.description", defaultValue: "Paste into ChatGPT, Claude, or another AI app to generate a CSV from your timetable."))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -334,8 +341,8 @@ struct ScheduleImportView: View {
                 } label: {
                     Label {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("选择 CSV 文件")
-                            Text("从本机选择已准备好的 CSV 文件导入")
+                            Text(String(localized: "import.csv.file.choose_action", defaultValue: "Choose CSV File"))
+                            Text(String(localized: "import.csv.file.description", defaultValue: "Choose a CSV file from your device."))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -345,9 +352,9 @@ struct ScheduleImportView: View {
                 }
                 .disabled(isImporting)
             } header: {
-                Text("CSV 导入")
+                Text(String(localized: "import.csv.title", defaultValue: "CSV Import"))
             } footer: {
-                Text("CSV 需包含表头：课程名,教师,地点,学分,周次,单双周,星期,起始节,结束节。课程名、星期、起始节为必填。")
+                Text(String(localized: "import.csv.format.description", defaultValue: "The CSV must include these headers: 课程名,教师,地点,学分,周次,单双周,星期,起始节,结束节. Course name (课程名), weekday (星期), and start period (起始节) are required. Keep the Chinese headers exactly as shown."))
             }
         }
         .listStyle(.insetGrouped)
@@ -358,15 +365,15 @@ struct ScheduleImportView: View {
         ) { result in
             handleCSVFileResult(result)
         }
-        .alert("已复制模板", isPresented: $showTemplateCopied) {
-            Button("确定") { showTemplateCopied = false }
+        .alert(String(localized: "import.csv.template.copied_title", defaultValue: "Template Copied"), isPresented: $showTemplateCopied) {
+            Button(String(localized: "common.action.ok", defaultValue: "OK")) { showTemplateCopied = false }
         } message: {
-            Text("CSV 模板已复制到剪贴板，可粘贴到 Excel 或备忘录中填写。")
+            Text(String(localized: "import.csv.template.copied_message", defaultValue: "CSV template copied. Paste it into Excel or Notes to fill it in."))
         }
-        .alert("已复制 Prompt", isPresented: $showPromptCopied) {
-            Button("确定") { showPromptCopied = false }
+        .alert(String(localized: "import.csv.prompt.copied_title", defaultValue: "Prompt Copied"), isPresented: $showPromptCopied) {
+            Button(String(localized: "common.action.ok", defaultValue: "OK")) { showPromptCopied = false }
         } message: {
-            Text("Prompt 已复制到剪贴板。在 ChatGPT、Claude 等 App 中粘贴，在底部填入你的课表信息，AI 会生成可导入的 CSV。")
+            Text(String(localized: "import.csv.prompt.copied_message", defaultValue: "Prompt copied. Paste it into ChatGPT, Claude, or another AI app, then add your timetable details at the bottom to generate an importable CSV."))
         }
     }
 
@@ -375,7 +382,7 @@ struct ScheduleImportView: View {
         case .success(let urls):
             guard let url = urls.first else { return }
             guard url.startAccessingSecurityScopedResource() else {
-                importError = "无法访问所选文件"
+                importError = String(localized: "import.csv.error.file_access", defaultValue: "Unable to access the selected file.")
                 return
             }
             defer { url.stopAccessingSecurityScopedResource() }
@@ -387,7 +394,7 @@ struct ScheduleImportView: View {
                     ?? ""
                 performCSVImport(csvString: string)
             } catch {
-                importError = "读取文件失败：\(error.localizedDescription)"
+                importError = String(localized: "import.csv.error.file_read", defaultValue: "Unable to read the file: \(error.localizedDescription)")
             }
         case .failure(let error):
             importError = error.localizedDescription
@@ -431,7 +438,7 @@ struct ScheduleImportView: View {
         switch importAction {
         case .overwrite:
             guard let schedule = activeSchedule else {
-                importError = "未找到当前课表。"
+                importError = String(localized: "import.error.schedule_missing", defaultValue: "The current timetable could not be found.")
                 return
             }
             for c in schedule.courses ?? [] { modelContext.delete(c) }
@@ -457,9 +464,9 @@ struct ScheduleImportView: View {
 
     private var chooseSourceView: some View {
         VStack(spacing: 0) {
-            Picker("来源", selection: $sourceTab) {
+            Picker(String(localized: "import.source.title", defaultValue: "Source"), selection: $sourceTab) {
                 ForEach(SourceTab.allCases, id: \.self) { tab in
-                    Text(tab.rawValue).tag(tab)
+                    Text(tab.displayName).tag(tab)
                 }
             }
             .pickerStyle(.segmented)
@@ -474,7 +481,7 @@ struct ScheduleImportView: View {
                                 HStack(spacing: 8) {
                                     Image(systemName: "magnifyingglass")
                                         .foregroundStyle(.secondary)
-                                    TextField("搜索学校名或拼音首字母", text: $schoolSearchText)
+                                    TextField(String(localized: "import.school.search_placeholder", defaultValue: "Search by school name or pinyin initials"), text: $schoolSearchText)
                                         .textInputAutocapitalization(.never)
                                         .autocorrectionDisabled(true)
                                     if !schoolSearchText.isEmpty {
@@ -518,7 +525,7 @@ struct ScheduleImportView: View {
                                                     Image(systemName: "chevron.right")
                                                         .foregroundStyle(.tertiary)
                                                 } else {
-                                                    Text("暂未支持")
+                                                    Text(String(localized: "import.school.status.unsupported", defaultValue: "Not Supported Yet"))
                                                         .font(.caption)
                                                         .foregroundStyle(.secondary)
                                                 }
@@ -532,7 +539,7 @@ struct ScheduleImportView: View {
                             Section {
                                 EmptyView()
                             } footer: {
-                                Text("将使用该学校对应的教务系统解析规则。支持按学校名或拼音首字母搜索。打开教务系统后，请进入「个人课表查询」页面，再点击右上角下载按钮导入。")
+                                Text(String(localized: "import.school.description", defaultValue: "Import uses the selected school's parsing rules. Search by school name or pinyin initials. Sign in, open the personal timetable page (“个人课表查询”), then tap the download button in the top right."))
                             }
                         }
                         .listStyle(.insetGrouped)
@@ -582,9 +589,9 @@ struct ScheduleImportView: View {
                             }
                         }
                     } header: {
-                        Text("选择教务系统")
+                        Text(String(localized: "import.school.system.choose_title", defaultValue: "Choose School System"))
                     } footer: {
-                        Text("若您的学校不在院校列表中，可选择对应的教务系统类型。打开浏览器后，请在地址栏输入您学校的教务系统网址，登录并进入课表页面后导入。")
+                        Text(String(localized: "import.school.system.description", defaultValue: "If your school isn't listed, select its academic system. Enter your school's URL in the browser, sign in, and open your timetable to import."))
                     }
                 }
                 .listStyle(.insetGrouped)
@@ -617,7 +624,7 @@ struct ScheduleImportView: View {
         Group {
             if let config = importConfig {
                 VStack(spacing: 0) {
-                    Text("请登录并进入课表页面后，点击右上角下载按钮导入。")
+                    Text(String(localized: "import.school.browser_instructions", defaultValue: "Sign in and open your timetable, then tap the download button in the top right to import."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .padding(8)
@@ -634,7 +641,7 @@ struct ScheduleImportView: View {
                     }
                 }
             } else {
-                ContentUnavailableView("未选择来源", systemImage: "building.2")
+                ContentUnavailableView(String(localized: "import.source.empty", defaultValue: "No Source Selected"), systemImage: "building.2")
             }
         }
         .onChange(of: step) { _, newStep in
@@ -689,7 +696,7 @@ struct ScheduleImportView: View {
             case .kingo, .urp, .south, .wisedu: pageName = "课表页面"
             default: pageName = "个人课表查询"
             }
-            importError = "未能从当前页面解析到课程，请确保已打开「\(pageName)」的课表页面。"
+            importError = String(localized: "import.school.error.wrong_page", defaultValue: "No courses could be read from this page. Open the “\(pageName)” timetable page and try again.")
             return
         }
         seedDefaultPresetsIfNeeded(modelContext: modelContext)
@@ -717,7 +724,7 @@ struct ScheduleImportView: View {
     }
 
     private func newScheduleName() -> String {
-        let base = "导入的课程表"
+        let base = String(localized: "schedule.default.imported_name", defaultValue: "Imported Timetable")
         var name = base
         var n = 1
         while schedules.contains(where: { $0.name == name }) {

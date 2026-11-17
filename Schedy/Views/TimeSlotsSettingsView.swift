@@ -39,10 +39,10 @@ struct TimeSlotsSettingsView: View {
     var body: some View {
         listContent
             .schedyPageStyle(navigationBackground: .automatic)
-            .navigationTitle("时间段")
+            .navigationTitle(String(localized: "settings.presets.title", defaultValue: "Time Presets"))
             .navigationBarTitleDisplayMode(.large)
             .toolbar { toolbarContent }
-            .alert("新建时间段", isPresented: $showAddPreset) { addPresetAlertContent } message: { addPresetAlertMessage }
+            .alert(String(localized: "preset.create.title", defaultValue: "New Time Preset"), isPresented: $showAddPreset) { addPresetAlertContent } message: { addPresetAlertMessage }
             .sheet(isPresented: presetSheetBinding) { presetEditSheetContent }
             .sheet(isPresented: slotSheetBinding) { slotEditSheetContent }
             .onAppear {
@@ -61,9 +61,9 @@ struct TimeSlotsSettingsView: View {
                     presetRow(preset: preset)
                 }
             } header: {
-                Text("时间段")
+                Text(String(localized: "settings.presets.title", defaultValue: "Time Presets"))
             } footer: {
-                Text("此处为「默认时间段」：未单独绑定时间段的课表将使用此项；新建课表时也可选此项。各课表可在「课程表」中编辑并绑定自己的时间段。下方可管理各节的起止时间。")
+                Text(String(localized: "preset.default.description", defaultValue: "Choose the default time preset for timetables without their own preset. Assign a preset to each timetable in Timetables. Manage period start and end times below."))
             }
             slotsDetailSection
         }
@@ -74,7 +74,7 @@ struct TimeSlotsSettingsView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(preset.name)
                     .font(.headline)
-                Text("\((preset.slots ?? []).count) 个时间段")
+                Text(String(localized: "preset.periods.count", defaultValue: "\((preset.slots ?? []).count) time slots"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -90,12 +90,12 @@ struct TimeSlotsSettingsView: View {
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             if presets.count > 1 {
-                Button("删除", systemImage: "trash", role: .destructive) {
+                Button(String(localized: "common.action.delete", defaultValue: "Delete"), systemImage: "trash", role: .destructive) {
                     deletePreset(preset)
                 }
                 .tint(.red)
             }
-            Button("编辑", systemImage: "pencil") {
+            Button(String(localized: "common.action.edit", defaultValue: "Edit"), systemImage: "pencil") {
                 presetToEdit = preset
             }
         }
@@ -110,18 +110,18 @@ struct TimeSlotsSettingsView: View {
                         TimeSlotEditView(slot: slot)
                     } label: {
                         HStack {
-                            Text("第 \(slot.periodIndex) 节")
+                            Text(String(localized: "course.period.label", defaultValue: "Period \(slot.periodIndex)"))
                             Spacer()
                             Text(slot.timeRangeString)
                                 .foregroundStyle(.secondary)
                         }
                     }
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        Button("删除", systemImage: "trash", role: .destructive) {
+                        Button(String(localized: "common.action.delete", defaultValue: "Delete"), systemImage: "trash", role: .destructive) {
                             deleteSlot(slot, from: preset)
                         }
                         .tint(.red)
-                        Button("编辑", systemImage: "pencil") {
+                        Button(String(localized: "common.action.edit", defaultValue: "Edit"), systemImage: "pencil") {
                             slotToEdit = slot
                         }
                     }
@@ -129,10 +129,10 @@ struct TimeSlotsSettingsView: View {
                 Button {
                     addSlot(to: preset)
                 } label: {
-                    Label("添加时间节", systemImage: "plus.circle")
+                    Label(String(localized: "preset.period.add_action", defaultValue: "Add Period"), systemImage: "plus.circle")
                 }
             } header: {
-                Text("\(preset.name) 时间段明细")
+                Text(String(localized: "preset.periods.title", defaultValue: "\(preset.name) Period Times"))
             }
         }
     }
@@ -150,19 +150,19 @@ struct TimeSlotsSettingsView: View {
 
     @ViewBuilder
     private var addPresetAlertContent: some View {
-        TextField("时间段名称", text: $newPresetName)
+        TextField(String(localized: "preset.field.name", defaultValue: "Time Preset Name"), text: $newPresetName)
             .textInputAutocapitalization(.words)
-        Button("取消", role: .cancel) {
+        Button(String(localized: "common.action.cancel", defaultValue: "Cancel"), role: .cancel) {
             newPresetName = ""
         }
-        Button("确定") {
+        Button(String(localized: "common.action.ok", defaultValue: "OK")) {
             createPreset()
         }
         .disabled(newPresetName.trimmingCharacters(in: .whitespaces).isEmpty)
     }
 
     private var addPresetAlertMessage: some View {
-        Text("例如：冬令时、夏令时、自定义")
+        Text(String(localized: "preset.name.placeholder", defaultValue: "For example: Winter, Summer, Custom"))
     }
 
     @ViewBuilder
@@ -179,7 +179,7 @@ struct TimeSlotsSettingsView: View {
                 TimeSlotEditView(slot: s)
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
-                            Button("完成") { slotToEdit = nil }
+                            Button(String(localized: "common.action.done", defaultValue: "Done")) { slotToEdit = nil }
                         }
                     }
             }
@@ -310,18 +310,18 @@ struct PresetRenameSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                TextField("时间段名称", text: $name)
+                TextField(String(localized: "preset.field.name", defaultValue: "Time Preset Name"), text: $name)
             }
             .schedyPageStyle()
-            .navigationTitle("编辑时间段")
+            .navigationTitle(String(localized: "preset.edit.title", defaultValue: "Edit Time Preset"))
             .navigationBarTitleDisplayMode(.inline)
             .onAppear { name = preset.name }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("取消") { dismiss() }
+                    Button(String(localized: "common.action.cancel", defaultValue: "Cancel")) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("保存") {
+                    Button(String(localized: "common.action.save", defaultValue: "Save")) {
                         let n = name.trimmingCharacters(in: .whitespaces)
                         let conflict = allPresets.contains { $0.name == n && $0 !== preset }
                         guard !conflict else { nameConflict = true; return }
@@ -332,10 +332,10 @@ struct PresetRenameSheet: View {
                     .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
-            .alert("名称已存在", isPresented: $nameConflict) {
-                Button("好") {}
+            .alert(String(localized: "validation.name_conflict.title", defaultValue: "Name Already Exists"), isPresented: $nameConflict) {
+                Button(String(localized: "common.action.ok_short", defaultValue: "OK")) {}
             } message: {
-                Text("已有同名时间段，请使用其他名称。")
+                Text(String(localized: "validation.preset.name_conflict", defaultValue: "A time preset with this name already exists. Choose another name."))
             }
         }
     }
@@ -344,7 +344,7 @@ struct PresetRenameSheet: View {
 // MARK: - 单节时间段编辑
 struct TimeSlotEditView: View {
     @Environment(\.modelContext) private var modelContext
-    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = "我的课程表"
+    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = String(localized: "schedule.default.name", defaultValue: "My Timetable")
     @Bindable var slot: TimeSlotItem
 
     private func dateFrom(hour: Int, minute: Int) -> Date {
@@ -375,13 +375,13 @@ struct TimeSlotEditView: View {
 
     var body: some View {
         Form {
-            Section("第 \(slot.periodIndex) 节") {
-                DatePicker("开始", selection: startDateBinding(), displayedComponents: .hourAndMinute)
-                DatePicker("结束", selection: endDateBinding(), displayedComponents: .hourAndMinute)
+            Section(String(localized: "course.period.label", defaultValue: "Period \(slot.periodIndex)")) {
+                DatePicker(String(localized: "common.field.start", defaultValue: "Start"), selection: startDateBinding(), displayedComponents: .hourAndMinute)
+                DatePicker(String(localized: "common.field.end", defaultValue: "End"), selection: endDateBinding(), displayedComponents: .hourAndMinute)
             }
         }
         .schedyPageStyle()
-        .navigationTitle("编辑时间段")
+        .navigationTitle(String(localized: "preset.edit.title", defaultValue: "Edit Time Preset"))
         .navigationBarTitleDisplayMode(.inline)
         .onDisappear {
             try? modelContext.save()

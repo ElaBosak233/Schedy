@@ -16,12 +16,12 @@ struct SchedyWidgetEntry: TimelineEntry {
 }
 
 private let sampleEntry = WidgetEntry(
-    scheduleName: "我的课程表",
-    dateString: "2月26日",
-    weekdayString: "周四",
+    scheduleName: String(localized: "schedule.default.name", defaultValue: "My Timetable"),
+    dateString: String(localized: "widget.preview.date", defaultValue: "Feb 26"),
+    weekdayString: String(localized: "calendar.weekday.thursday.short", defaultValue: "Thu"),
     status: "next",
-    course1: ("高等数学", "08:00", "A101"),
-    course2: ("英语", "09:50", "B202")
+    course1: (String(localized: "widget.preview.course.calculus", defaultValue: "Calculus"), "08:00", "A101"),
+    course2: (String(localized: "widget.preview.course.english", defaultValue: "English"), "09:50", "B202")
 )
 
 @available(iOS 17.0, macOS 14.0, watchOS 10.0, *)
@@ -106,13 +106,13 @@ struct SchedyWidgetView: View {
         Group {
             switch entry.status {
             case "noClass":
-                Text(hasNeverSynced ? "打开 App 同步课程" : "今天没课哦，好好休息吧")
+                Text(hasNeverSynced ? String(localized: "widget.sync_required.description", defaultValue: "Open Schedy to sync classes") : String(localized: "widget.empty.description", defaultValue: "No classes today. Enjoy your break!"))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             case "allDone":
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("今天的课上完啦，辛苦～")
+                    Text(String(localized: "widget.finished.description", defaultValue: "All done for today. Nice work!"))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.leading)
@@ -137,7 +137,7 @@ struct SchedyWidgetView: View {
                     }
                 }
             default:
-                Text(hasNeverSynced ? "打开 App 同步课程" : "今天没课哦，好好休息吧")
+                Text(hasNeverSynced ? String(localized: "widget.sync_required.description", defaultValue: "Open Schedy to sync classes") : String(localized: "widget.empty.description", defaultValue: "No classes today. Enjoy your break!"))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -211,8 +211,8 @@ struct SchedyWidget: Widget {
         AppIntentConfiguration(kind: kind, intent: SchedyWidgetConfigIntent.self, provider: SchedyWidgetProvider()) { entry in
             SchedyWidgetView(entry: entry.entry)
         }
-        .configurationDisplayName("今日课程")
-        .description("选择要显示的课表，将使用该课表绑定的时间段展示日期与接下来两节课。")
+        .configurationDisplayName(String(localized: "widget.title", defaultValue: "Today's Classes"))
+        .description(String(localized: "widget.description", defaultValue: "Choose a timetable to see the date and next two classes using its assigned time preset."))
         .supportedFamilies([WidgetFamily.systemSmall, WidgetFamily.systemMedium])
     }
 }

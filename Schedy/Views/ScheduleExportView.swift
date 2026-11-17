@@ -12,7 +12,7 @@ struct ScheduleExportView: View {
     @Environment(\.dismiss) private var dismiss
 
     @Query(sort: \Schedule.name) private var schedules: [Schedule]
-    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = "我的课程表"
+    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = String(localized: "schedule.default.name", defaultValue: "My Timetable")
 
     /// 用户选择「导出为 CSV」时由外部生成文件并设置 shareExportURL，然后关闭本界面
     var onExportCSV: () -> Void
@@ -36,8 +36,8 @@ struct ScheduleExportView: View {
                     } label: {
                         Label {
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("导出为 CSV")
-                                Text("导出与导入格式一致的 CSV，便于备份或二次编辑")
+                                Text(String(localized: "export.csv.action", defaultValue: "Export as CSV"))
+                                Text(String(localized: "export.csv.action_description", defaultValue: "Export an importable CSV for backup or editing."))
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
@@ -47,18 +47,18 @@ struct ScheduleExportView: View {
                     }
                     .disabled(!hasCourses)
                 } header: {
-                    Text("导出格式")
+                    Text(String(localized: "export.format.title", defaultValue: "Export Format"))
                 } footer: {
-                    Text("CSV 包含课程名、教师、地点、周次、星期、节次等信息，可用 Excel 打开编辑。")
+                    Text(String(localized: "export.csv.description", defaultValue: "The CSV includes course names, teachers, locations, weeks, weekdays, and periods. You can edit it in Excel."))
                 }
             }
             .listStyle(.insetGrouped)
             .schedyPageStyle()
-            .navigationTitle("导出课表")
+            .navigationTitle(String(localized: "export.title", defaultValue: "Export Timetable"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("取消") {
+                    Button(String(localized: "common.action.cancel", defaultValue: "Cancel")) {
                         dismiss()
                     }
                 }

@@ -219,7 +219,7 @@ private enum ScriptLoadingError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .missingResource(let path):
-            return "未找到注入脚本资源：\(path)"
+            return String(localized: "import.school.error.script_missing", defaultValue: "Import script resource not found: \(path)")
         }
     }
 }

@@ -73,7 +73,7 @@ private func handleBackgroundRefreshTask(_ task: BGAppRefreshTask) {
 
         let context = ModelContext(container)
         scheduleCourseReminders(modelContext: context)
-        let activeScheduleName = UserDefaults.standard.string(forKey: ScheduleDisplayKeys.activeScheduleName) ?? "我的课程表"
+        let activeScheduleName = UserDefaults.standard.string(forKey: ScheduleDisplayKeys.activeScheduleName) ?? String(localized: "schedule.default.name", defaultValue: "My Timetable")
         refreshWidgetData(modelContext: context, activeScheduleName: activeScheduleName)
         scheduleNextBackgroundRefresh()
         success = true

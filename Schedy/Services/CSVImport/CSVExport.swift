@@ -30,7 +30,12 @@ enum CSVExport {
         let location = escapeCSV(course.location ?? "")
         let credits: String = course.credits.map { String(format: "%g", $0) } ?? ""
         let weekRanges = escapeCSV(course.weekRangesString ?? weekRangesExportString(course))
-        let weekParityStr = course.weekParity.displayName
+        let weekParityStr: String
+        switch course.weekParity {
+        case .all: weekParityStr = "all"
+        case .odd: weekParityStr = "odd"
+        case .even: weekParityStr = "even"
+        }
         let day = "\(course.dayOfWeek)"
         let startPeriod = "\(course.periodIndex)"
         let endPeriod = course.periodIndex == course.effectivePeriodEnd ? "" : "\(course.effectivePeriodEnd)"

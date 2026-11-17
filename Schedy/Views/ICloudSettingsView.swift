@@ -45,22 +45,22 @@ struct ICloudSettingsView: View {
         List {
             Section {
                 Toggle(isOn: iCloudSyncBinding) {
-                    Label("iCloud 同步", systemImage: "icloud")
+                    Label(String(localized: "sync.icloud.title", defaultValue: "iCloud Sync"), systemImage: "icloud")
                 }
                 .disabled(!iCloudAvailable)
             } footer: {
                 if iCloudAvailable {
-                    Text("请确保已登录同一 Apple ID。")
+                    Text(String(localized: "sync.icloud.account_hint", defaultValue: "Make sure your devices use the same Apple ID."))
                 } else {
-                    Text("当前设备未登录 iCloud（如模拟器），无法使用同步功能。请在真机登录 Apple ID 后使用。")
+                    Text(String(localized: "sync.icloud.unavailable", defaultValue: "This device is not signed in to iCloud. Sign in with your Apple ID on a physical device to use sync."))
                 }
             }
 
             if iCloudAvailable && iCloudSyncEnabled {
-                Section("同步状态") {
+                Section(String(localized: "sync.status.title", defaultValue: "Sync Status")) {
                     if isSyncing {
                         HStack {
-                            Label("正在同步…", systemImage: "arrow.triangle.2.circlepath.icloud")
+                            Label(String(localized: "sync.status.syncing", defaultValue: "Syncing…"), systemImage: "arrow.triangle.2.circlepath.icloud")
                             Spacer()
                             ProgressView()
                         }
@@ -68,13 +68,13 @@ struct ICloudSettingsView: View {
                         Label(err, systemImage: "exclamationmark.icloud")
                             .foregroundStyle(.red)
                     } else {
-                        Label("同步正常", systemImage: "checkmark.icloud")
+                        Label(String(localized: "sync.status.up_to_date", defaultValue: "Up to Date"), systemImage: "checkmark.icloud")
                             .foregroundStyle(.green)
                     }
 
                     if let date = lastSyncDate {
                         HStack {
-                            Text("上次同步")
+                            Text(String(localized: "sync.status.last_synced", defaultValue: "Last Synced"))
                                 .foregroundStyle(.secondary)
                             Spacer()
                             Text(date, format: .dateTime.year().month().day().hour().minute().second())
@@ -86,7 +86,7 @@ struct ICloudSettingsView: View {
 
             if needsRestart {
                 Section {
-                    Text("设置已更改，请重启 App 以生效。")
+                    Text(String(localized: "sync.restart_required", defaultValue: "Restart the app to apply your changes."))
                         .foregroundStyle(.orange)
                         .font(.subheadline)
                 }
@@ -96,71 +96,71 @@ struct ICloudSettingsView: View {
                 Button(role: .destructive) {
                     showClearConfirm = true
                 } label: {
-                    Label("还原默认数据", systemImage: "arrow.counterclockwise")
+                    Label(String(localized: "sync.reset.title", defaultValue: "Reset to Defaults"), systemImage: "arrow.counterclockwise")
                 }
             } footer: {
-                Text("清除本设备上的所有课程表与时间段数据，并重新创建默认课程表。iCloud 中的数据不受影响。")
+                Text(String(localized: "sync.reset.description", defaultValue: "Delete all timetables and time presets on this device and create a default timetable. Your data in iCloud will be kept."))
             }
         }
         .schedyPageStyle(navigationBackground: .automatic)
-        .navigationTitle("数据同步")
+        .navigationTitle(String(localized: "settings.sync.title", defaultValue: "Data Sync"))
         .navigationBarTitleDisplayMode(.large)
         // 关闭 iCloud 确认
         .alert(
-            "关闭 iCloud 同步",
+            String(localized: "sync.disable.title", defaultValue: "Turn Off iCloud Sync"),
             isPresented: Binding(
                 get: { pendingToggleValue == false },
                 set: { if !$0 { pendingToggleValue = nil } }
             )
         ) {
-            Button("关闭", role: .destructive) {
+            Button(String(localized: "common.action.close", defaultValue: "Close"), role: .destructive) {
                 iCloudSyncEnabled = false
                 needsRestart = true
                 pendingToggleValue = nil
             }
-            Button("取消", role: .cancel) { pendingToggleValue = nil }
+            Button(String(localized: "common.action.cancel", defaultValue: "Cancel"), role: .cancel) { pendingToggleValue = nil }
         } message: {
-            Text("关闭后将仅使用本地数据，iCloud 中的数据不受影响。")
+            Text(String(localized: "sync.disable.description", defaultValue: "Only local data will be used. Your data in iCloud will be kept."))
         }
         // 开启 iCloud：本地有数据时询问优先级
         .alert(
-            "开启 iCloud 同步",
+            String(localized: "sync.enable.title", defaultValue: "Turn On iCloud Sync"),
             isPresented: Binding(
                 get: { pendingToggleValue == true && localScheduleCount > 0 },
                 set: { if !$0 { pendingToggleValue = nil } }
             )
         ) {
-            Button("合并本地与云端") {
+            Button(String(localized: "sync.action.merge", defaultValue: "Merge Local and iCloud Data")) {
                 iCloudSyncEnabled = true
                 needsRestart = true
                 pendingToggleValue = nil
             }
-            Button("云端覆盖本地", role: .destructive) {
+            Button(String(localized: "sync.action.replace_local", defaultValue: "Replace Local Data"), role: .destructive) {
                 UserDefaults.standard.set(true, forKey: kClearLocalDataOnNextLaunchKey)
                 iCloudSyncEnabled = true
                 needsRestart = true
                 pendingToggleValue = nil
             }
-            Button("取消", role: .cancel) { pendingToggleValue = nil }
+            Button(String(localized: "common.action.cancel", defaultValue: "Cancel"), role: .cancel) { pendingToggleValue = nil }
         } message: {
-            Text("本地有 \(localScheduleCount) 张课程表。\n\n合并：保留本地数据，并与 iCloud 云端数据合并。\n云端覆盖：删除本地数据，完全使用 iCloud 云端数据。")
+            Text(String(localized: "sync.enable.merge_description", defaultValue: "You have \(localScheduleCount) local timetables.\n\nMerge: Keep local data and merge it with iCloud.\nReplace: Delete local data and use only the data from iCloud."))
         }
         // 开启 iCloud：本地无数据时直接确认
         .alert(
-            "开启 iCloud 同步",
+            String(localized: "sync.enable.title", defaultValue: "Turn On iCloud Sync"),
             isPresented: Binding(
                 get: { pendingToggleValue == true && localScheduleCount == 0 },
                 set: { if !$0 { pendingToggleValue = nil } }
             )
         ) {
-            Button("开启") {
+            Button(String(localized: "common.action.enable", defaultValue: "Turn On")) {
                 iCloudSyncEnabled = true
                 needsRestart = true
                 pendingToggleValue = nil
             }
-            Button("取消", role: .cancel) { pendingToggleValue = nil }
+            Button(String(localized: "common.action.cancel", defaultValue: "Cancel"), role: .cancel) { pendingToggleValue = nil }
         } message: {
-            Text("开启后，iCloud 数据将自动同步到本设备。")
+            Text(String(localized: "sync.enable.description", defaultValue: "Your iCloud data will sync to this device automatically."))
         }
         .onReceive(
             NotificationCenter.default.publisher(
@@ -189,11 +189,11 @@ struct ICloudSettingsView: View {
             }
         }
         // 还原默认数据确认
-        .alert("还原默认数据", isPresented: $showClearConfirm) {
-            Button("还原", role: .destructive) { resetToDefault() }
-            Button("取消", role: .cancel) {}
+        .alert(String(localized: "sync.reset.title", defaultValue: "Reset to Defaults"), isPresented: $showClearConfirm) {
+            Button(String(localized: "common.action.reset", defaultValue: "Reset"), role: .destructive) { resetToDefault() }
+            Button(String(localized: "common.action.cancel", defaultValue: "Cancel"), role: .cancel) {}
         } message: {
-            Text("将清除所有课程表与时间段数据，并重新创建默认课程表，此操作不可撤销。")
+            Text(String(localized: "sync.reset.confirmation", defaultValue: "All timetables and time presets will be deleted and a default timetable will be created. This cannot be undone."))
         }
     }
 
@@ -206,7 +206,7 @@ struct ICloudSettingsView: View {
         try? modelContext.save()
         seedDefaultPresetsIfNeeded(modelContext: modelContext)
         let allPresets = (try? modelContext.fetch(FetchDescriptor<TimeSlotPreset>())) ?? []
-        let defaultName = "我的课程表"
+        let defaultName = String(localized: "schedule.default.name", defaultValue: "My Timetable")
         let schedule = Schedule(name: defaultName, semesterStartDate: defaultSemesterStartDate())
         schedule.timeSlotPreset = allPresets.first
         modelContext.insert(schedule)

@@ -18,7 +18,7 @@ private struct EditableWeekRange: Identifiable {
 struct CourseEditSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = "我的课程表"
+    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = String(localized: "schedule.default.name", defaultValue: "My Timetable")
 
     let course: Course?
     let schedule: Schedule?
@@ -124,32 +124,32 @@ struct CourseEditSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("课程信息") {
-                    TextField("课程名", text: $name)
-                    TextField("任课老师", text: $teacher)
-                    TextField("地点", text: $location)
-                    TextField("学分", text: $creditsText)
+                Section(String(localized: "course.details.title", defaultValue: "Course Details")) {
+                    TextField(String(localized: "course.field.name", defaultValue: "Course Name"), text: $name)
+                    TextField(String(localized: "course.field.teacher", defaultValue: "Teacher"), text: $teacher)
+                    TextField(String(localized: "course.field.location", defaultValue: "Location"), text: $location)
+                    TextField(String(localized: "course.field.credits", defaultValue: "Credits"), text: $creditsText)
                         .keyboardType(.decimalPad)
                 }
 
-                Section("上课时间") {
+                Section(String(localized: "course.schedule.title", defaultValue: "Class Schedule")) {
                     Group {
-                        Text("周次范围")
+                        Text(String(localized: "course.field.week_ranges", defaultValue: "Week Ranges"))
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         ForEach($weekRanges) { $range in
                             HStack(spacing: 12) {
-                                Picker("起", selection: $range.start) {
+                                Picker(String(localized: "course.week_range.start", defaultValue: "Start"), selection: $range.start) {
                                     ForEach(1...25, id: \.self) { w in
-                                        Text("第 \(w) 周").tag(w)
+                                        Text(String(localized: "schedule.week.label", defaultValue: "Week \(w)")).tag(w)
                                     }
                                 }
                                 .labelsHidden()
                                 .frame(maxWidth: .infinity)
-                                Text("至")
-                                Picker("止", selection: $range.end) {
+                                Text(String(localized: "course.week_range.separator", defaultValue: "to"))
+                                Picker(String(localized: "course.week_range.end", defaultValue: "End"), selection: $range.end) {
                                     ForEach(1...25, id: \.self) { w in
-                                        Text("第 \(w) 周").tag(w)
+                                        Text(String(localized: "schedule.week.label", defaultValue: "Week \(w)")).tag(w)
                                     }
                                 }
                                 .labelsHidden()
@@ -170,65 +170,65 @@ struct CourseEditSheet: View {
                             let lastEnd = weekRanges.last?.end ?? 1
                             weekRanges.append(EditableWeekRange(start: lastEnd, end: min(25, lastEnd + 1)))
                         } label: {
-                            Label("添加一段周次", systemImage: "plus.circle")
+                            Label(String(localized: "course.week_range.add_action", defaultValue: "Add Week Range"), systemImage: "plus.circle")
                         }
                     }
 
-                    Picker("单双周", selection: $weekParity) {
+                    Picker(String(localized: "course.field.week_pattern", defaultValue: "Week Pattern"), selection: $weekParity) {
                         ForEach(Course.WeekParity.allCases, id: \.rawValue) { p in
                             Text(p.displayName).tag(p)
                         }
                     }
 
-                    Picker("星期", selection: $dayOfWeek) {
+                    Picker(String(localized: "course.field.weekday", defaultValue: "Weekday"), selection: $dayOfWeek) {
                         ForEach(1...7, id: \.self) { d in
                             Text(dayName(d)).tag(d)
                         }
                     }
 
-                    Picker("起始节", selection: $periodStart) {
+                    Picker(String(localized: "course.field.start_period", defaultValue: "Start Period"), selection: $periodStart) {
                         ForEach(sortedPeriods, id: \.periodIndex) { slot in
-                            Text("第 \(slot.periodIndex) 节 (\(slot.timeRangeString))")
+                            Text(String(localized: "course.period.time_label", defaultValue: "Period \(slot.periodIndex) (\(slot.timeRangeString))"))
                                 .tag(slot.periodIndex)
                         }
                         if sortedPeriods.isEmpty {
-                            Text("请先在设置中配置时间段").tag(1)
+                            Text(String(localized: "course.period.setup_required", defaultValue: "Set up period times in Settings first.")).tag(1)
                         }
                     }
                     .onChange(of: periodStart) { _, newStart in
                         if periodEnd < newStart { periodEnd = newStart }
                     }
 
-                    Picker("结束节", selection: $periodEnd) {
+                    Picker(String(localized: "course.field.end_period", defaultValue: "End Period"), selection: $periodEnd) {
                         ForEach(endPeriodOptions, id: \.periodIndex) { slot in
-                            Text("第 \(slot.periodIndex) 节 (\(slot.timeRangeString))")
+                            Text(String(localized: "course.period.time_label", defaultValue: "Period \(slot.periodIndex) (\(slot.timeRangeString))"))
                                 .tag(slot.periodIndex)
                         }
                         if endPeriodOptions.isEmpty {
-                            Text("请先在设置中配置时间段").tag(1)
+                            Text(String(localized: "course.period.setup_required", defaultValue: "Set up period times in Settings first.")).tag(1)
                         }
                     }
                     .disabled(sortedPeriods.isEmpty)
                 }
             }
             .schedyPageStyle()
-            .navigationTitle(isEditing ? "编辑课程" : "添加课程")
+            .navigationTitle(isEditing ? String(localized: "course.edit.title", defaultValue: "Edit Course") : String(localized: "course.create.title", defaultValue: "Add Course"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("取消") {
+                    Button(String(localized: "common.action.cancel", defaultValue: "Cancel")) {
                         dismiss()
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("保存") {
+                    Button(String(localized: "common.action.save", defaultValue: "Save")) {
                         save()
                     }
                     .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
                 if isEditing {
                     ToolbarItem(placement: .destructiveAction) {
-                        Button("删除", role: .destructive) {
+                        Button(String(localized: "common.action.delete", defaultValue: "Delete"), role: .destructive) {
                             delete()
                         }
                     }

@@ -11,7 +11,7 @@ import SwiftUI
 struct ScheduleListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Schedule.name) private var schedules: [Schedule]
-    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = "我的课程表"
+    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = String(localized: "schedule.default.name", defaultValue: "My Timetable")
 
     @State private var showAddSchedule = false
     @State private var scheduleToEdit: Schedule?
@@ -30,13 +30,13 @@ struct ScheduleListView: View {
                     scheduleRow(schedule)
                 }
             } header: {
-                Text("课程表")
+                Text(String(localized: "navigation.timetable.title", defaultValue: "Timetable"))
             } footer: {
-                Text("点击选择当前使用的课程表。每张课程表可单独设置名称、学期第一天与绑定的时间段；小组件选哪张课表即使用该课表的时间段。")
+                Text(String(localized: "schedule.list.description", defaultValue: "Tap a timetable to select it. Each timetable has its own name, semester start date, and time preset. Widgets use the selected timetable's preset."))
             }
         }
         .schedyPageStyle(navigationBackground: .automatic)
-        .navigationTitle("课程表")
+        .navigationTitle(String(localized: "navigation.timetable.title", defaultValue: "Timetable"))
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -58,7 +58,7 @@ struct ScheduleListView: View {
         .onAppear {
             seedDefaultScheduleIfNeeded(modelContext: modelContext)
             if activeScheduleName.isEmpty {
-                activeScheduleName = schedules.first?.name ?? "我的课程表"
+                activeScheduleName = schedules.first?.name ?? String(localized: "schedule.default.name", defaultValue: "My Timetable")
             }
             refreshWidgetData(modelContext: modelContext, activeScheduleName: activeScheduleName)
             scheduleCourseReminders(modelContext: modelContext)
@@ -90,12 +90,12 @@ struct ScheduleListView: View {
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             if schedules.count > 1 {
-                Button("删除", systemImage: "trash", role: .destructive) {
+                Button(String(localized: "common.action.delete", defaultValue: "Delete"), systemImage: "trash", role: .destructive) {
                     deleteSchedule(schedule)
                 }
                 .tint(.red)
             }
-            Button("编辑", systemImage: "pencil") {
+            Button(String(localized: "common.action.edit", defaultValue: "Edit"), systemImage: "pencil") {
                 scheduleToEdit = schedule
             }
         }
@@ -103,9 +103,9 @@ struct ScheduleListView: View {
 
     private func semesterStartText(_ date: Date) -> String {
         let f = DateFormatter()
-        f.dateFormat = "yyyy年M月d日"
-        f.locale = Locale(identifier: "zh_CN")
-        return "学期开始：\(f.string(from: date))"
+        f.locale = Locale.current
+        f.setLocalizedDateFormatFromTemplate("yMMMd")
+        return String(localized: "schedule.semester.start_summary", defaultValue: "Semester starts: \(f.string(from: date))")
     }
 
     private func deleteSchedule(_ schedule: Schedule) {
@@ -123,7 +123,7 @@ struct ScheduleListView: View {
 struct ScheduleEditSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = "我的课程表"
+    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = String(localized: "schedule.default.name", defaultValue: "My Timetable")
     @AppStorage(ScheduleDisplayKeys.activeTimeSlotPresetName) private var activeTimeSlotPresetName: String = ""
     @Query(sort: \TimeSlotPreset.name) private var presets: [TimeSlotPreset]
     @Query private var allSchedules: [Schedule]
@@ -141,39 +141,39 @@ struct ScheduleEditSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("名称") {
-                    TextField("课程表名称", text: $name)
+                Section(String(localized: "common.field.name", defaultValue: "Name")) {
+                    TextField(String(localized: "schedule.field.name", defaultValue: "Timetable Name"), text: $name)
                         .textInputAutocapitalization(.words)
                 }
-                Section("本学期第一天") {
-                    DatePicker("学期第一天", selection: $semesterStartDate, displayedComponents: .date)
+                Section(String(localized: "schedule.semester.section_title", defaultValue: "Semester Start")) {
+                    DatePicker(String(localized: "schedule.semester.start_date", defaultValue: "Semester Start Date"), selection: $semesterStartDate, displayedComponents: .date)
                 }
                 Section {
-                    Picker("时间段", selection: presetPickerBinding) {
-                        Text("使用默认").tag("")
+                    Picker(String(localized: "settings.presets.title", defaultValue: "Time Presets"), selection: presetPickerBinding) {
+                        Text(String(localized: "preset.selection.default", defaultValue: "Use Default")).tag("")
                         ForEach(presets, id: \.name) { p in
                             Text(p.name).tag(p.name)
                         }
                     }
                     .pickerStyle(.menu)
                 } header: {
-                    Text("时间段")
+                    Text(String(localized: "settings.presets.title", defaultValue: "Time Presets"))
                 } footer: {
-                    Text("该课表在网格与小组件中显示时使用此时间段。未设置则使用 App 默认。")
+                    Text(String(localized: "schedule.preset.description", defaultValue: "This preset is used in the timetable grid and widgets. Leave unset to use the app default."))
                 }
                 if isEditing, let s = schedule {
                     Section {
-                        Toggle("课程提醒", isOn: Binding(
+                        Toggle(String(localized: "notification.course.title", defaultValue: "Class Reminders"), isOn: Binding(
                             get: { s.notificationsEnabled },
                             set: { s.notificationsEnabled = $0 }
                         ))
                     } footer: {
-                        Text("开启后，该课表中有课的时间会提前 15 分钟收到提醒。多张课表可同时开启，适合带多个班的老师。")
+                        Text(String(localized: "schedule.reminders.description", defaultValue: "Get a reminder 15 minutes before each class. Enable reminders for multiple timetables if you teach or attend several groups."))
                     }
                 }
             }
             .schedyPageStyle()
-            .navigationTitle(isEditing ? "编辑课程表" : "新建课程表")
+            .navigationTitle(isEditing ? String(localized: "schedule.edit.title", defaultValue: "Edit Timetable") : String(localized: "schedule.create.title", defaultValue: "New Timetable"))
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 if let s = schedule {
@@ -187,19 +187,19 @@ struct ScheduleEditSheet: View {
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("取消") { dismiss() }
+                    Button(String(localized: "common.action.cancel", defaultValue: "Cancel")) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("保存") {
+                    Button(String(localized: "common.action.save", defaultValue: "Save")) {
                         save()
                     }
                     .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
-            .alert("名称已存在", isPresented: $nameConflict) {
-                Button("好") {}
+            .alert(String(localized: "validation.name_conflict.title", defaultValue: "Name Already Exists"), isPresented: $nameConflict) {
+                Button(String(localized: "common.action.ok_short", defaultValue: "OK")) {}
             } message: {
-                Text("已有同名课程表，请使用其他名称。")
+                Text(String(localized: "validation.schedule.name_conflict", defaultValue: "A timetable with this name already exists. Choose another name."))
             }
         }
     }

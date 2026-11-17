@@ -16,10 +16,10 @@ enum CSVParserError: Error, LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .emptyFile: return "CSV 文件为空"
-        case .invalidHeader: return "表头解析失败"
-        case .missingColumn(let col): return "缺少必填列：\(col)"
-        case .noValidCourses: return "未能解析到任何有效课程，请检查 CSV 格式"
+        case .emptyFile: return String(localized: "import.csv.error.empty_file", defaultValue: "The CSV file is empty.")
+        case .invalidHeader: return String(localized: "import.csv.error.invalid_header", defaultValue: "Unable to read the CSV header.")
+        case .missingColumn(let col): return String(localized: "import.csv.error.missing_column", defaultValue: "Missing required column: \(col)")
+        case .noValidCourses: return String(localized: "import.csv.error.no_courses", defaultValue: "No valid courses were found. Check the CSV format.")
         }
     }
 }

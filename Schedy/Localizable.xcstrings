@@ -1,0 +1,3725 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "about.license.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This software uses the Schedy License. You may use, modify, and create derivative works from this code. Retain the original author attribution and release derivative works as open source. App distributions must use the App Store. See LICENSE in the repository for details."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本软件采用 Schedy 开源协议。可自由使用、修改与基于本代码开发衍生产品；须保留原作者署名，衍生产品须开源；以应用形式分发须通过 App Store。详见仓库 LICENSE。"
+          }
+        }
+      }
+    },
+    "about.license.name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schedy License"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schedy 协议"
+          }
+        }
+      }
+    },
+    "about.license.read_action": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read Full License"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查看完整协议"
+          }
+        }
+      }
+    },
+    "about.license.section_title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Source License"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开源协议"
+          }
+        }
+      }
+    },
+    "about.license.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "License"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "协议"
+          }
+        }
+      }
+    },
+    "about.open_source.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schedy is open source. Star the project or contribute on GitHub."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schedy 为开源项目，欢迎在 GitHub 上 star 与参与贡献。"
+          }
+        }
+      }
+    },
+    "about.open_source.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Source"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开源"
+          }
+        }
+      }
+    },
+    "about.repository.open_action": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View on GitHub"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开源地址"
+          }
+        }
+      }
+    },
+    "about.repository.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Repository"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仓库"
+          }
+        }
+      }
+    },
+    "academic_system.chaoxing.name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chaoxing Academic Affairs"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "超星教务"
+          }
+        }
+      }
+    },
+    "academic_system.kingo.name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kingo Academic Affairs"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "金智教务"
+          }
+        }
+      }
+    },
+    "academic_system.qiangzhi.name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qiangzhi Academic Affairs"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "强智教务"
+          }
+        }
+      }
+    },
+    "academic_system.south.name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nansoft Academic Affairs"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "南软教务"
+          }
+        }
+      }
+    },
+    "academic_system.unknown.name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unknown System"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未知教务"
+          }
+        }
+      }
+    },
+    "academic_system.urp.name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URP Academic Affairs"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URP 综合教务"
+          }
+        }
+      }
+    },
+    "academic_system.wisedu.name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wisedu"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "金智 Wisedu"
+          }
+        }
+      }
+    },
+    "academic_system.zhengfang.name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zhengfang Academic Affairs"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正方教务"
+          }
+        }
+      }
+    },
+    "browser.action.go": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "前往"
+          }
+        }
+      }
+    },
+    "browser.url.placeholder": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter or paste a URL"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入或粘贴网址"
+          }
+        }
+      }
+    },
+    "calendar.weekday.friday.short": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fri"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "周五"
+          }
+        }
+      }
+    },
+    "calendar.weekday.monday.short": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mon"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "周一"
+          }
+        }
+      }
+    },
+    "calendar.weekday.saturday.short": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sat"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "周六"
+          }
+        }
+      }
+    },
+    "calendar.weekday.sunday.short": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sun"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "周日"
+          }
+        }
+      }
+    },
+    "calendar.weekday.thursday.short": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thu"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "周四"
+          }
+        }
+      }
+    },
+    "calendar.weekday.tuesday.short": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tue"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "周二"
+          }
+        }
+      }
+    },
+    "calendar.weekday.wednesday.short": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wed"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "周三"
+          }
+        }
+      }
+    },
+    "common.action.back": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上一步"
+          }
+        }
+      }
+    },
+    "common.action.cancel": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        }
+      }
+    },
+    "common.action.close": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭"
+          }
+        }
+      }
+    },
+    "common.action.delete": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除"
+          }
+        }
+      }
+    },
+    "common.action.done": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
+          }
+        }
+      }
+    },
+    "common.action.edit": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑"
+          }
+        }
+      }
+    },
+    "common.action.enable": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn On"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开启"
+          }
+        }
+      }
+    },
+    "common.action.ok": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "确定"
+          }
+        }
+      }
+    },
+    "common.action.ok_short": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "好"
+          }
+        }
+      }
+    },
+    "common.action.reset": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还原"
+          }
+        }
+      }
+    },
+    "common.action.save": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存"
+          }
+        }
+      }
+    },
+    "common.field.end": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束"
+          }
+        }
+      }
+    },
+    "common.field.name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名称"
+          }
+        }
+      }
+    },
+    "common.field.start": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始"
+          }
+        }
+      }
+    },
+    "common.status.unknown": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unknown"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未知"
+          }
+        }
+      }
+    },
+    "course.create.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Course"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加课程"
+          }
+        }
+      }
+    },
+    "course.credits.summary": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Credits: %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学分：%@"
+          }
+        }
+      }
+    },
+    "course.details.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Course Details"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课程信息"
+          }
+        }
+      }
+    },
+    "course.edit.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit Course"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑课程"
+          }
+        }
+      }
+    },
+    "course.field.credits": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Credits"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学分"
+          }
+        }
+      }
+    },
+    "course.field.end_period": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End Period"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束节"
+          }
+        }
+      }
+    },
+    "course.field.location": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Location"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地点"
+          }
+        }
+      }
+    },
+    "course.field.name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Course Name"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课程名"
+          }
+        }
+      }
+    },
+    "course.field.period": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Period"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "节次"
+          }
+        }
+      }
+    },
+    "course.field.start_period": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start Period"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "起始节"
+          }
+        }
+      }
+    },
+    "course.field.teacher": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Teacher"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "任课老师"
+          }
+        }
+      }
+    },
+    "course.field.week": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Week"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "周次"
+          }
+        }
+      }
+    },
+    "course.field.week_pattern": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Week Pattern"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "单双周"
+          }
+        }
+      }
+    },
+    "course.field.week_ranges": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Week Ranges"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "周次范围"
+          }
+        }
+      }
+    },
+    "course.field.weekday": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weekday"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "星期"
+          }
+        }
+      }
+    },
+    "course.period.label": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Period %lld"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 节"
+          }
+        }
+      }
+    },
+    "course.period.range": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Periods %1$lld–%2$lld"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %1$lld–%2$lld 节"
+          }
+        }
+      }
+    },
+    "course.period.setup_required": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set up period times in Settings first."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请先在设置中配置时间段"
+          }
+        }
+      }
+    },
+    "course.period.time_label": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Period %1$lld (%2$@)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %1$lld 节 (%2$@)"
+          }
+        }
+      }
+    },
+    "course.schedule.summary": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Periods %2$lld–%3$lld"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · 第 %2$lld–%3$lld 节"
+          }
+        }
+      }
+    },
+    "course.schedule.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Class Schedule"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上课时间"
+          }
+        }
+      }
+    },
+    "course.week_pattern.all": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All Weeks"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部"
+          }
+        }
+      }
+    },
+    "course.week_pattern.even": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Even Weeks"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "双周"
+          }
+        }
+      }
+    },
+    "course.week_pattern.odd": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odd Weeks"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "单周"
+          }
+        }
+      }
+    },
+    "course.week_range.add_action": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Week Range"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加一段周次"
+          }
+        }
+      }
+    },
+    "course.week_range.end": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "止"
+          }
+        }
+      }
+    },
+    "course.week_range.separator": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "to"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "至"
+          }
+        }
+      }
+    },
+    "course.week_range.start": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "起"
+          }
+        }
+      }
+    },
+    "course.weeks.summary": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weeks: %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "周次：%@"
+          }
+        }
+      }
+    },
+    "export.csv.action": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export as CSV"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导出为 CSV"
+          }
+        }
+      }
+    },
+    "export.csv.action_description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export an importable CSV for backup or editing."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导出与导入格式一致的 CSV，便于备份或二次编辑"
+          }
+        }
+      }
+    },
+    "export.csv.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The CSV includes course names, teachers, locations, weeks, weekdays, and periods. You can edit it in Excel."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CSV 包含课程名、教师、地点、周次、星期、节次等信息，可用 Excel 打开编辑。"
+          }
+        }
+      }
+    },
+    "export.csv.share_action": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share or Save CSV"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分享或保存 CSV"
+          }
+        }
+      }
+    },
+    "export.format.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export Format"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导出格式"
+          }
+        }
+      }
+    },
+    "export.ready.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export Ready"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导出文件已生成"
+          }
+        }
+      }
+    },
+    "export.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export Timetable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导出课表"
+          }
+        }
+      }
+    },
+    "import.csv.action": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import from CSV"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从 CSV 导入"
+          }
+        }
+      }
+    },
+    "import.csv.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use a CSV file or generate one with AI."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用 CSV 文件或通过 AI 生成课表"
+          }
+        }
+      }
+    },
+    "import.csv.error.empty_file": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The CSV file is empty."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CSV 文件为空"
+          }
+        }
+      }
+    },
+    "import.csv.error.file_access": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to access the selected file."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法访问所选文件"
+          }
+        }
+      }
+    },
+    "import.csv.error.file_read": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to read the file: %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "读取文件失败：%@"
+          }
+        }
+      }
+    },
+    "import.csv.error.invalid_header": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to read the CSV header."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "表头解析失败"
+          }
+        }
+      }
+    },
+    "import.csv.error.missing_column": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Missing required column: %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "缺少必填列：%@"
+          }
+        }
+      }
+    },
+    "import.csv.error.no_courses": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No valid courses were found. Check the CSV format."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未能解析到任何有效课程，请检查 CSV 格式"
+          }
+        }
+      }
+    },
+    "import.csv.file.choose_action": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose CSV File"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择 CSV 文件"
+          }
+        }
+      }
+    },
+    "import.csv.file.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a CSV file from your device."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从本机选择已准备好的 CSV 文件导入"
+          }
+        }
+      }
+    },
+    "import.csv.format.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The CSV must include these headers: 课程名,教师,地点,学分,周次,单双周,星期,起始节,结束节. Course name (课程名), weekday (星期), and start period (起始节) are required. Keep the Chinese headers exactly as shown."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CSV 需包含表头：课程名,教师,地点,学分,周次,单双周,星期,起始节,结束节。课程名、星期、起始节为必填。"
+          }
+        }
+      }
+    },
+    "import.csv.prompt.content": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Generate a CSV file from the timetable information I provide, for import into Schedy: Timetable.\n\nCSV format:\n- Keep this exact header (the Chinese column names are required by the import format):\n  课程名,教师,地点,学分,周次,单双周,星期,起始节,结束节\n- Columns, in order:\n  1. Course name: required; preserve the original name.\n  2. Teacher: optional.\n  3. Location: optional.\n  4. Credits: optional number, e.g. 4.0. Use a decimal point.\n  5. Weeks: optional, e.g. 1-16. For multiple ranges, quote the cell: \"1-1,5-8\". Default: 1-1.\n  6. Week pattern: all, odd, or even. Default: all.\n  7. Weekday: required, 1=Monday through 7=Sunday.\n  8. Start period: required, starting from 1.\n  9. End period: optional; leave empty for a single period.\n\nExamples:\nCalculus,Dr. Smith,A101,4.0,1-16,all,1,1,2\nEnglish,Dr. Lee,,2.0,1-16,all,3,3,\n\nOutput only CSV, with the exact header above. Quote fields containing commas, quotes, or line breaks; double any quotes inside a quoted field.\n\nMy timetable information:\n\n"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请根据我提供的课表信息，生成符合以下格式的 CSV 文件，用于导入 Schedy 课程表 App。\n\n## CSV 格式说明\n\n- **表头**（第一行，必须保留）：\n  课程名,教师,地点,学分,周次,单双周,星期,起始节,结束节\n\n- **列含义**：\n  - 课程名：必填\n  - 教师：选填\n  - 地点：选填\n  - 学分：选填，数字如 4.0\n  - 周次：选填，如 \"1-16\" 表示第1到16周，\"1-1,5-8\" 表示第1周 + 第5到8周。默认 \"1-1\"\n  - 单双周：选填，填「全部」/「单周」/「双周」之一，默认为「全部」\n  - 星期：必填，1=周一 … 7=周日，或填「周一」「周二」等\n  - 起始节：必填，第几节课开始，从 1 起算\n  - 结束节：选填，跨多节时填结束节；单节课可留空\n\n- **示例**：\n  高等数学,张老师,教学楼A101,4.0,1-16,全部,1,1,2\n  大学英语,李老师,,2.0,1-16,全部,3,3,\n\n请只输出 CSV 内容，不要输出其他说明。表头必须与示例一致。\n\n---\n\n以下是我的课表信息，请生成 CSV：\n"
+          }
+        }
+      }
+    },
+    "import.csv.prompt.copied_message": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prompt copied. Paste it into ChatGPT, Claude, or another AI app, then add your timetable details at the bottom to generate an importable CSV."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prompt 已复制到剪贴板。在 ChatGPT、Claude 等 App 中粘贴，在底部填入你的课表信息，AI 会生成可导入的 CSV。"
+          }
+        }
+      }
+    },
+    "import.csv.prompt.copied_title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prompt Copied"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已复制 Prompt"
+          }
+        }
+      }
+    },
+    "import.csv.prompt.copy_action": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy AI Prompt"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制 Prompt"
+          }
+        }
+      }
+    },
+    "import.csv.prompt.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paste into ChatGPT, Claude, or another AI app to generate a CSV from your timetable."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制后粘贴到 ChatGPT、Claude 等，让 AI 根据课表生成 CSV"
+          }
+        }
+      }
+    },
+    "import.csv.template.content": {
+      "comment": "CSV template. Keep the Chinese header names and field order unchanged; use all/odd/even and numeric weekdays in English.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课程名,教师,地点,学分,周次,单双周,星期,起始节,结束节\nCalculus,Dr. Smith,A101,4.0,1-16,all,1,1,2\nEnglish,Dr. Lee,B201,2.0,1-16,all,3,3,4\nProgramming,Dr. Wang,C301,3.0,1-8,odd,5,5,"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课程名,教师,地点,学分,周次,单双周,星期,起始节,结束节\n高等数学,张老师,教学楼A101,4.0,1-16,全部,1,1,2\n大学英语,李老师,教学楼B201,2.0,1-16,全部,3,3,4\n程序设计,王老师,实验楼C301,3.0,1-8,单周,5,5,"
+          }
+        }
+      }
+    },
+    "import.csv.template.copied_message": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CSV template copied. Paste it into Excel or Notes to fill it in."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CSV 模板已复制到剪贴板，可粘贴到 Excel 或备忘录中填写。"
+          }
+        }
+      }
+    },
+    "import.csv.template.copied_title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Template Copied"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已复制模板"
+          }
+        }
+      }
+    },
+    "import.csv.template.copy_action": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy CSV Template"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制 CSV 模板"
+          }
+        }
+      }
+    },
+    "import.csv.template.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy the template, then paste it into Excel or a text editor to fill it in."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将模板复制到剪贴板，可粘贴到 Excel 或文本编辑器填写"
+          }
+        }
+      }
+    },
+    "import.csv.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CSV Import"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CSV 导入"
+          }
+        }
+      }
+    },
+    "import.error.schedule_missing": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The current timetable could not be found."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未找到当前课表。"
+          }
+        }
+      }
+    },
+    "import.error.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import Failed"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导入失败"
+          }
+        }
+      }
+    },
+    "import.mode.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Replace courses in the current timetable or import into a new one."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择将课程导入到当前课表（覆盖）或新建一个课表。"
+          }
+        }
+      }
+    },
+    "import.mode.new_description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import into a new timetable and keep your existing timetables."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "创建新课表并导入，保留现有课表不变"
+          }
+        }
+      }
+    },
+    "import.mode.new_title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Timetable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新建课表"
+          }
+        }
+      }
+    },
+    "import.mode.overwrite_description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Replace courses in “%@”."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "替换「%@」中的课程"
+          }
+        }
+      }
+    },
+    "import.mode.overwrite_title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Replace Current Timetable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "覆盖当前课表"
+          }
+        }
+      }
+    },
+    "import.mode.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import Mode"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导入方式"
+          }
+        }
+      }
+    },
+    "import.school.action": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import from School System"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从教务导入"
+          }
+        }
+      }
+    },
+    "import.school.action_description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import from your school's academic system website."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通过学校教务系统网页导入课表"
+          }
+        }
+      }
+    },
+    "import.school.browser_instructions": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in and open your timetable, then tap the download button in the top right to import."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请登录并进入课表页面后，点击右上角下载按钮导入。"
+          }
+        }
+      }
+    },
+    "import.school.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import uses the selected school's parsing rules. Search by school name or pinyin initials. Sign in, open the personal timetable page (“个人课表查询”), then tap the download button in the top right."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将使用该学校对应的教务系统解析规则。支持按学校名或拼音首字母搜索。打开教务系统后，请进入「个人课表查询」页面，再点击右上角下载按钮导入。"
+          }
+        }
+      }
+    },
+    "import.school.error.failed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "School system import failed: %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "教务导入失败：%@"
+          }
+        }
+      }
+    },
+    "import.school.error.http": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request failed (HTTP %@)."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请求失败（HTTP %@）"
+          }
+        }
+      }
+    },
+    "import.school.error.network": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The network request failed."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "网络请求失败"
+          }
+        }
+      }
+    },
+    "import.school.error.no_courses": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No course data was found."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未查询到课程数据"
+          }
+        }
+      }
+    },
+    "import.school.error.open_timetable": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open your timetable page in the school system before importing."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请先进入教务系统的课表查询页面后再点击导入"
+          }
+        }
+      }
+    },
+    "import.school.error.parse_failed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to parse course data: %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "数据解析失败：%@"
+          }
+        }
+      }
+    },
+    "import.school.error.script_missing": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import script resource not found: %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未找到注入脚本资源：%@"
+          }
+        }
+      }
+    },
+    "import.school.error.timeout": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The import script timed out. Open your timetable page and try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "注入脚本执行超时，请确认已进入课表页面后重试。"
+          }
+        }
+      }
+    },
+    "import.school.error.unsupported_layout": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The timetable could not be found. Open your timetable page and try again. This school's page layout may not be supported yet."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未能定位课表，请确认已打开课表页面；该学校的页面结构可能暂未适配。"
+          }
+        }
+      }
+    },
+    "import.school.error.wrong_page": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No courses could be read from this page. Open the “%@” timetable page and try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未能从当前页面解析到课程，请确保已打开「%@」的课表页面。"
+          }
+        }
+      }
+    },
+    "import.school.list.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "School"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "院校"
+          }
+        }
+      }
+    },
+    "import.school.search_placeholder": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search by school name or pinyin initials"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索学校名或拼音首字母"
+          }
+        }
+      }
+    },
+    "import.school.status.unsupported": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not Supported Yet"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂未支持"
+          }
+        }
+      }
+    },
+    "import.school.system.choose_title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose School System"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择教务系统"
+          }
+        }
+      }
+    },
+    "import.school.system.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "If your school isn't listed, select its academic system. Enter your school's URL in the browser, sign in, and open your timetable to import."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "若您的学校不在院校列表中，可选择对应的教务系统类型。打开浏览器后，请在地址栏输入您学校的教务系统网址，登录并进入课表页面后导入。"
+          }
+        }
+      }
+    },
+    "import.school.system.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "School System"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "教务系统"
+          }
+        }
+      }
+    },
+    "import.source.choose_title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import Source"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择导入来源"
+          }
+        }
+      }
+    },
+    "import.source.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open your school's academic system, navigate to your timetable, then tap the download button in the top right to import. You can also import a CSV file or ask AI to generate one."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从教务导入会打开学校教务系统网页，进入课表页面后点击右上角下载按钮即可导入。也可使用 CSV 文件导入或让 AI 生成 CSV。"
+          }
+        }
+      }
+    },
+    "import.source.empty": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Source Selected"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未选择来源"
+          }
+        }
+      }
+    },
+    "import.source.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Source"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "来源"
+          }
+        }
+      }
+    },
+    "import.success.course_count": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Imported %lld course."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Imported %lld courses."
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已导入 %lld 门课程。"
+          }
+        }
+      }
+    },
+    "import.success.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import Complete"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导入完成"
+          }
+        }
+      }
+    },
+    "import.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import Timetable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导入课表"
+          }
+        }
+      }
+    },
+    "navigation.about.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关于"
+          }
+        }
+      }
+    },
+    "navigation.permissions.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permissions"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "权限"
+          }
+        }
+      }
+    },
+    "navigation.settings.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置"
+          }
+        }
+      }
+    },
+    "navigation.timetable.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Timetable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课程表"
+          }
+        }
+      }
+    },
+    "navigation.today.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天"
+          }
+        }
+      }
+    },
+    "notification.course.body": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%2$@” in “%1$@” is starting soon."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」%@ 快要开始啦"
+          }
+        }
+      },
+      "extractionState": "manual",
+      "comment": "Scheduled notification body. Arguments: timetable name, course name. Localized by the system at delivery."
+    },
+    "notification.course.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Class Reminders"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课程提醒"
+          }
+        }
+      }
+    },
+    "permissions.action.open_settings": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open System Settings"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在系统设置中修改"
+          }
+        }
+      }
+    },
+    "permissions.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notifications remind you 15 minutes before class. Network access loads school systems and project links using your device's connection. Tap Open System Settings to change notification permissions."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通知权限用于在课程开始前 15 分钟提醒你；网络用于加载教务系统、开源链接等，随系统网络状态使用。若需修改通知权限，可点击「在系统设置中修改」跳转。"
+          }
+        }
+      }
+    },
+    "permissions.network.status.system": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uses System Connection"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "随系统网络"
+          }
+        }
+      }
+    },
+    "permissions.network.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Network"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "网络"
+          }
+        }
+      }
+    },
+    "permissions.notifications.status.ephemeral": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ephemeral"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "临时"
+          }
+        }
+      }
+    },
+    "permissions.notifications.status.not_set": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not Set"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未选择"
+          }
+        }
+      }
+    },
+    "permissions.notifications.status.provisional": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Provisional (Summary)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "临时（摘要）"
+          }
+        }
+      }
+    },
+    "permissions.notifications.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notifications"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通知"
+          }
+        }
+      }
+    },
+    "permissions.status.checking": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "检查中…"
+          }
+        }
+      }
+    },
+    "permissions.status.off": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Off"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已关闭"
+          }
+        }
+      }
+    },
+    "permissions.status.on": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已开启"
+          }
+        }
+      }
+    },
+    "permissions.summary.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schedy Permissions"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schedy 当前权限"
+          }
+        }
+      }
+    },
+    "preset.create.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Time Preset"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新建时间段"
+          }
+        }
+      }
+    },
+    "preset.default.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose the default time preset for timetables without their own preset. Assign a preset to each timetable in Timetables. Manage period start and end times below."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此处为「默认时间段」：未单独绑定时间段的课表将使用此项；新建课表时也可选此项。各课表可在「课程表」中编辑并绑定自己的时间段。下方可管理各节的起止时间。"
+          }
+        }
+      }
+    },
+    "preset.default.summer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Summer"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "夏令时"
+          }
+        }
+      }
+    },
+    "preset.default.winter": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Winter"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "冬令时"
+          }
+        }
+      }
+    },
+    "preset.edit.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit Time Preset"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑时间段"
+          }
+        }
+      }
+    },
+    "preset.field.name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time Preset Name"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时间段名称"
+          }
+        }
+      }
+    },
+    "preset.name.placeholder": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "For example: Winter, Summer, Custom"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "例如：冬令时、夏令时、自定义"
+          }
+        }
+      }
+    },
+    "preset.period.add_action": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Period"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加时间节"
+          }
+        }
+      }
+    },
+    "preset.periods.count": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld time slot"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld time slots"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 个时间段"
+          }
+        }
+      }
+    },
+    "preset.periods.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Period Times"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 时间段明细"
+          }
+        }
+      }
+    },
+    "preset.selection.default": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use Default"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用默认"
+          }
+        }
+      }
+    },
+    "reschedule.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move “%1$@” from week %2$lld (%3$@, periods %4$lld–%5$lld) to the time below, keeping the same number of periods."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将 第 %2$lld 周 的「%1$@」（%3$@ 第 %4$lld–%5$lld 节）调至下方选择的时间，课时数保持不变。"
+          }
+        }
+      }
+    },
+    "reschedule.destination.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move To"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "调至"
+          }
+        }
+      }
+    },
+    "reschedule.period_summary": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Period %1$lld (total: %2$lld)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %1$lld 节（共 %2$lld 节）"
+          }
+        }
+      }
+    },
+    "reschedule.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reschedule"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "调课"
+          }
+        }
+      }
+    },
+    "reschedule.undo_action": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Undo This Reschedule"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "撤销该次调课"
+          }
+        }
+      }
+    },
+    "schedule.action.switch": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Switch Timetable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "切换课程表"
+          }
+        }
+      }
+    },
+    "schedule.create.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Timetable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新建课程表"
+          }
+        }
+      }
+    },
+    "schedule.default.imported_name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imported Timetable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导入的课程表"
+          }
+        }
+      }
+    },
+    "schedule.default.name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "My Timetable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我的课程表"
+          }
+        }
+      }
+    },
+    "schedule.edit.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit Timetable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑课程表"
+          }
+        }
+      }
+    },
+    "schedule.field.name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Timetable Name"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课程表名称"
+          }
+        }
+      }
+    },
+    "schedule.list.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap a timetable to select it. Each timetable has its own name, semester start date, and time preset. Widgets use the selected timetable's preset."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点击选择当前使用的课程表。每张课程表可单独设置名称、学期第一天与绑定的时间段；小组件选哪张课表即使用该课表的时间段。"
+          }
+        }
+      }
+    },
+    "schedule.manage.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manage Timetables"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课表管理"
+          }
+        }
+      }
+    },
+    "schedule.preset.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This preset is used in the timetable grid and widgets. Leave unset to use the app default."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "该课表在网格与小组件中显示时使用此时间段。未设置则使用 App 默认。"
+          }
+        }
+      }
+    },
+    "schedule.reminders.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Get a reminder 15 minutes before each class. Enable reminders for multiple timetables if you teach or attend several groups."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开启后，该课表中有课的时间会提前 15 分钟收到提醒。多张课表可同时开启，适合带多个班的老师。"
+          }
+        }
+      }
+    },
+    "schedule.selection.current": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current Timetable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前课表"
+          }
+        }
+      }
+    },
+    "schedule.semester.ended": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Semester Ended"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学期已结束"
+          }
+        }
+      }
+    },
+    "schedule.semester.not_started": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Semester Hasn't Started"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未开学"
+          }
+        }
+      }
+    },
+    "schedule.semester.section_title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Semester Start"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本学期第一天"
+          }
+        }
+      }
+    },
+    "schedule.semester.start_date": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Semester Start Date"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学期第一天"
+          }
+        }
+      }
+    },
+    "schedule.semester.start_summary": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Semester starts: %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学期开始：%@"
+          }
+        }
+      }
+    },
+    "schedule.week.current": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This Week"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "回到本周"
+          }
+        }
+      }
+    },
+    "schedule.week.jump": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go to Week"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跳转周次"
+          }
+        }
+      }
+    },
+    "schedule.week.label": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Week %lld"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 周"
+          }
+        }
+      }
+    },
+    "schedule.week.next": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next Week"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下一周"
+          }
+        }
+      }
+    },
+    "schedule.week.previous": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Previous Week"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上一周"
+          }
+        }
+      }
+    },
+    "schedule.week.view": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View Week"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查看周次"
+          }
+        }
+      }
+    },
+    "settings.appearance.dark": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dark"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "深色"
+          }
+        }
+      }
+    },
+    "settings.appearance.light": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Light"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "浅色"
+          }
+        }
+      }
+    },
+    "settings.appearance.system": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跟随系统"
+          }
+        }
+      }
+    },
+    "settings.appearance.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appearance"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外观"
+          }
+        }
+      }
+    },
+    "settings.first_weekday.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose Sunday or Monday as the leftmost timetable column."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择周日或周一作为课表最左侧的列。"
+          }
+        }
+      }
+    },
+    "settings.first_weekday.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First Day of Week"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每周第一天"
+          }
+        }
+      }
+    },
+    "settings.grid_lines.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose which grid lines appear in the timetable."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "控制课表网格中横线与竖线的显示。"
+          }
+        }
+      }
+    },
+    "settings.grid_lines.horizontal": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Horizontal Lines"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示横线"
+          }
+        }
+      }
+    },
+    "settings.grid_lines.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grid Lines"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "网格线"
+          }
+        }
+      }
+    },
+    "settings.grid_lines.vertical": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Vertical Lines"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示竖线"
+          }
+        }
+      }
+    },
+    "settings.presets.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time Presets"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时间段"
+          }
+        }
+      }
+    },
+    "settings.sync.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Data Sync"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "数据同步"
+          }
+        }
+      }
+    },
+    "settings.timetable_display.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Timetable Display"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "课表显示"
+          }
+        }
+      }
+    },
+    "settings.weekends.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When turned off, the timetable shows Monday through Friday only."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭后课表仅显示周一至周五。"
+          }
+        }
+      }
+    },
+    "settings.weekends.show": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Weekends"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示周末"
+          }
+        }
+      }
+    },
+    "settings.weekends.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weekends"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "周末"
+          }
+        }
+      }
+    },
+    "sync.action.merge": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Merge Local and iCloud Data"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "合并本地与云端"
+          }
+        }
+      }
+    },
+    "sync.action.replace_local": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Replace Local Data"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "云端覆盖本地"
+          }
+        }
+      }
+    },
+    "sync.disable.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only local data will be used. Your data in iCloud will be kept."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭后将仅使用本地数据，iCloud 中的数据不受影响。"
+          }
+        }
+      }
+    },
+    "sync.disable.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn Off iCloud Sync"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭 iCloud 同步"
+          }
+        }
+      }
+    },
+    "sync.enable.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your iCloud data will sync to this device automatically."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开启后，iCloud 数据将自动同步到本设备。"
+          }
+        }
+      }
+    },
+    "sync.enable.merge_description": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "You have %lld local timetable.\n\nMerge: Keep local data and merge it with iCloud.\nReplace: Delete local data and use only the data from iCloud."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "You have %lld local timetables.\n\nMerge: Keep local data and merge it with iCloud.\nReplace: Delete local data and use only the data from iCloud."
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本地有 %lld 张课程表。\n\n合并：保留本地数据，并与 iCloud 云端数据合并。\n云端覆盖：删除本地数据，完全使用 iCloud 云端数据。"
+          }
+        }
+      }
+    },
+    "sync.enable.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn On iCloud Sync"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开启 iCloud 同步"
+          }
+        }
+      }
+    },
+    "sync.icloud.account_hint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Make sure your devices use the same Apple ID."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请确保已登录同一 Apple ID。"
+          }
+        }
+      }
+    },
+    "sync.icloud.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Sync"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud 同步"
+          }
+        }
+      }
+    },
+    "sync.icloud.unavailable": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device is not signed in to iCloud. Sign in with your Apple ID on a physical device to use sync."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前设备未登录 iCloud（如模拟器），无法使用同步功能。请在真机登录 Apple ID 后使用。"
+          }
+        }
+      }
+    },
+    "sync.reset.confirmation": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All timetables and time presets will be deleted and a default timetable will be created. This cannot be undone."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将清除所有课程表与时间段数据，并重新创建默认课程表，此操作不可撤销。"
+          }
+        }
+      }
+    },
+    "sync.reset.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete all timetables and time presets on this device and create a default timetable. Your data in iCloud will be kept."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除本设备上的所有课程表与时间段数据，并重新创建默认课程表。iCloud 中的数据不受影响。"
+          }
+        }
+      }
+    },
+    "sync.reset.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset to Defaults"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还原默认数据"
+          }
+        }
+      }
+    },
+    "sync.restart_required": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restart the app to apply your changes."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置已更改，请重启 App 以生效。"
+          }
+        }
+      }
+    },
+    "sync.status.last_synced": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last Synced"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上次同步"
+          }
+        }
+      }
+    },
+    "sync.status.syncing": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Syncing…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在同步…"
+          }
+        }
+      }
+    },
+    "sync.status.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sync Status"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同步状态"
+          }
+        }
+      }
+    },
+    "sync.status.up_to_date": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Up to Date"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同步正常"
+          }
+        }
+      }
+    },
+    "today.empty.description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add courses to your timetable to see your classes here."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在课程表中添加课程后，有课的日子会在这里显示"
+          }
+        }
+      }
+    },
+    "today.empty.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Classes Today"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天没有课"
+          }
+        }
+      }
+    },
+    "validation.name_conflict.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name Already Exists"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名称已存在"
+          }
+        }
+      }
+    },
+    "validation.preset.name_conflict": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A time preset with this name already exists. Choose another name."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已有同名时间段，请使用其他名称。"
+          }
+        }
+      }
+    },
+    "validation.schedule.name_conflict": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A timetable with this name already exists. Choose another name."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已有同名课程表，请使用其他名称。"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

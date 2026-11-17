@@ -10,10 +10,10 @@ import WidgetKit
 
 @available(iOS 17.0, macOS 14.0, watchOS 10.0, *)
 struct SchedyWidgetConfigIntent: AppIntent, WidgetConfigurationIntent {
-    static var title: LocalizedStringResource = "今日课程"
-    static var description = IntentDescription("选择要在小组件中显示的课表，将使用该课表绑定的时间段")
+    static var title: LocalizedStringResource = LocalizedStringResource("widget.title", defaultValue: "Today's Classes")
+    static var description = IntentDescription(LocalizedStringResource("widget.configuration.description", defaultValue: "Choose a timetable for this widget. Its assigned time preset will be used."))
 
-    @Parameter(title: "课表", optionsProvider: ScheduleOptionsProvider())
+    @Parameter(title: LocalizedStringResource("widget.configuration.schedule.title", defaultValue: "Timetable"), optionsProvider: ScheduleOptionsProvider())
     var scheduleName: String?
 
     init() {
@@ -28,10 +28,12 @@ struct SchedyWidgetConfigIntent: AppIntent, WidgetConfigurationIntent {
 @available(iOS 17.0, macOS 14.0, watchOS 10.0, *)
 extension SchedyWidgetConfigIntent {
     struct ScheduleOptionsProvider: DynamicOptionsProvider {
-        func results() async throws -> [String] {
+        func results() async throws -> IntentItemCollection<String> {
             let suite = UserDefaults(suiteName: kWidgetAppGroupSuiteName)
             let list = suite?.stringArray(forKey: WidgetDataKeys.scheduleNamesList) ?? []
-            return [kWidgetScheduleOptionFollowApp] + list
+            let items = [IntentItem(kWidgetScheduleOptionFollowApp, title: LocalizedStringResource("widget.configuration.follow_app", defaultValue: "Follow App Selection"))]
+                + list.map { IntentItem($0, title: LocalizedStringResource("widget.configuration.schedule_name", defaultValue: "\($0)")) }
+            return IntentItemCollection(sections: [IntentItemSection(items: items)])
         }
     }
 }

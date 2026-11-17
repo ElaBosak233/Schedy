@@ -17,6 +17,7 @@ let kWidgetScheduleOptionFollowApp = "跟随 App 当前选中"
 enum WidgetDataKeys {
     static let scheduleName = "widgetScheduleName"
     static let date = "widgetDate"
+    static let displayDate = "widgetDisplayDate"
     static let weekday = "widgetWeekday"
     static let status = "widgetStatus"
     static let course1Name = "widgetCourse1Name"
@@ -47,7 +48,7 @@ struct WidgetEntry {
     /// 从 suite 读取「课表+时间段」的缓存数据（key 为 entryPrefix_scheduleName__SEP__presetName）
     static func load(from suite: UserDefaults?, scheduleName name: String, presetName preset: String) -> WidgetEntry {
         guard let suite = suite else {
-            return WidgetEntry(scheduleName: "课程表", dateString: "", weekdayString: "", status: "noClass", course1: nil, course2: nil)
+            return WidgetEntry(scheduleName: String(localized: "navigation.timetable.title", defaultValue: "Timetable"), dateString: "", weekdayString: "", status: "noClass", course1: nil, course2: nil)
         }
         let key = "\(WidgetDataKeys.entryPrefix)_\(name)\(WidgetDataKeys.entrySeparator)\(preset)"
         if let dict = suite.dictionary(forKey: key) as? [String: String] {
@@ -57,13 +58,14 @@ struct WidgetEntry {
         if let legacy = loadLegacy(from: suite, scheduleName: name) {
             return legacy
         }
-        return WidgetEntry(scheduleName: name.isEmpty ? "课程表" : name, dateString: "", weekdayString: "", status: "noClass", course1: nil, course2: nil)
+        return WidgetEntry(scheduleName: name.isEmpty ? String(localized: "navigation.timetable.title", defaultValue: "Timetable") : name, dateString: "", weekdayString: "", status: "noClass", course1: nil, course2: nil)
     }
 
     private static func parseEntryDict(dict: [String: String], fallbackScheduleName: String) -> WidgetEntry {
         let scheduleName = dict[WidgetDataKeys.scheduleName] ?? fallbackScheduleName
-        let dateString = dict[WidgetDataKeys.date] ?? ""
-        let weekdayString = dict[WidgetDataKeys.weekday] ?? ""
+        let displayDate = dict[WidgetDataKeys.displayDate].flatMap(Double.init).map(Date.init(timeIntervalSince1970:))
+        let dateString = displayDate?.formatted(.dateTime.month(.abbreviated).day()) ?? dict[WidgetDataKeys.date] ?? ""
+        let weekdayString = displayDate?.formatted(.dateTime.weekday(.abbreviated)) ?? dict[WidgetDataKeys.weekday] ?? ""
         let status = dict[WidgetDataKeys.status] ?? "noClass"
         let c1Name = dict[WidgetDataKeys.course1Name] ?? ""
         let c1Time = dict[WidgetDataKeys.course1Time] ?? ""
@@ -147,6 +149,6 @@ extension WidgetEntry {
         let c2Location = suite.string(forKey: WidgetDataKeys.course2Location) ?? ""
         let course1: (name: String, time: String, location: String)? = c1Name.isEmpty ? nil : (c1Name, c1Time, c1Location)
         let course2: (name: String, time: String, location: String)? = c2Name.isEmpty ? nil : (c2Name, c2Time, c2Location)
-        return WidgetEntry(scheduleName: scheduleName ?? "课程表", dateString: dateString, weekdayString: weekdayString, status: status, course1: course1, course2: course2)
+        return WidgetEntry(scheduleName: scheduleName ?? String(localized: "navigation.timetable.title", defaultValue: "Timetable"), dateString: dateString, weekdayString: weekdayString, status: status, course1: course1, course2: course2)
     }
 }

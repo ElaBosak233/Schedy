@@ -26,60 +26,60 @@ struct SettingsRootView: View {
                         Text(mode.displayName).tag(mode)
                     }
                 } label: {
-                    Label("外观", systemImage: "circle.lefthalf.filled")
+                    Label(String(localized: "settings.appearance.title", defaultValue: "Appearance"), systemImage: "circle.lefthalf.filled")
                 }
                 .pickerStyle(.menu)
                 NavigationLink {
                     ScheduleDisplaySettingsView()
                 } label: {
-                    Label("课表显示", systemImage: "tablecells")
+                    Label(String(localized: "settings.timetable_display.title", defaultValue: "Timetable Display"), systemImage: "tablecells")
                 }
             } header: {
-                Text("外观")
+                Text(String(localized: "settings.appearance.title", defaultValue: "Appearance"))
             }
 
             Section {
                 NavigationLink {
                     ScheduleListView()
                 } label: {
-                    Label("课程表", systemImage: "rectangle.grid.2x2")
+                    Label(String(localized: "navigation.timetable.title", defaultValue: "Timetable"), systemImage: "rectangle.grid.2x2")
                 }
                 NavigationLink {
                     TimeSlotsSettingsView()
                 } label: {
-                    Label("时间段", systemImage: "clock")
+                    Label(String(localized: "settings.presets.title", defaultValue: "Time Presets"), systemImage: "clock")
                 }
                 NavigationLink {
                     ICloudSettingsView()
                 } label: {
-                    Label("数据同步", systemImage: "arrow.triangle.2.circlepath.icloud")
+                    Label(String(localized: "settings.sync.title", defaultValue: "Data Sync"), systemImage: "arrow.triangle.2.circlepath.icloud")
                 }
             } header: {
-                Text("课程表")
+                Text(String(localized: "navigation.timetable.title", defaultValue: "Timetable"))
             }
 
             Section {
                 NavigationLink {
                     PermissionsView()
                 } label: {
-                    Label("权限", systemImage: "hand.raised")
+                    Label(String(localized: "navigation.permissions.title", defaultValue: "Permissions"), systemImage: "hand.raised")
                 }
             } header: {
-                Text("权限")
+                Text(String(localized: "navigation.permissions.title", defaultValue: "Permissions"))
             }
 
             Section {
                 NavigationLink {
                     AboutView()
                 } label: {
-                    Label("关于", systemImage: "info.circle")
+                    Label(String(localized: "navigation.about.title", defaultValue: "About"), systemImage: "info.circle")
                 }
             } header: {
-                Text("关于")
+                Text(String(localized: "navigation.about.title", defaultValue: "About"))
             }
         }
         .schedyPageStyle(navigationBackground: .automatic)
-        .navigationTitle("设置")
+        .navigationTitle(String(localized: "navigation.settings.title", defaultValue: "Settings"))
         .navigationBarTitleDisplayMode(.large)
     }
 }

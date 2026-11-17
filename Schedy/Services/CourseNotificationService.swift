@@ -84,7 +84,7 @@ private func scheduleCourseRemindersAfterClear(modelContext: ModelContext) {
         for schedule in enabledSchedules {
             guard scheduledCount < maxTotal else { break }
             let scheduleID = schedule.persistentModelID
-            let scheduleName = schedule.name.isEmpty ? "课程表" : schedule.name
+            let scheduleName = schedule.name.isEmpty ? String(localized: "navigation.timetable.title", defaultValue: "Timetable") : schedule.name
             let courses = allCourses.filter { $0.schedule?.persistentModelID == scheduleID }
             guard !courses.isEmpty else { continue }
 
@@ -123,8 +123,8 @@ private func scheduleCourseRemindersAfterClear(modelContext: ModelContext) {
                         if reminderDate <= now { continue }
                         let id = "\(kNotificationPrefix)\(occ.course.persistentModelID.hashValue)-\(scheduleID.hashValue)-\(week)-\(dayOfWeek)-\(occ.periodStart)"
                         let content = UNMutableNotificationContent()
-                        content.title = "课程提醒"
-                        content.body = "「\(scheduleName)」\(occ.course.name) 快要开始啦"
+                        content.title = NSString.localizedUserNotificationString(forKey: "notification.course.title", arguments: nil)
+                        content.body = NSString.localizedUserNotificationString(forKey: "notification.course.body", arguments: [scheduleName, occ.course.name])
                         content.sound = .default
                         let triggerComps = cal.dateComponents([.year, .month, .day, .hour, .minute], from: reminderDate)
                         let trigger = UNCalendarNotificationTrigger(dateMatching: triggerComps, repeats: false)

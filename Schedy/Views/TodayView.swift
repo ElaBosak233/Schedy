@@ -39,7 +39,7 @@ private struct TodayCourseCard: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer(minLength: 8)
-                    Text("第 \(periodStart)–\(periodEnd) 节")
+                    Text(String(localized: "course.period.range", defaultValue: "Periods \(periodStart)–\(periodEnd)"))
                         .font(.caption)
                         .fontWeight(.medium)
                         .foregroundStyle(cardAccent)
@@ -75,7 +75,7 @@ private struct TodayCourseCard: View {
                 Label(location, systemImage: "mappin.circle.fill")
             }
             if let credits = course.credits {
-                Label(String(format: "%g", credits) + " 学分", systemImage: "number.circle.fill")
+                Label(String(localized: "course.credits.summary", defaultValue: "Credits: \(credits.formatted())"), systemImage: "number.circle.fill")
             }
         }
         .font(.caption)
@@ -88,7 +88,7 @@ struct TodayView: View {
     @ScaledMetric(relativeTo: .body) private var minimumCardWidth: CGFloat = 320
     @Query(sort: \Schedule.name) private var schedules: [Schedule]
     @Query(sort: \TimeSlotPreset.name) private var presets: [TimeSlotPreset]
-    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = "我的课程表"
+    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = String(localized: "schedule.default.name", defaultValue: "My Timetable")
     @AppStorage(ScheduleDisplayKeys.activeTimeSlotPresetName) private var activeTimeSlotPresetName: String = ""
 
     private var activeSchedule: Schedule? {
@@ -138,14 +138,14 @@ struct TodayView: View {
         if let start = startSlot, let end = endSlot {
             return "\(start.startTimeString) ~ \(end.endTimeString)"
         }
-        return "第 \(periodStart)–\(periodEnd) 节"
+        return String(localized: "course.period.range", defaultValue: "Periods \(periodStart)–\(periodEnd)")
     }
 
     /// 今日日期文案
     private var todayDateString: String {
         let f = DateFormatter()
-        f.dateFormat = "M月d日 EEEE"
-        f.locale = Locale(identifier: "zh_CN")
+        f.locale = Locale.current
+        f.setLocalizedDateFormatFromTemplate("MMMMdEEEE")
         return f.string(from: Date())
     }
 
@@ -194,12 +194,12 @@ struct TodayView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .schedyPageStyle()
-            .navigationTitle("今天")
+            .navigationTitle(String(localized: "navigation.today.title", defaultValue: "Today"))
             .navigationBarTitleDisplayMode(.large)
             .onAppear {
                 seedDefaultScheduleIfNeeded(modelContext: modelContext)
                 if activeScheduleName.isEmpty {
-                    activeScheduleName = schedules.first?.name ?? "我的课程表"
+                    activeScheduleName = schedules.first?.name ?? String(localized: "schedule.default.name", defaultValue: "My Timetable")
                 }
             }
             .task(id: "\(activeSchedule?.name ?? "")_\(currentWeek)_\(todayDayOfWeek)") {
@@ -226,11 +226,11 @@ struct TodayView: View {
             Image(systemName: "calendar.badge.checkmark")
                 .font(.system(size: 56))
                 .foregroundStyle(.secondary)
-            Text("今天没有课")
+            Text(String(localized: "today.empty.title", defaultValue: "No Classes Today"))
                 .font(.title3)
                 .fontWeight(.medium)
                 .foregroundStyle(.primary)
-            Text("在课程表中添加课程后，有课的日子会在这里显示")
+            Text(String(localized: "today.empty.description", defaultValue: "Add courses to your timetable to see your classes here."))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

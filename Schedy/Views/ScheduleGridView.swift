@@ -20,14 +20,14 @@ private struct CoursePreviewContext: Identifiable {
 private enum ScheduleDateFormatters {
     static let shortMD: DateFormatter = {
         let f = DateFormatter()
-        f.dateFormat = "M/d"
-        f.locale = Locale(identifier: "zh_CN")
+        f.locale = Locale.current
+        f.setLocalizedDateFormatFromTemplate("Md")
         return f
     }()
     static let monthDay: DateFormatter = {
         let f = DateFormatter()
-        f.dateFormat = "M月d日"
-        f.locale = Locale(identifier: "zh_CN")
+        f.locale = Locale.current
+        f.setLocalizedDateFormatFromTemplate("MMMd")
         return f
     }()
 }
@@ -118,7 +118,7 @@ struct ScheduleGridView: View {
     @ScaledMetric(relativeTo: .caption) private var minimumDayWidth: CGFloat = 44
     @Query(sort: \Schedule.name) private var schedules: [Schedule]
     @Query(sort: \TimeSlotPreset.name) private var presets: [TimeSlotPreset]
-    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = "我的课程表"
+    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = String(localized: "schedule.default.name", defaultValue: "My Timetable")
     @AppStorage(ScheduleDisplayKeys.activeTimeSlotPresetName) private var activeTimeSlotPresetName: String = ""
     @AppStorage(ScheduleDisplayKeys.showHorizontalLines) private var showHorizontalLines: Bool = true
     @AppStorage(ScheduleDisplayKeys.showVerticalLines) private var showVerticalLines: Bool = true
@@ -190,7 +190,7 @@ struct ScheduleGridView: View {
     private func performCSVExport() {
         guard let schedule = activeSchedule else { return }
         let csv = CSVExport.csvString(from: schedule)
-        let fileName = (schedule.name.isEmpty ? "课程表" : schedule.name)
+        let fileName = (schedule.name.isEmpty ? String(localized: "navigation.timetable.title", defaultValue: "Timetable") : schedule.name)
             .replacingOccurrences(of: "/", with: "-")
             + ".csv"
         let tempDir = FileManager.default.temporaryDirectory
@@ -214,11 +214,11 @@ struct ScheduleGridView: View {
         let cal = Calendar.current
         let today = cal.startOfDay(for: Date())
         let start = cal.startOfDay(for: schedule.semesterStartDate)
-        if today < start { return "未开学" }
+        if today < start { return String(localized: "schedule.semester.not_started", defaultValue: "Semester Hasn't Started") }
         let days = cal.dateComponents([.day], from: start, to: today).day ?? 0
         let week = days / 7 + 1
-        if week > effectiveMaxWeeks { return "学期已结束" }
-        return "第 \(week) 周"
+        if week > effectiveMaxWeeks { return String(localized: "schedule.semester.ended", defaultValue: "Semester Ended") }
+        return String(localized: "schedule.week.label", defaultValue: "Week \(week)")
     }
 
     /// 打开 app 时默认显示的周次：当前周；未开学或学期已结束则为第 1 周
@@ -278,7 +278,7 @@ struct ScheduleGridView: View {
                 weekIndicator
             }
             .schedyPageStyle()
-            .navigationTitle(activeSchedule?.name ?? "课程表")
+            .navigationTitle(activeSchedule?.name ?? String(localized: "navigation.timetable.title", defaultValue: "Timetable"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { scheduleToolbar }
             .sheet(isPresented: $showScheduleImport) {
@@ -324,7 +324,7 @@ struct ScheduleGridView: View {
             .onAppear {
                 seedDefaultScheduleIfNeeded(modelContext: modelContext)
                 if activeScheduleName.isEmpty {
-                    activeScheduleName = schedules.first?.name ?? "我的课程表"
+                    activeScheduleName = schedules.first?.name ?? String(localized: "schedule.default.name", defaultValue: "My Timetable")
                 }
                 if !hasSelectedInitialWeek {
                     viewingWeek = defaultViewingWeek
@@ -360,24 +360,24 @@ struct ScheduleGridView: View {
     private var scheduleToolbar: some ToolbarContent {
         if let onDismiss {
             ToolbarItem(placement: .cancellationAction) {
-                Button("关闭", action: onDismiss)
+                Button(String(localized: "common.action.close", defaultValue: "Close"), action: onDismiss)
             }
         }
         ToolbarItem(placement: .primaryAction) {
             Button { showAddCourse = true } label: {
-                Label("添加课程", systemImage: "plus")
+                Label(String(localized: "course.create.title", defaultValue: "Add Course"), systemImage: "plus")
             }
         }
         ToolbarItem(placement: .primaryAction) {
             Menu {
                 Button { showScheduleImport = true } label: {
-                    Label("导入课表", systemImage: "square.and.arrow.down")
+                    Label(String(localized: "import.title", defaultValue: "Import Timetable"), systemImage: "square.and.arrow.down")
                 }
                 Button { showScheduleExport = true } label: {
-                    Label("导出课表", systemImage: "square.and.arrow.up")
+                    Label(String(localized: "export.title", defaultValue: "Export Timetable"), systemImage: "square.and.arrow.up")
                 }
                 .disabled(activeSchedule == nil)
-                Section("切换课程表") {
+                Section(String(localized: "schedule.action.switch", defaultValue: "Switch Timetable")) {
                     ForEach(schedules, id: \.name) { schedule in
                         Button {
                             activeScheduleName = schedule.name
@@ -391,7 +391,7 @@ struct ScheduleGridView: View {
                     }
                 }
             } label: {
-                Label("课表管理", systemImage: "slider.horizontal.3")
+                Label(String(localized: "schedule.manage.title", defaultValue: "Manage Timetables"), systemImage: "slider.horizontal.3")
             }
         }
     }
@@ -424,7 +424,7 @@ struct ScheduleGridView: View {
             }
             VStack(alignment: .leading, spacing: 4) {
                 weekPicker
-                Text("\(todayDateString) · \(semesterWeekStatusString)")
+                Text(verbatim: "\(todayDateString) · \(semesterWeekStatusString)")
                     .foregroundStyle(.secondary)
             }
         }
@@ -439,36 +439,36 @@ struct ScheduleGridView: View {
         Menu {
             Section {
                 Button { changeWeek(by: -1) } label: {
-                    Label("上一周", systemImage: "chevron.left")
+                    Label(String(localized: "schedule.week.previous", defaultValue: "Previous Week"), systemImage: "chevron.left")
                 }
                 .disabled(viewingWeek <= 1)
                 Button { changeWeek(by: 1) } label: {
-                    Label("下一周", systemImage: "chevron.right")
+                    Label(String(localized: "schedule.week.next", defaultValue: "Next Week"), systemImage: "chevron.right")
                 }
                 .disabled(viewingWeek >= effectiveMaxWeeks)
                 Button { viewingWeek = defaultViewingWeek } label: {
-                    Label("回到本周", systemImage: "calendar.badge.clock")
+                    Label(String(localized: "schedule.week.current", defaultValue: "This Week"), systemImage: "calendar.badge.clock")
                 }
             }
-            Section("跳转周次") {
-                Picker("查看周次", selection: $viewingWeek) {
+            Section(String(localized: "schedule.week.jump", defaultValue: "Go to Week")) {
+                Picker(String(localized: "schedule.week.view", defaultValue: "View Week"), selection: $viewingWeek) {
                     ForEach(1...effectiveMaxWeeks, id: \.self) { week in
-                        Text("第 \(week) 周").tag(week)
+                        Text(String(localized: "schedule.week.label", defaultValue: "Week \(week)")).tag(week)
                     }
                 }
                 .pickerStyle(.inline)
             }
         } label: {
             HStack(spacing: 4) {
-                Text("第 \(viewingWeek) 周")
+                Text(String(localized: "schedule.week.label", defaultValue: "Week \(viewingWeek)"))
                 Image(systemName: "chevron.up.chevron.down")
                     .font(.caption2)
             }
             .frame(minHeight: 28)
         }
         .fixedSize()
-        .accessibilityLabel("查看周次")
-        .accessibilityValue("第 \(viewingWeek) 周")
+        .accessibilityLabel(String(localized: "schedule.week.view", defaultValue: "View Week"))
+        .accessibilityValue(String(localized: "schedule.week.label", defaultValue: "Week \(viewingWeek)"))
     }
 
     private func scheduleTable(week: Int) -> some View {
@@ -583,7 +583,7 @@ struct ScheduleGridView: View {
 
     private var timeColumnHeader: some View {
         VStack(spacing: 2) {
-            Text("节次")
+            Text(String(localized: "course.field.period", defaultValue: "Period"))
                 .font(.caption)
                 .fontWeight(.semibold)
                 .foregroundStyle(.secondary)
@@ -613,7 +613,7 @@ struct ScheduleGridView: View {
         let period = periodSlot.periodIndex
         return HStack(alignment: .top, spacing: 0) {
             VStack(alignment: .center, spacing: 2) {
-                Text("\(period)")
+                Text(verbatim: "\(period)")
                     .font(.caption)
                     .fontWeight(.medium)
                 Text(periodSlot.startTimeString)
@@ -723,9 +723,9 @@ private struct CoursePreviewSheet: View {
                                     row(icon: "mappin.circle.fill", text: loc)
                                 }
                                 row(icon: "calendar", text: course.weekRangesDisplayString)
-                                row(icon: "clock.fill", text: "\(course.dayOfWeekName) · 第 \(course.periodIndex)–\(course.effectivePeriodEnd) 节")
+                                row(icon: "clock.fill", text: String(localized: "course.schedule.summary", defaultValue: "\(course.dayOfWeekName) · Periods \(course.periodIndex)–\(course.effectivePeriodEnd)"))
                                 if let credits = course.credits {
-                                    row(icon: "number.circle.fill", text: String(format: "%g", credits) + " 学分")
+                                    row(icon: "number.circle.fill", text: String(localized: "course.credits.summary", defaultValue: "Credits: \(credits.formatted())"))
                                 }
                             }
                             .padding(.vertical, 4)
@@ -741,7 +741,7 @@ private struct CoursePreviewSheet: View {
                         Button {
                             showRescheduleSheet = true
                         } label: {
-                            Label("调课", systemImage: "calendar.badge.clock")
+                            Label(String(localized: "reschedule.title", defaultValue: "Reschedule"), systemImage: "calendar.badge.clock")
                         }
                     }
                 }
@@ -750,14 +750,14 @@ private struct CoursePreviewSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("关闭") { dismiss() }
+                    Button(String(localized: "common.action.close", defaultValue: "Close")) { dismiss() }
                 }
                 if !isNotThisWeek {
                     ToolbarItem(placement: .primaryAction) {
                         Button {
                             onEdit()
                         } label: {
-                            Label("编辑", systemImage: "pencil")
+                            Label(String(localized: "common.action.edit", defaultValue: "Edit"), systemImage: "pencil")
                         }
                     }
                 }
@@ -796,7 +796,7 @@ private struct ShareExportSheet: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 16) {
-                Text("导出文件已生成")
+                Text(String(localized: "export.ready.title", defaultValue: "Export Ready"))
                     .font(.headline)
                 Text(fileURL.lastPathComponent)
                     .font(.caption)
@@ -804,11 +804,11 @@ private struct ShareExportSheet: View {
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
                 ShareLink(item: fileURL) {
-                    Label("分享或保存 CSV", systemImage: "square.and.arrow.up")
+                    Label(String(localized: "export.csv.share_action", defaultValue: "Share or Save CSV"), systemImage: "square.and.arrow.up")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
-                Button("关闭") {
+                Button(String(localized: "common.action.close", defaultValue: "Close")) {
                     onComplete()
                     dismiss()
                 }
@@ -817,11 +817,11 @@ private struct ShareExportSheet: View {
             .padding()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .schedyPageStyle()
-            .navigationTitle("导出课表")
+            .navigationTitle(String(localized: "export.title", defaultValue: "Export Timetable"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("关闭") {
+                    Button(String(localized: "common.action.close", defaultValue: "Close")) {
                         onComplete()
                         dismiss()
                     }

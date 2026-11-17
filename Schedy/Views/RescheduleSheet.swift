@@ -67,41 +67,41 @@ struct RescheduleSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    Text("将 第 \(sourceWeek) 周 的「\(course.name)」（\(course.dayOfWeekName) 第 \(course.periodIndex)–\(course.effectivePeriodEnd) 节）调至下方选择的时间，课时数保持不变。")
+                    Text(String(localized: "reschedule.description", defaultValue: "Move “\(course.name)” from week \(sourceWeek) (\(course.dayOfWeekName), periods \(course.periodIndex)–\(course.effectivePeriodEnd)) to the time below, keeping the same number of periods."))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
 
-                Section("调至") {
-                    Picker("周次", selection: $newWeek) {
+                Section(String(localized: "reschedule.destination.title", defaultValue: "Move To")) {
+                    Picker(String(localized: "course.field.week", defaultValue: "Week"), selection: $newWeek) {
                         ForEach(targetWeekOptions, id: \.self) { w in
-                            Text("第 \(w) 周").tag(w)
+                            Text(String(localized: "schedule.week.label", defaultValue: "Week \(w)")).tag(w)
                         }
                     }
 
-                    Picker("星期", selection: $newDayOfWeek) {
+                    Picker(String(localized: "course.field.weekday", defaultValue: "Weekday"), selection: $newDayOfWeek) {
                         ForEach(1...7, id: \.self) { d in
                             Text(dayName(d)).tag(d)
                         }
                     }
 
-                    Picker("起始节", selection: $newPeriodStart) {
+                    Picker(String(localized: "course.field.start_period", defaultValue: "Start Period"), selection: $newPeriodStart) {
                         ForEach(startPeriodOptions, id: \.periodIndex) { slot in
-                            Text("第 \(slot.periodIndex) 节 (\(slot.timeRangeString))")
+                            Text(String(localized: "course.period.time_label", defaultValue: "Period \(slot.periodIndex) (\(slot.timeRangeString))"))
                                 .tag(slot.periodIndex)
                         }
                         if startPeriodOptions.isEmpty {
-                            Text("请先在设置中配置时间段").tag(1)
+                            Text(String(localized: "course.period.setup_required", defaultValue: "Set up period times in Settings first.")).tag(1)
                         }
                     }
                     .disabled(sortedPeriods.isEmpty)
 
                     if periodSpan > 1 {
                         HStack {
-                            Text("结束节")
+                            Text(String(localized: "course.field.end_period", defaultValue: "End Period"))
                                 .foregroundStyle(.secondary)
                             Spacer()
-                            Text("第 \(computedNewPeriodEnd) 节（共 \(periodSpan) 节）")
+                            Text(String(localized: "reschedule.period_summary", defaultValue: "Period \(computedNewPeriodEnd) (total: \(periodSpan))"))
                                 .foregroundStyle(.secondary)
                         }
                     }
@@ -112,22 +112,22 @@ struct RescheduleSheet: View {
                         Button(role: .destructive) {
                             undoReschedule()
                         } label: {
-                            Label("撤销该次调课", systemImage: "arrow.uturn.backward")
+                            Label(String(localized: "reschedule.undo_action", defaultValue: "Undo This Reschedule"), systemImage: "arrow.uturn.backward")
                         }
                     }
                 }
             }
             .schedyPageStyle()
-            .navigationTitle("调课")
+            .navigationTitle(String(localized: "reschedule.title", defaultValue: "Reschedule"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("取消") {
+                    Button(String(localized: "common.action.cancel", defaultValue: "Cancel")) {
                         dismiss()
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("保存") {
+                    Button(String(localized: "common.action.save", defaultValue: "Save")) {
                         save()
                     }
                     .disabled(sortedPeriods.isEmpty)

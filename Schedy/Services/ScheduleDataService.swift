@@ -29,7 +29,7 @@ func seedDefaultPresetsIfNeeded(modelContext: ModelContext) {
         }
     }
 
-    let winter = TimeSlotPreset(name: "冬令时", slots: [])
+    let winter = TimeSlotPreset(name: String(localized: "preset.default.winter", defaultValue: "Winter"), slots: [])
     modelContext.insert(winter)
     for slot in makeSlots(TimeSlotPreset.Default.winter()) {
         slot.preset = winter
@@ -37,7 +37,7 @@ func seedDefaultPresetsIfNeeded(modelContext: ModelContext) {
         modelContext.insert(slot)
     }
 
-    let summer = TimeSlotPreset(name: "夏令时", slots: [])
+    let summer = TimeSlotPreset(name: String(localized: "preset.default.summer", defaultValue: "Summer"), slots: [])
     modelContext.insert(summer)
     for slot in makeSlots(TimeSlotPreset.Default.summer()) {
         slot.preset = summer
@@ -134,7 +134,7 @@ func seedDefaultScheduleIfNeeded(modelContext: ModelContext) {
     if schedules.isEmpty && !iCloudEnabled {
         seedDefaultPresetsIfNeeded(modelContext: modelContext)
         let presets = (try? modelContext.fetch(FetchDescriptor<TimeSlotPreset>())) ?? []
-        let defaultName = "我的课程表"
+        let defaultName = String(localized: "schedule.default.name", defaultValue: "My Timetable")
         let schedule = Schedule(name: defaultName, semesterStartDate: defaultSemesterStartDate())
         schedule.timeSlotPreset = presets.first
         modelContext.insert(schedule)

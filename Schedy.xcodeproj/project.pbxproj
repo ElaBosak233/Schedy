@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A10100000000000000000001 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A10100000000000000000003; };
+		A10100000000000000000002 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A10100000000000000000004; };
 		65283F0E2F4F4D45006BE09E /* SchedyWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65283F0A2F4F4D45006BE09E /* SchedyWidget.swift */; };
 		65283F0F2F4F4D45006BE09E /* WidgetDataKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65283F0B2F4F4D45006BE09E /* WidgetDataKeys.swift */; };
 		65283F1C2F4F4D45006BE09E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65283F1B2F4F4D45006BE09E /* WidgetKit.framework */; };
@@ -47,6 +49,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A10100000000000000000003 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		A10100000000000000000004 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		65283F0A2F4F4D45006BE09E /* SchedyWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedyWidget.swift; sourceTree = "<group>"; };
 		65283F0B2F4F4D45006BE09E /* WidgetDataKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetDataKeys.swift; sourceTree = "<group>"; };
 		65283F0C2F4F4D45006BE09E /* SchedyWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SchedyWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -122,6 +126,8 @@
 		65283F0D2F4F4D45006BE09E /* SchedyWidget */ = {
 			isa = PBXGroup;
 			children = (
+				A10100000000000000000003 /* Localizable.xcstrings */,
+				A10100000000000000000004 /* InfoPlist.xcstrings */,
 				65283F0A2F4F4D45006BE09E /* SchedyWidget.swift */,
 				65283F0B2F4F4D45006BE09E /* WidgetDataKeys.swift */,
 				65B6906C2F501200001C550A /* SchedyWidgetIntent.swift */,
@@ -213,6 +219,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				"zh-Hans",
 				Base,
 			);
 			mainGroup = 65283EE22F4F4D44006BE09E;
@@ -233,6 +240,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A10100000000000000000001 /* Localizable.xcstrings in Resources */,
+				A10100000000000000000002 /* InfoPlist.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -459,7 +468,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Schedy/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Schedy 课程表";
+				INFOPLIST_KEY_CFBundleDisplayName = "Schedy: Timetable";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -494,7 +503,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Schedy/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Schedy 课程表";
+				INFOPLIST_KEY_CFBundleDisplayName = "Schedy: Timetable";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

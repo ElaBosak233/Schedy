@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct AboutView: View {
-    private let appName = "Schedy"
-    private let appSubtitle = "课程表"
+    private let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? "Schedy"
+    private let appSubtitle = String(localized: "navigation.timetable.title", defaultValue: "Timetable")
     private let repoURLString = "https://github.com/ElaBosak233/Schedy"
     private let licenseURLString = "https://github.com/ElaBosak233/Schedy/blob/main/LICENSE"
 
@@ -46,18 +46,18 @@ struct AboutView: View {
             // 开源
             Section {
                 HStack {
-                    Label("仓库", systemImage: "chevron.left.forwardslash.chevron.right")
+                    Label(String(localized: "about.repository.title", defaultValue: "Repository"), systemImage: "chevron.left.forwardslash.chevron.right")
                     Spacer()
-                    Text("ElaBosak233/Schedy")
+                    Text(verbatim: "ElaBosak233/Schedy")
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                 }
                 Link(destination: URL(string: repoURLString)!) {
                     HStack {
-                        Label("开源地址", systemImage: "link")
+                        Label(String(localized: "about.repository.open_action", defaultValue: "View on GitHub"), systemImage: "link")
                         Spacer()
-                        Text("GitHub")
+                        Text(verbatim: "GitHub")
                             .foregroundStyle(.secondary)
                         Image(systemName: "arrow.up.right.square")
                             .font(.caption)
@@ -65,24 +65,24 @@ struct AboutView: View {
                     }
                 }
             } header: {
-                Text("开源")
+                Text(String(localized: "about.open_source.title", defaultValue: "Open Source"))
             } footer: {
-                Text("Schedy 为开源项目，欢迎在 GitHub 上 star 与参与贡献。")
+                Text(String(localized: "about.open_source.description", defaultValue: "Schedy is open source. Star the project or contribute on GitHub."))
             }
 
             // 协议
             Section {
                 HStack {
-                    Label("开源协议", systemImage: "doc.text")
+                    Label(String(localized: "about.license.section_title", defaultValue: "Open Source License"), systemImage: "doc.text")
                     Spacer()
-                    Text("Schedy 协议")
+                    Text(String(localized: "about.license.name", defaultValue: "Schedy License"))
                         .fontWeight(.medium)
                         .foregroundStyle(.secondary)
                 }
 
                 Link(destination: URL(string: licenseURLString)!) {
                     HStack {
-                        Label("查看完整协议", systemImage: "safari")
+                        Label(String(localized: "about.license.read_action", defaultValue: "Read Full License"), systemImage: "safari")
                         Spacer()
                         Image(systemName: "arrow.up.right.square")
                             .font(.caption)
@@ -90,13 +90,13 @@ struct AboutView: View {
                     }
                 }
             } header: {
-                Text("协议")
+                Text(String(localized: "about.license.title", defaultValue: "License"))
             } footer: {
-                Text("本软件采用 Schedy 开源协议。可自由使用、修改与基于本代码开发衍生产品；须保留原作者署名，衍生产品须开源；以应用形式分发须通过 App Store。详见仓库 LICENSE。")
+                Text(String(localized: "about.license.description", defaultValue: "This software uses the Schedy License. You may use, modify, and create derivative works from this code. Retain the original author attribution and release derivative works as open source. App distributions must use the App Store. See LICENSE in the repository for details."))
             }
         }
         .schedyPageStyle()
-        .navigationTitle("关于")
+        .navigationTitle(String(localized: "navigation.about.title", defaultValue: "About"))
         .navigationBarTitleDisplayMode(.inline)
     }
 }

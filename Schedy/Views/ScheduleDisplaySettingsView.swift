@@ -14,8 +14,8 @@ enum FirstWeekdayOption: Int, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .sunday: return "周日"
-        case .monday: return "周一"
+        case .sunday: return String(localized: "calendar.weekday.sunday.short", defaultValue: "Sun")
+        case .monday: return String(localized: "calendar.weekday.monday.short", defaultValue: "Mon")
         }
     }
 }
@@ -37,25 +37,25 @@ struct ScheduleDisplaySettingsView: View {
         List {
             Section {
                 Toggle(isOn: $showHorizontalLines) {
-                    Label("显示横线", systemImage: "line.diagonal")
+                    Label(String(localized: "settings.grid_lines.horizontal", defaultValue: "Show Horizontal Lines"), systemImage: "line.diagonal")
                 }
                 Toggle(isOn: $showVerticalLines) {
-                    Label("显示竖线", systemImage: "rectangle.split.2x1")
+                    Label(String(localized: "settings.grid_lines.vertical", defaultValue: "Show Vertical Lines"), systemImage: "rectangle.split.2x1")
                 }
             } header: {
-                Text("网格线")
+                Text(String(localized: "settings.grid_lines.title", defaultValue: "Grid Lines"))
             } footer: {
-                Text("控制课表网格中横线与竖线的显示。")
+                Text(String(localized: "settings.grid_lines.description", defaultValue: "Choose which grid lines appear in the timetable."))
             }
 
             Section {
                 Toggle(isOn: $showWeekends) {
-                    Label("显示周末", systemImage: "calendar")
+                    Label(String(localized: "settings.weekends.show", defaultValue: "Show Weekends"), systemImage: "calendar")
                 }
             } header: {
-                Text("周末")
+                Text(String(localized: "settings.weekends.title", defaultValue: "Weekends"))
             } footer: {
-                Text("关闭后课表仅显示周一至周五。")
+                Text(String(localized: "settings.weekends.description", defaultValue: "When turned off, the timetable shows Monday through Friday only."))
             }
 
             Section {
@@ -64,17 +64,17 @@ struct ScheduleDisplaySettingsView: View {
                         Text(option.displayName).tag(option)
                     }
                 } label: {
-                    Label("每周第一天", systemImage: "calendar.badge.clock")
+                    Label(String(localized: "settings.first_weekday.title", defaultValue: "First Day of Week"), systemImage: "calendar.badge.clock")
                 }
                 .pickerStyle(.menu)
             } header: {
-                Text("每周第一天")
+                Text(String(localized: "settings.first_weekday.title", defaultValue: "First Day of Week"))
             } footer: {
-                Text("选择周日或周一作为课表最左侧的列。")
+                Text(String(localized: "settings.first_weekday.description", defaultValue: "Choose Sunday or Monday as the leftmost timetable column."))
             }
         }
         .schedyPageStyle()
-        .navigationTitle("课表显示")
+        .navigationTitle(String(localized: "settings.timetable_display.title", defaultValue: "Timetable Display"))
         .navigationBarTitleDisplayMode(.inline)
     }
 }

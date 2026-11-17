@@ -14,14 +14,14 @@ struct PermissionsView: View {
     @State private var isLoading = true
 
     private var notificationStatusText: String {
-        guard let status = notificationStatus else { return "检查中…" }
+        guard let status = notificationStatus else { return String(localized: "permissions.status.checking", defaultValue: "Checking…") }
         switch status {
-        case .authorized: return "已开启"
-        case .denied: return "已关闭"
-        case .notDetermined: return "未选择"
-        case .provisional: return "临时（摘要）"
-        case .ephemeral: return "临时"
-        @unknown default: return "未知"
+        case .authorized: return String(localized: "permissions.status.on", defaultValue: "On")
+        case .denied: return String(localized: "permissions.status.off", defaultValue: "Off")
+        case .notDetermined: return String(localized: "permissions.notifications.status.not_set", defaultValue: "Not Set")
+        case .provisional: return String(localized: "permissions.notifications.status.provisional", defaultValue: "Provisional (Summary)")
+        case .ephemeral: return String(localized: "permissions.notifications.status.ephemeral", defaultValue: "Ephemeral")
+        @unknown default: return String(localized: "common.status.unknown", defaultValue: "Unknown")
         }
     }
 
@@ -39,7 +39,7 @@ struct PermissionsView: View {
         List {
             Section {
                 HStack {
-                    Label("通知", systemImage: "bell.badge")
+                    Label(String(localized: "permissions.notifications.title", defaultValue: "Notifications"), systemImage: "bell.badge")
                     Spacer()
                     Text(notificationStatusText)
                         .foregroundStyle(notificationStatusColor)
@@ -48,9 +48,9 @@ struct PermissionsView: View {
                 .opacity(isLoading ? 0.7 : 1)
 
                 HStack {
-                    Label("网络", systemImage: "wifi")
+                    Label(String(localized: "permissions.network.title", defaultValue: "Network"), systemImage: "wifi")
                     Spacer()
-                    Text("随系统网络")
+                    Text(String(localized: "permissions.network.status.system", defaultValue: "Uses System Connection"))
                         .foregroundStyle(.secondary)
                         .fontWeight(.medium)
                 }
@@ -59,7 +59,7 @@ struct PermissionsView: View {
                     openSystemSettings()
                 } label: {
                     HStack {
-                        Label("在系统设置中修改", systemImage: "gear")
+                        Label(String(localized: "permissions.action.open_settings", defaultValue: "Open System Settings"), systemImage: "gear")
                         Spacer()
                         Image(systemName: "arrow.up.right.square")
                             .font(.caption)
@@ -67,13 +67,13 @@ struct PermissionsView: View {
                     }
                 }
             } header: {
-                Text("Schedy 当前权限")
+                Text(String(localized: "permissions.summary.title", defaultValue: "Schedy Permissions"))
             } footer: {
-                Text("通知权限用于在课程开始前 15 分钟提醒你；网络用于加载教务系统、开源链接等，随系统网络状态使用。若需修改通知权限，可点击「在系统设置中修改」跳转。")
+                Text(String(localized: "permissions.description", defaultValue: "Notifications remind you 15 minutes before class. Network access loads school systems and project links using your device's connection. Tap Open System Settings to change notification permissions."))
             }
         }
         .schedyPageStyle()
-        .navigationTitle("权限")
+        .navigationTitle(String(localized: "navigation.permissions.title", defaultValue: "Permissions"))
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await fetchNotificationStatus()

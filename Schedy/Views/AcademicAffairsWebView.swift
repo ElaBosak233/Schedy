@@ -43,14 +43,14 @@ struct AcademicAffairsWebView: View {
 
     private var urlBar: some View {
         HStack(spacing: 8) {
-            TextField("输入或粘贴网址", text: $urlBarText)
+            TextField(String(localized: "browser.url.placeholder", defaultValue: "Enter or paste a URL"), text: $urlBarText)
                 .textFieldStyle(.roundedBorder)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .keyboardType(.URL)
                 .submitLabel(.go)
                 .onSubmit { tryLoadURL() }
-            Button("前往") {
+            Button(String(localized: "browser.action.go", defaultValue: "Go")) {
                 tryLoadURL()
             }
             .buttonStyle(.borderedProminent)
@@ -199,8 +199,8 @@ private final class AcademicAffairsWebViewController: UIViewController, WKNaviga
 
     func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Void) {
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "取消", style: .cancel) { _ in completionHandler(false) })
-        alert.addAction(UIAlertAction(title: "确定", style: .default) { _ in completionHandler(true) })
+        alert.addAction(UIAlertAction(title: String(localized: "common.action.cancel", defaultValue: "Cancel"), style: .cancel) { _ in completionHandler(false) })
+        alert.addAction(UIAlertAction(title: String(localized: "common.action.ok", defaultValue: "OK"), style: .default) { _ in completionHandler(true) })
         present(alert, animated: true)
     }
 
@@ -209,8 +209,8 @@ private final class AcademicAffairsWebViewController: UIViewController, WKNaviga
         alert.addTextField { textField in
             textField.text = defaultText
         }
-        alert.addAction(UIAlertAction(title: "取消", style: .cancel) { _ in completionHandler(nil) })
-        alert.addAction(UIAlertAction(title: "确定", style: .default) { _ in
+        alert.addAction(UIAlertAction(title: String(localized: "common.action.cancel", defaultValue: "Cancel"), style: .cancel) { _ in completionHandler(nil) })
+        alert.addAction(UIAlertAction(title: String(localized: "common.action.ok", defaultValue: "OK"), style: .default) { _ in
             completionHandler(alert.textFields?.first?.text)
         })
         present(alert, animated: true)
@@ -330,9 +330,30 @@ private enum AcademicAffairsWebViewError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .provider(let message):
-            return message
+            // Script messages are protocol tokens; translate them at the native UI boundary.
+            switch message {
+            case "请先进入教务系统的课表查询页面后再点击导入":
+                return String(localized: "import.school.error.open_timetable", defaultValue: "Open your timetable page in the school system before importing.")
+            case "未查询到课程数据", "未能提取到课程数据":
+                return String(localized: "import.school.error.no_courses", defaultValue: "No course data was found.")
+            case "网络请求失败":
+                return String(localized: "import.school.error.network", defaultValue: "The network request failed.")
+            case "未查找到强智课表表格", "未查找到URP课表表格", "未能定位南软课表",
+                 "未查找到金智课表表格", "未查找到金智教务课表表格", "超星 DOM 需针对不同高校结构微调适配":
+                return String(localized: "import.school.error.unsupported_layout", defaultValue: "The timetable could not be found. Open your timetable page and try again. This school's page layout may not be supported yet.")
+            default:
+                if message.hasPrefix("请求失败 (HTTP ") {
+                    let status = String(message.dropFirst("请求失败 (HTTP ".count).dropLast())
+                    return String(localized: "import.school.error.http", defaultValue: "Request failed (HTTP \(status)).")
+                }
+                if message.hasPrefix("数据解析失败 ") {
+                    let detail = String(message.dropFirst("数据解析失败 ".count))
+                    return String(localized: "import.school.error.parse_failed", defaultValue: "Unable to parse course data: \(detail)")
+                }
+                return String(localized: "import.school.error.failed", defaultValue: "School system import failed: \(message)")
+            }
         case .timeout:
-            return "注入脚本执行超时，请确认已进入课表页面后重试。"
+            return String(localized: "import.school.error.timeout", defaultValue: "The import script timed out. Open your timetable page and try again.")
         }
     }
 }

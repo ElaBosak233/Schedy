@@ -23,6 +23,7 @@ let kWidgetAppGroupSuiteName = "group.dev.e23.schedy"
 enum WidgetDataKeys {
     static let scheduleName = "widgetScheduleName"
     static let date = "widgetDate"
+    static let displayDate = "widgetDisplayDate"
     static let weekday = "widgetWeekday"
     static let status = "widgetStatus"  // "noClass" | "allDone" | "next"
     static let course1Name = "widgetCourse1Name"
@@ -63,8 +64,8 @@ func refreshWidgetData(modelContext: ModelContext, activeScheduleName: String) {
 
     let cal = Calendar.current
     let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "M月d日"
-    dateFormatter.locale = Locale(identifier: "zh_CN")
+    dateFormatter.locale = Locale.current
+    dateFormatter.setLocalizedDateFormatFromTemplate("MMMd")
 
     func dateText(for date: Date) -> String {
         dateFormatter.string(from: date)
@@ -193,6 +194,7 @@ func refreshWidgetData(modelContext: ModelContext, activeScheduleName: String) {
         let dict: [String: String] = [
             WidgetDataKeys.scheduleName: scheduleName,
             WidgetDataKeys.date: dateString,
+            WidgetDataKeys.displayDate: String(today.timeIntervalSince1970),
             WidgetDataKeys.weekday: weekdayString,
             WidgetDataKeys.status: status,
             WidgetDataKeys.course1Name: c1Name,
@@ -216,6 +218,7 @@ func refreshWidgetData(modelContext: ModelContext, activeScheduleName: String) {
             var e: [String: String] = [
                 WidgetDataKeys.scheduleName: scheduleName,
                 WidgetDataKeys.date: dateText(for: dayDate),
+                WidgetDataKeys.displayDate: String(dayDate.timeIntervalSince1970),
                 WidgetDataKeys.weekday: weekdayText(for: dayDate),
                 WidgetDataKeys.timelineTrigger: String(trigger.timeIntervalSince1970),
             ]

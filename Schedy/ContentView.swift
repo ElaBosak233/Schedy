@@ -13,7 +13,7 @@ struct ContentView: View {
     @SceneStorage("selectedTab") private var selectedTab = 0
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
-    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = "我的课程表"
+    @AppStorage(ScheduleDisplayKeys.activeScheduleName) private var activeScheduleName: String = String(localized: "schedule.default.name", defaultValue: "My Timetable")
 
     var body: some View {
         ZStack {
@@ -22,13 +22,13 @@ struct ContentView: View {
                 TodayView()
                     .tag(0)
                     .tabItem {
-                        Label("今天", systemImage: "list.bullet.rectangle")
+                        Label(String(localized: "navigation.today.title", defaultValue: "Today"), systemImage: "list.bullet.rectangle")
                     }
 
                 ScheduleGridView()
                     .tag(1)
                     .tabItem {
-                        Label("课程表", systemImage: "calendar")
+                        Label(String(localized: "navigation.timetable.title", defaultValue: "Timetable"), systemImage: "calendar")
                     }
 
                 NavigationStack {
@@ -36,7 +36,7 @@ struct ContentView: View {
                 }
                 .tag(2)
                 .tabItem {
-                    Label("设置", systemImage: "gearshape")
+                    Label(String(localized: "navigation.settings.title", defaultValue: "Settings"), systemImage: "gearshape")
                 }
             }
             .tint(.accentColor)

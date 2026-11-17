@@ -23,9 +23,9 @@ final class Course {
 
         var displayName: String {
             switch self {
-            case .all: return "全部"
-            case .odd: return "单周"
-            case .even: return "双周"
+            case .all: return String(localized: "course.week_pattern.all", defaultValue: "All Weeks")
+            case .odd: return String(localized: "course.week_pattern.odd", defaultValue: "Odd Weeks")
+            case .even: return String(localized: "course.week_pattern.even", defaultValue: "Even Weeks")
             }
         }
     }
@@ -140,7 +140,7 @@ final class Course {
         let parts = ranges.map { r in
             r.start == r.end ? "\(r.start)" : "\(r.start)-\(r.end)"
         }
-        let base = "第" + parts.joined(separator: "、") + "周"
+        let base = String(localized: "course.weeks.summary", defaultValue: "Weeks: \(parts.joined(separator: ", "))")
         if weekParity == .all { return base }
         return base + " " + weekParity.displayName
     }

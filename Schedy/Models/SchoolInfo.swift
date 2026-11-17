@@ -72,7 +72,7 @@ enum SchoolAcademicAffairsType: String {
         case .south:
             return AcademicAffairsType.south.displayName
         case .unknown:
-            return "未知教务"
+            return String(localized: "academic_system.unknown.name", defaultValue: "Unknown System")
         }
     }
 }
